@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus } from "lucide-react";
 
-interface AddTurnoDialogProps {
+interface EditTurnoDialogProps {
+  turno: any;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
@@ -37,15 +39,14 @@ const tiposCombustivel = [
   { value: "eletrico", label: "Elétrico" },
 ];
 
-export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const EditTurnoDialog = ({ turno, open, onOpenChange, onSuccess }: EditTurnoDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     veiculo_id: "",
-    data: new Date().toISOString().split("T")[0],
+    data: "",
     km_inicial: "",
     km_final: "",
     hora_inicio: "",
@@ -59,7 +60,6 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
     valor_ganho: "",
   });
 
-  // Função para formatar valores monetários (2 casas decimais)
   const formatMoney = (value: string): string => {
     const numbers = value.replace(/\D/g, "");
     if (!numbers) return "";
@@ -67,7 +67,6 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
     return (cents / 100).toFixed(2);
   };
 
-  // Função para formatar consumo (1 casa decimal)
   const formatConsumption = (value: string): string => {
     const numbers = value.replace(/\D/g, "");
     if (!numbers) return "";
@@ -86,10 +85,29 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
   };
 
   useEffect(() => {
-    if (open) {
+    if (open && turno) {
       loadVeiculos();
+      
+      // Check if fonte_ganho is in the predefined list
+      const isCustomSource = !fontesGanho.some(fonte => fonte.value === turno.fonte_ganho.toLowerCase());
+      
+      setFormData({
+        veiculo_id: turno.veiculo_id,
+        data: turno.data,
+        km_inicial: turno.km_inicial.toString(),
+        km_final: turno.km_final.toString(),
+        hora_inicio: turno.hora_inicio,
+        hora_fim: turno.hora_fim,
+        tipo_combustivel: turno.tipo_combustivel,
+        preco_combustivel: turno.preco_combustivel.toFixed(2),
+        consumo_combustivel: turno.consumo_combustivel.toFixed(1),
+        fonte_ganho: isCustomSource ? "outros" : turno.fonte_ganho.toLowerCase(),
+        fonte_ganho_outros: isCustomSource ? turno.fonte_ganho : "",
+        quantidade_corridas: turno.quantidade_corridas?.toString() || "0",
+        valor_ganho: turno.valor_ganho.toFixed(2),
+      });
     }
-  }, [open]);
+  }, [open, turno]);
 
   const loadVeiculos = async () => {
     try {
@@ -118,58 +136,42 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
-
       const fonteGanhoFinal = formData.fonte_ganho === "outros" 
         ? formData.fonte_ganho_outros 
         : formData.fonte_ganho;
 
-      const { error } = await supabase.from("turnos_km").insert({
-        user_id: user.id,
-        veiculo_id: formData.veiculo_id,
-        data: formData.data,
-        km_inicial: parseFloat(formData.km_inicial),
-        km_final: parseFloat(formData.km_final),
-        hora_inicio: formData.hora_inicio,
-        hora_fim: formData.hora_fim,
-        tipo_combustivel: formData.tipo_combustivel,
-        preco_combustivel: parseFloat(formData.preco_combustivel),
-        consumo_combustivel: parseFloat(formData.consumo_combustivel),
-        fonte_ganho: fonteGanhoFinal,
-        categoria_ganho: fonteGanhoFinal,
-        quantidade_corridas: parseInt(formData.quantidade_corridas),
-        valor_ganho: parseFloat(formData.valor_ganho),
-      });
+      const { error } = await supabase
+        .from("turnos_km")
+        .update({
+          veiculo_id: formData.veiculo_id,
+          data: formData.data,
+          km_inicial: parseFloat(formData.km_inicial),
+          km_final: parseFloat(formData.km_final),
+          hora_inicio: formData.hora_inicio,
+          hora_fim: formData.hora_fim,
+          tipo_combustivel: formData.tipo_combustivel,
+          preco_combustivel: parseFloat(formData.preco_combustivel),
+          consumo_combustivel: parseFloat(formData.consumo_combustivel),
+          fonte_ganho: fonteGanhoFinal,
+          categoria_ganho: fonteGanhoFinal,
+          quantidade_corridas: parseInt(formData.quantidade_corridas),
+          valor_ganho: parseFloat(formData.valor_ganho),
+        })
+        .eq("id", turno.id);
 
       if (error) throw error;
 
       toast({
-        title: "Turno registrado!",
-        description: "O turno foi cadastrado com sucesso",
+        title: "Turno atualizado!",
+        description: "As alterações foram salvas com sucesso",
       });
 
-      setOpen(false);
-      setFormData({
-        veiculo_id: "",
-        data: new Date().toISOString().split("T")[0],
-        km_inicial: "",
-        km_final: "",
-        hora_inicio: "",
-        hora_fim: "",
-        tipo_combustivel: "",
-        preco_combustivel: "",
-        consumo_combustivel: "",
-        fonte_ganho: "",
-        fonte_ganho_outros: "",
-        quantidade_corridas: "",
-        valor_ganho: "",
-      });
+      onOpenChange(false);
       onSuccess();
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erro ao registrar turno",
+        title: "Erro ao atualizar turno",
         description: error.message,
       });
     } finally {
@@ -178,16 +180,10 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Novo Turno
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Registrar Turno</DialogTitle>
+          <DialogTitle>Editar Turno</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -374,7 +370,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
             <Button type="submit" disabled={loading}>
