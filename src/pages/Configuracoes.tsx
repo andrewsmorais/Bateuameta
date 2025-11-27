@@ -7,10 +7,17 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Car, Info } from "lucide-react";
+import { Camera, Car, Info, Instagram, Phone } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AvatarEditor } from "@/components/AvatarEditor";
 import { Link } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Profile {
   nome_completo: string;
@@ -28,6 +35,10 @@ const Configuracoes = () => {
     avatar_url: null,
   });
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
+  const [showRefundPolicy, setShowRefundPolicy] = useState(false);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showContact, setShowContact] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -189,56 +200,50 @@ const Configuracoes = () => {
       <Card>
         <CardContent className="space-y-3 pt-6">
           <Link to="/veiculos">
-            <Button variant="outline" className="w-full justify-start">
-              <Car className="mr-2 h-4 w-4" />
+            <Button variant="outline" className="w-full justify-start text-base">
+              <Car className="mr-2 h-5 w-5" />
               Adicionar Veículo
             </Button>
           </Link>
         </CardContent>
       </Card>
 
-      {/* Políticas Legais */}
+      {/* Políticas e Informações */}
       <Card>
-        <CardHeader>
-          <CardTitle>Políticas Legais</CardTitle>
-          <CardDescription>Informações sobre reembolso e privacidade</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">Política de Reembolso</h3>
-            <p className="text-sm text-muted-foreground">
-              Você tem direito a reembolso total em até <strong>7 dias</strong> após a compra, 
-              conforme garantido pela legislação do consumidor.
-            </p>
-          </div>
+        <CardContent className="space-y-3 pt-6">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-base"
+            onClick={() => setShowRefundPolicy(true)}
+          >
+            Política de Reembolso
+          </Button>
           
-          <Separator />
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-base"
+            onClick={() => setShowPrivacyPolicy(true)}
+          >
+            Política de Privacidade (LGPD)
+          </Button>
           
-          <div>
-            <h3 className="font-semibold mb-2">Política de Privacidade (LGPD)</h3>
-            <p className="text-sm text-muted-foreground">
-              Seus dados pessoais são coletados e tratados de acordo com a Lei Geral de Proteção 
-              de Dados (LGPD - Lei nº 13.709/2018). Armazenamos apenas as informações necessárias 
-              para o funcionamento do aplicativo e garantimos a segurança dos seus dados. 
-              Você tem direito de acessar, corrigir ou excluir suas informações a qualquer momento.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Sobre o Aplicativo */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-base"
+            onClick={() => setShowAbout(true)}
+          >
+            <Info className="mr-2 h-5 w-5" />
             Sobre o Aplicativo
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground leading-relaxed">
-            O aplicativo <strong>Bateu A Meta</strong> foi feito com a finalidade de auxiliar 
-            o controle financeiro de motoristas de aplicativos.
-          </p>
+          </Button>
+
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-base"
+            onClick={() => setShowContact(true)}
+          >
+            <Phone className="mr-2 h-5 w-5" />
+            Contato
+          </Button>
         </CardContent>
       </Card>
 
@@ -254,6 +259,81 @@ const Configuracoes = () => {
           <AvatarEditor onSave={handleAvatarSaved} onCancel={() => setShowAvatarEditor(false)} />
         </DialogContent>
       </Dialog>
+
+      {/* Refund Policy Dialog */}
+      <AlertDialog open={showRefundPolicy} onOpenChange={setShowRefundPolicy}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Política de Reembolso</AlertDialogTitle>
+            <AlertDialogDescription className="text-foreground">
+              Você tem direito a reembolso total em até 7 dias após a compra, conforme garantido pela legislação do consumidor.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Button onClick={() => setShowRefundPolicy(false)}>Fechar</Button>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Privacy Policy Dialog */}
+      <AlertDialog open={showPrivacyPolicy} onOpenChange={setShowPrivacyPolicy}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Política de Privacidade (LGPD)</AlertDialogTitle>
+            <AlertDialogDescription className="text-foreground">
+              Seus dados pessoais são coletados e tratados de acordo com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018). Armazenamos apenas as informações necessárias para o funcionamento do aplicativo e garantimos a segurança dos seus dados. Você tem direito de acessar, corrigir ou excluir suas informações a qualquer momento.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Button onClick={() => setShowPrivacyPolicy(false)}>Fechar</Button>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* About Dialog */}
+      <AlertDialog open={showAbout} onOpenChange={setShowAbout}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sobre o Aplicativo</AlertDialogTitle>
+            <AlertDialogDescription className="text-foreground">
+              O aplicativo Bateu A Meta foi feito com a finalidade de auxiliar o controle financeiro de motoristas de aplicativos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Button onClick={() => setShowAbout(false)}>Fechar</Button>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Contact Dialog */}
+      <AlertDialog open={showContact} onOpenChange={setShowContact}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Contato</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4 text-foreground">
+              <div className="flex items-center gap-2">
+                <Instagram className="h-5 w-5" />
+                <span className="font-semibold">Instagram:</span>
+                <a 
+                  href="https://instagram.com/bateuameta" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  @Bateu A Meta
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-5 w-5" />
+                <span className="font-semibold">Celular (WhatsApp):</span>
+                <a 
+                  href="https://wa.me/5512981796135" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  12 98179-6135
+                </a>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Button onClick={() => setShowContact(false)}>Fechar</Button>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

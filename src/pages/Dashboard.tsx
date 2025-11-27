@@ -251,18 +251,18 @@ const Dashboard = () => {
             {/* Metas */}
             <div className="grid grid-cols-3 gap-4 pt-4 border-t">
               <div className="text-center">
-                <p className="text-sm font-medium text-muted-foreground mb-1">Meta Diária</p>
-                <p className="text-lg font-bold">-</p>
+                <p className="text-sm font-bold text-foreground mb-1">Meta Diária</p>
+                <p className="text-lg font-bold text-success">-</p>
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-muted-foreground mb-1">Meta Semanal</p>
-                <p className="text-lg font-bold">
+                <p className="text-sm font-bold text-foreground mb-1">Meta Semanal</p>
+                <p className="text-lg font-bold text-success">
                   {periodo === "semana" ? `R$ ${metrics.valorMeta.toFixed(2)}` : "-"}
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-muted-foreground mb-1">Meta Mensal</p>
-                <p className="text-lg font-bold">
+                <p className="text-sm font-bold text-foreground mb-1">Meta Mensal</p>
+                <p className="text-lg font-bold text-success">
                   {periodo === "mes" ? `R$ ${metrics.valorMeta.toFixed(2)}` : "-"}
                 </p>
               </div>
@@ -272,7 +272,7 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Evolução Diária - {periodo === "semana" ? "Semana" : "Mês"}</CardTitle>
+            <CardTitle>Gráfico de Barras</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -305,16 +305,16 @@ const Dashboard = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Lucro Por KM</p>
-              <p className="text-2xl font-bold">R$ {metrics.lucroPorKm.toFixed(2)}</p>
+              <p className="text-sm font-bold text-foreground mb-1">Lucro Por KM</p>
+              <p className="text-2xl font-bold text-success">R$ {metrics.lucroPorKm.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Ganhos/Hora</p>
-              <p className="text-2xl font-bold">R$ {metrics.ganhosPorHora.toFixed(2)}</p>
+              <p className="text-sm font-bold text-foreground mb-1">Ganhos/Hora</p>
+              <p className="text-2xl font-bold text-success">R$ {metrics.ganhosPorHora.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Horas Trabalhadas</p>
-              <p className="text-2xl font-bold">{metrics.horasTrabalhadas.toFixed(1)} h</p>
+              <p className="text-sm font-bold text-foreground mb-1">Horas Trabalhadas</p>
+              <p className="text-2xl font-bold text-success">{metrics.horasTrabalhadas.toFixed(1)} h</p>
             </div>
           </div>
         </CardContent>
