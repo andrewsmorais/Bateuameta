@@ -177,6 +177,7 @@ export type Database = {
           km_inicial: number
           lucro_liquido: number | null
           preco_combustivel: number
+          quantidade_corridas: number
           tipo_combustivel: string
           total_horas: number | null
           user_id: string
@@ -196,6 +197,7 @@ export type Database = {
           km_inicial: number
           lucro_liquido?: number | null
           preco_combustivel: number
+          quantidade_corridas?: number
           tipo_combustivel: string
           total_horas?: number | null
           user_id: string
@@ -215,6 +217,7 @@ export type Database = {
           km_inicial?: number
           lucro_liquido?: number | null
           preco_combustivel?: number
+          quantidade_corridas?: number
           tipo_combustivel?: string
           total_horas?: number | null
           user_id?: string

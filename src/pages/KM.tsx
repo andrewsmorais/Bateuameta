@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AddTurnoDialog } from "@/components/dialogs/AddTurnoDialog";
+import { EditTurnoDialog } from "@/components/dialogs/EditTurnoDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -33,6 +34,8 @@ interface Turno {
   preco_combustivel: number;
   consumo_combustivel: number;
   fonte_ganho: string;
+  quantidade_corridas: number;
+  veiculo_id: string;
   veiculos: {
     modelo: string;
     placa: string;
@@ -42,6 +45,7 @@ interface Turno {
 const KM = () => {
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingTurno, setEditingTurno] = useState<Turno | null>(null);
   const { toast } = useToast();
 
   const loadTurnos = async () => {
@@ -141,6 +145,14 @@ const KM = () => {
                       </CardTitle>
                     </div>
                     <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => setEditingTurno(turno)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -168,67 +180,71 @@ const KM = () => {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
                     <div>
-                      <p className="text-muted-foreground mb-1">Data</p>
-                      <p className="font-medium">{format(new Date(turno.data), "dd/MM/yyyy", { locale: ptBR })}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Data:</span></p>
+                      <p>{format(new Date(turno.data), "dd/MM/yyyy", { locale: ptBR })}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Valor Ganho</p>
-                      <p className="font-medium">R$ {turno.valor_ganho.toFixed(2)}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Valor Ganho:</span></p>
+                      <p>R$ {turno.valor_ganho.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">KM Inicial</p>
-                      <p className="font-medium">{turno.km_inicial.toFixed(2)} km</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">KM Inicial:</span></p>
+                      <p>{turno.km_inicial.toFixed(2)} km</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">KM Final</p>
-                      <p className="font-medium">{turno.km_final.toFixed(2)} km</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">KM Final:</span></p>
+                      <p>{turno.km_final.toFixed(2)} km</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Hora Início</p>
-                      <p className="font-medium">{turno.hora_inicio}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Hora Início:</span></p>
+                      <p>{turno.hora_inicio}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Hora Fim</p>
-                      <p className="font-medium">{turno.hora_fim}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Hora Fim:</span></p>
+                      <p>{turno.hora_fim}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Tipo Combustível</p>
-                      <p className="font-medium">{turno.tipo_combustivel}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Tipo Combustível:</span></p>
+                      <p>{turno.tipo_combustivel}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Preço Combustível</p>
-                      <p className="font-medium">R$ {turno.preco_combustivel.toFixed(2)}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Preço Combustível:</span></p>
+                      <p>R$ {turno.preco_combustivel.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Consumo</p>
-                      <p className="font-medium">{turno.consumo_combustivel.toFixed(1)} L</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Consumo:</span></p>
+                      <p>{turno.consumo_combustivel.toFixed(1)} L</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground mb-1">Fonte de Ganho</p>
-                      <p className="font-medium">{turno.fonte_ganho}</p>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Fonte de Ganho:</span></p>
+                      <p>{turno.fonte_ganho}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground mb-1"><span className="font-bold">Quantidade de Corridas:</span></p>
+                      <p>{turno.quantidade_corridas || 0}</p>
                     </div>
                     <div className="col-span-full mt-4 pt-4 border-t">
                       <h4 className="font-semibold mb-3 text-base">Métricas Calculadas</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         <div>
-                          <p className="text-muted-foreground mb-1">Ganhos Brutos</p>
-                          <p className="font-medium text-primary">R$ {turno.valor_ganho.toFixed(2)}</p>
+                          <p className="text-muted-foreground mb-1"><span className="font-bold">Ganhos Brutos:</span></p>
+                          <p className="text-primary">R$ {turno.valor_ganho.toFixed(2)}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground mb-1">Despesa Combustível</p>
-                          <p className="font-medium text-destructive">R$ {despesaCombustivel.toFixed(2)}</p>
+                          <p className="text-muted-foreground mb-1"><span className="font-bold">Despesa Combustível:</span></p>
+                          <p className="text-destructive">R$ {despesaCombustivel.toFixed(2)}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground mb-1">Lucro Líquido</p>
-                          <p className="font-medium text-green-600 dark:text-green-500">R$ {lucroLiquido.toFixed(2)}</p>
+                          <p className="text-muted-foreground mb-1"><span className="font-bold">Lucro Líquido:</span></p>
+                          <p className="text-green-600 dark:text-green-500">R$ {lucroLiquido.toFixed(2)}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground mb-1">Lucro/KM</p>
-                          <p className="font-medium">R$ {lucroPorKm.toFixed(2)}</p>
+                          <p className="text-muted-foreground mb-1"><span className="font-bold">Lucro/KM:</span></p>
+                          <p>R$ {lucroPorKm.toFixed(2)}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground mb-1">Ganhos/Hora</p>
-                          <p className="font-medium">R$ {ganhosPorHora.toFixed(2)}</p>
+                          <p className="text-muted-foreground mb-1"><span className="font-bold">Ganhos/Hora:</span></p>
+                          <p>R$ {ganhosPorHora.toFixed(2)}</p>
                         </div>
                       </div>
                     </div>
@@ -238,6 +254,15 @@ const KM = () => {
             );
           })}
         </div>
+      )}
+      
+      {editingTurno && (
+        <EditTurnoDialog
+          turno={editingTurno}
+          open={!!editingTurno}
+          onOpenChange={(open) => !open && setEditingTurno(null)}
+          onSuccess={loadTurnos}
+        />
       )}
     </div>
   );
