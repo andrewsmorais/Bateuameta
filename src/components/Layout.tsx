@@ -36,10 +36,6 @@ const menuItems = [{
   label: "Relatórios",
   path: "/relatorios"
 }, {
-  icon: Car,
-  label: "Veículos",
-  path: "/veiculos"
-}, {
   icon: Settings,
   label: "Configurações",
   path: "/configuracoes"
