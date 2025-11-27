@@ -19,6 +19,32 @@ export const AddVeiculoDialog = ({ onSuccess }: AddVeiculoDialogProps) => {
   const [ano, setAno] = useState("");
   const { toast } = useToast();
 
+  const handleModeloChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value.length === 1 && modelo.length === 0) {
+      // Capitalize first letter only when starting to type
+      setModelo(value.charAt(0).toUpperCase());
+    } else {
+      setModelo(value);
+    }
+  };
+
+  const handlePlacaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    // Auto-insert hyphen after 3rd character
+    if (value.length > 3 && !placa.includes('-')) {
+      value = value.slice(0, 3) + '-' + value.slice(3);
+    }
+    
+    // Limit to 8 characters (ABC-1234)
+    if (value.length > 8) {
+      value = value.slice(0, 8);
+    }
+    
+    setPlaca(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -75,7 +101,7 @@ export const AddVeiculoDialog = ({ onSuccess }: AddVeiculoDialogProps) => {
             <Input
               id="modelo"
               value={modelo}
-              onChange={(e) => setModelo(e.target.value)}
+              onChange={handleModeloChange}
               placeholder="Ex: Honda Civic"
               required
             />
@@ -85,8 +111,9 @@ export const AddVeiculoDialog = ({ onSuccess }: AddVeiculoDialogProps) => {
             <Input
               id="placa"
               value={placa}
-              onChange={(e) => setPlaca(e.target.value)}
+              onChange={handlePlacaChange}
               placeholder="Ex: ABC-1234"
+              maxLength={8}
               required
             />
           </div>

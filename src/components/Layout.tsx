@@ -55,7 +55,32 @@ export const Layout = ({ children }: LayoutProps) => {
 
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [user]);
+
+  // Subscribe to profile changes for real-time updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        () => {
+          loadProfile();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   const loadProfile = async () => {
     try {
@@ -92,12 +117,9 @@ export const Layout = ({ children }: LayoutProps) => {
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-sidebar border-r border-sidebar-border">
         <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-2">
-            <Car className="h-6 w-6 text-sidebar-primary" />
-            <h1 className="text-lg font-bold text-sidebar-foreground">
-              Bateu a Meta
-            </h1>
-          </div>
+          <h1 className="text-lg font-bold text-sidebar-foreground">
+            Bateu a Meta
+          </h1>
           <div className="flex items-center gap-1">
             <ThemeToggle />
             <DropdownMenu>
@@ -164,12 +186,9 @@ export const Layout = ({ children }: LayoutProps) => {
         )}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-2">
-            <Car className="h-6 w-6 text-sidebar-primary" />
-            <h1 className="text-lg font-bold text-sidebar-foreground">
-              Bateu a Meta
-            </h1>
-          </div>
+          <h1 className="text-lg font-bold text-sidebar-foreground">
+            Bateu a Meta
+          </h1>
           <Button
             variant="ghost"
             size="icon"
@@ -215,10 +234,7 @@ export const Layout = ({ children }: LayoutProps) => {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <div className="ml-4 flex items-center gap-2">
-              <Car className="h-5 w-5 text-primary" />
-              <h1 className="text-lg font-bold">Bateu a Meta</h1>
-            </div>
+            <h1 className="ml-4 text-lg font-bold">Bateu a Meta</h1>
           </div>
           <div className="flex items-center gap-1">
             <ThemeToggle />
