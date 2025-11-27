@@ -8,6 +8,8 @@ import { Download, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Filtros {
   dataInicio: string;
@@ -127,7 +129,7 @@ const Relatorios = () => {
     }
   };
 
-  const exportarCSV = () => {
+  const exportarPDF = () => {
     if (resultados.length === 0) {
       toast({
         variant: "destructive",
@@ -137,47 +139,63 @@ const Relatorios = () => {
       return;
     }
 
-    const headers = [
-      "Data",
-      "Veículo",
-      "KM Inicial",
-      "KM Final",
-      "KM Rodados",
-      "Hora Início",
-      "Hora Fim",
-      "Total Horas",
-      "Fonte Ganho",
-      "Valor Ganho",
-      "Lucro Líquido",
-    ];
-
-    const csvData = resultados.map((r) => [
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Relatório - Bateu a Meta", 14, 20);
+    
+    // Summary metrics
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total de Turnos: ${metricas.totalTurnos}`, 14, 35);
+    doc.text(`Lucro Líquido: R$ ${metricas.lucroLiquido.toFixed(2)}`, 14, 42);
+    doc.text(`Total de Horas: ${metricas.totalHoras.toFixed(2)}h`, 14, 49);
+    doc.text(`KM Rodados: ${metricas.kmRodados.toFixed(0)} km`, 14, 56);
+    
+    // Table data
+    const tableData = resultados.map((r) => [
       format(new Date(r.data), "dd/MM/yyyy"),
-      `${r.veiculos.modelo} - ${r.veiculos.placa}`,
-      r.km_inicial,
-      r.km_final,
-      (r.km_final - r.km_inicial).toFixed(2),
-      r.hora_inicio,
-      r.hora_fim,
-      r.total_horas?.toFixed(2) || "0.00",
-      r.fonte_ganho,
-      r.valor_ganho.toFixed(2),
-      r.lucro_liquido?.toFixed(2) || "0.00",
+      `${r.veiculos.modelo}`,
+      r.km_inicial.toString(),
+      r.km_final.toString(),
+      (r.km_final - r.km_inicial).toFixed(0),
+      `${r.hora_inicio} - ${r.hora_fim}`,
+      r.total_horas?.toFixed(2) || "0",
+      `R$ ${r.lucro_liquido?.toFixed(2) || "0.00"}`,
     ]);
 
-    const csv = [headers, ...csvData].map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `relatorio_${Date.now()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    autoTable(doc, {
+      startY: 65,
+      head: [["Data", "Veículo", "KM Ini", "KM Fim", "KM Rod", "Horário", "Horas", "Lucro"]],
+      body: tableData,
+      theme: 'grid',
+      styles: { 
+        fontSize: 8,
+        cellPadding: 2,
+      },
+      headStyles: { 
+        fillColor: [41, 128, 185],
+        fontStyle: 'bold',
+      },
+      columnStyles: {
+        0: { cellWidth: 22 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 18 },
+        3: { cellWidth: 18 },
+        4: { cellWidth: 18 },
+        5: { cellWidth: 32 },
+        6: { cellWidth: 16 },
+        7: { cellWidth: 24 },
+      },
+    });
+
+    doc.save(`relatorio_bateu_a_meta_${format(new Date(), "yyyy-MM-dd")}.pdf`);
 
     toast({
       title: "Relatório exportado",
-      description: "O arquivo CSV foi baixado com sucesso",
+      description: "O arquivo PDF foi baixado com sucesso",
     });
   };
 
@@ -185,9 +203,9 @@ const Relatorios = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Relatórios</h1>
-        <Button onClick={exportarCSV} variant="outline" className="gap-2">
+        <Button onClick={exportarPDF} variant="outline" className="gap-2">
           <Download className="w-4 h-4" />
-          Exportar CSV
+          Exportar PDF
         </Button>
       </div>
 
