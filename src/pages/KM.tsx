@@ -144,12 +144,6 @@ const KM = () => {
         <>
         <div className="grid gap-4">
           {turnos.map((turno) => {
-            const kmRodados = turno.km_final - turno.km_inicial;
-            const despesaCombustivel = turno.consumo_combustivel * turno.preco_combustivel;
-            const lucroLiquido = turno.lucro_liquido || 0;
-            const lucroPorKm = kmRodados > 0 ? lucroLiquido / kmRodados : 0;
-            const ganhosPorHora = turno.total_horas > 0 ? turno.valor_ganho / turno.total_horas : 0;
-
             return (
               <Card key={turno.id}>
                 <CardHeader>
@@ -244,35 +238,6 @@ const KM = () => {
                             • <span className="font-bold">{turno.fonte_ganho}:</span> {turno.quantidade_corridas} corridas - R$ {turno.valor_ganho.toFixed(2)}
                           </p>
                         )}
-                      </div>
-                    </div>
-                    <div className="col-span-full mt-4 pt-4 border-t">
-                      <h4 className="font-semibold mb-3 text-base">Métricas Calculadas</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <div>
-                          <p className="text-muted-foreground mb-1"><span className="font-bold">KM Rodados:</span></p>
-                          <p>{kmRodados.toFixed(2)} km</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground mb-1"><span className="font-bold">Ganhos Brutos:</span></p>
-                          <p className="text-primary">R$ {turno.valor_ganho.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground mb-1"><span className="font-bold">Despesa Combustível:</span></p>
-                          <p className="text-destructive">R$ {despesaCombustivel.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground mb-1"><span className="font-bold">Lucro Líquido:</span></p>
-                          <p className="text-green-600 dark:text-green-500">R$ {lucroLiquido.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground mb-1"><span className="font-bold">Lucro/KM:</span></p>
-                          <p>R$ {lucroPorKm.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground mb-1"><span className="font-bold">Ganhos/Hora:</span></p>
-                          <p>R$ {ganhosPorHora.toFixed(2)}</p>
-                        </div>
                       </div>
                     </div>
                   </div>
