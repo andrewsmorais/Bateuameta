@@ -22,6 +22,10 @@ const fontesGanho = [
   { value: "uber", label: "Uber" },
   { value: "99", label: "99" },
   { value: "cabify", label: "Cabify" },
+  { value: "ifood", label: "Ifood" },
+  { value: "indriver", label: "Indriver" },
+  { value: "lalamove", label: "Lalamove" },
+  { value: "blabacar", label: "Blabacar" },
   { value: "outros", label: "Outros" },
 ];
 
@@ -30,6 +34,7 @@ const tiposCombustivel = [
   { value: "etanol", label: "Etanol" },
   { value: "gnv", label: "GNV" },
   { value: "flex", label: "Flex" },
+  { value: "eletrico", label: "Elétrico" },
 ];
 
 export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
@@ -49,6 +54,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
     preco_combustivel: "",
     consumo_combustivel: "",
     fonte_ganho: "",
+    fonte_ganho_outros: "",
     categoria_ganho: "",
     valor_ganho: "",
   });
@@ -89,6 +95,10 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
+      const fonteGanhoFinal = formData.fonte_ganho === "outros" 
+        ? formData.fonte_ganho_outros 
+        : formData.fonte_ganho;
+
       const { error } = await supabase.from("turnos_km").insert({
         user_id: user.id,
         veiculo_id: formData.veiculo_id,
@@ -100,7 +110,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
         tipo_combustivel: formData.tipo_combustivel,
         preco_combustivel: parseFloat(formData.preco_combustivel),
         consumo_combustivel: parseFloat(formData.consumo_combustivel),
-        fonte_ganho: formData.fonte_ganho,
+        fonte_ganho: fonteGanhoFinal,
         categoria_ganho: formData.categoria_ganho,
         valor_ganho: parseFloat(formData.valor_ganho),
       });
@@ -124,6 +134,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
         preco_combustivel: "",
         consumo_combustivel: "",
         fonte_ganho: "",
+        fonte_ganho_outros: "",
         categoria_ganho: "",
         valor_ganho: "",
       });
@@ -154,7 +165,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="veiculo">Veículo *</Label>
+              <Label htmlFor="veiculo">Veículo</Label>
               <Select
                 value={formData.veiculo_id}
                 onValueChange={(value) => setFormData({ ...formData, veiculo_id: value })}
@@ -174,7 +185,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="data">Data *</Label>
+              <Label htmlFor="data">Data</Label>
               <Input
                 id="data"
                 type="date"
@@ -185,33 +196,33 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="km_inicial">KM Inicial *</Label>
+              <Label htmlFor="km_inicial">KM Inicial</Label>
               <Input
                 id="km_inicial"
                 type="number"
                 step="0.01"
                 value={formData.km_inicial}
                 onChange={(e) => setFormData({ ...formData, km_inicial: e.target.value })}
-                placeholder="0.00"
+                placeholder="KM"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="km_final">KM Final *</Label>
+              <Label htmlFor="km_final">KM Final</Label>
               <Input
                 id="km_final"
                 type="number"
                 step="0.01"
                 value={formData.km_final}
                 onChange={(e) => setFormData({ ...formData, km_final: e.target.value })}
-                placeholder="0.00"
+                placeholder="KM"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hora_inicio">Hora Início *</Label>
+              <Label htmlFor="hora_inicio">Hora Início</Label>
               <Input
                 id="hora_inicio"
                 type="time"
@@ -222,7 +233,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hora_fim">Hora Fim *</Label>
+              <Label htmlFor="hora_fim">Hora Fim</Label>
               <Input
                 id="hora_fim"
                 type="time"
@@ -233,7 +244,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tipo_combustivel">Tipo Combustível *</Label>
+              <Label htmlFor="tipo_combustivel">Tipo de Combustível</Label>
               <Select
                 value={formData.tipo_combustivel}
                 onValueChange={(value) => setFormData({ ...formData, tipo_combustivel: value })}
@@ -253,33 +264,33 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="preco_combustivel">Preço Combustível (R$/L) *</Label>
+              <Label htmlFor="preco_combustivel">Preço Combustível</Label>
               <Input
                 id="preco_combustivel"
                 type="number"
                 step="0.01"
                 value={formData.preco_combustivel}
                 onChange={(e) => setFormData({ ...formData, preco_combustivel: e.target.value })}
-                placeholder="0.00"
+                placeholder="R$"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="consumo_combustivel">Consumo (L) *</Label>
+              <Label htmlFor="consumo_combustivel">Consumo</Label>
               <Input
                 id="consumo_combustivel"
                 type="number"
                 step="0.01"
                 value={formData.consumo_combustivel}
                 onChange={(e) => setFormData({ ...formData, consumo_combustivel: e.target.value })}
-                placeholder="0.00"
+                placeholder="Litros"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fonte_ganho">Fonte de Ganho *</Label>
+              <Label htmlFor="fonte_ganho">Fonte de Ganho</Label>
               <Select
                 value={formData.fonte_ganho}
                 onValueChange={(value) => setFormData({ ...formData, fonte_ganho: value })}
@@ -298,8 +309,21 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
               </Select>
             </div>
 
+            {formData.fonte_ganho === "outros" && (
+              <div className="space-y-2">
+                <Label htmlFor="fonte_ganho_outros">Nome da Fonte</Label>
+                <Input
+                  id="fonte_ganho_outros"
+                  value={formData.fonte_ganho_outros}
+                  onChange={(e) => setFormData({ ...formData, fonte_ganho_outros: e.target.value })}
+                  placeholder="Digite o nome da fonte"
+                  required
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="categoria_ganho">Categoria *</Label>
+              <Label htmlFor="categoria_ganho">Categoria</Label>
               <Input
                 id="categoria_ganho"
                 value={formData.categoria_ganho}
@@ -310,14 +334,14 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="valor_ganho">Valor Ganho (R$) *</Label>
+              <Label htmlFor="valor_ganho">Valor Ganho</Label>
               <Input
                 id="valor_ganho"
                 type="number"
                 step="0.01"
                 value={formData.valor_ganho}
                 onChange={(e) => setFormData({ ...formData, valor_ganho: e.target.value })}
-                placeholder="0.00"
+                placeholder="R$"
                 required
               />
             </div>
