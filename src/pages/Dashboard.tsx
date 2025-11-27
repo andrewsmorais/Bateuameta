@@ -161,7 +161,7 @@ const Dashboard = () => {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Ganhos Totais</CardTitle>
@@ -197,29 +197,13 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">
-              Meta {periodo === "semana" ? "Semanal" : "Mensal"}
-            </CardTitle>
-            <Target className="w-4 h-4 text-warning" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{metrics.progressoMeta.toFixed(0)}%</div>
-            <p className="text-xs text-muted-foreground">
-              R$ {metrics.lucroLiquido.toFixed(2)} de R$ {metrics.valorMeta.toFixed(2)}
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Composição Financeira</CardTitle>
-          </CardHeader>
+      <Card>
+        <CardHeader>
+          <CardTitle>Composição Financeira</CardTitle>
+        </CardHeader>
           <CardContent className="space-y-6">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -266,36 +250,9 @@ const Dashboard = () => {
                   {periodo === "mes" ? `R$ ${metrics.valorMeta.toFixed(2)}` : "-"}
                 </p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Gráfico de Barras</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="name" className="text-muted-foreground" />
-                <YAxis className="text-muted-foreground" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Legend />
-                <Bar dataKey="ganhos" fill="hsl(var(--primary))" name="Ganhos" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="despesas" fill="hsl(var(--destructive))" name="Despesas" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="lucro" fill="hsl(var(--success))" name="Lucro" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Métricas Adicionais */}
       <Card>
