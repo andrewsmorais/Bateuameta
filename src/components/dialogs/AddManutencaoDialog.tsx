@@ -355,7 +355,7 @@ export const AddManutencaoDialog = ({ onSuccess, preSelectedType, triggerButton 
                   id="observacoes"
                   value={formData.observacoes}
                   onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                  placeholder="Ex: Castrol 5W30, Pneus Michelin..."
+                  placeholder=""
                   rows={3}
                 />
               </div>
