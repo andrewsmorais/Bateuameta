@@ -207,15 +207,17 @@ const Metas = () => {
             return (
               <Card key={meta.id} className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <h3 className="font-semibold text-lg">{getMetaLabel(meta)}</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base font-medium text-foreground">
                       {format(new Date(meta.data_inicio), "dd/MM/yyyy", { locale: ptBR })} -{" "}
                       {format(new Date(meta.data_fim), "dd/MM/yyyy", { locale: ptBR })}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold">Métrica de Rastreamento:</span>{" "}
-                      {meta.metrica_rastreamento === "lucro_liquido" ? "Lucro Líquido" : "Ganhos Brutos"}
+                    <p className="text-sm">
+                      <span className="font-semibold text-muted-foreground">Métrica de Rastreamento:</span>{" "}
+                      <span className="font-medium text-foreground">
+                        {meta.metrica_rastreamento === "lucro_liquido" ? "Lucro Líquido" : "Ganhos Brutos"}
+                      </span>
                     </p>
                   </div>
                   <div className="flex gap-2">
