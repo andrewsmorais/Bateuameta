@@ -102,7 +102,6 @@ export function EditMetaDialog({ meta, open, onOpenChange, onSuccess }: EditMeta
               id="nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              placeholder="Ex: Férias, Compra de Carro..."
               required
             />
           </div>

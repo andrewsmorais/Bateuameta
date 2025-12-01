@@ -85,7 +85,6 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
               id="nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              placeholder="Ex: Férias, Compra de Carro..."
               required
             />
           </div>
