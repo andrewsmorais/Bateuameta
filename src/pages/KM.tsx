@@ -132,7 +132,8 @@ const KM = () => {
     const despesaCombustivel = (kmRodados / turno.consumo_combustivel) * turno.preco_combustivel;
     const outrasDespesas = turno.outras_despesas || 0;
     const despesaTotal = despesaCombustivel + outrasDespesas;
-    const lucroLiquido = turno.lucro_liquido || (turno.valor_ganho - despesaTotal);
+    // Lucro Líquido = Ganhos Brutos - Despesas Totais (combustível + outras despesas)
+    const lucroLiquido = turno.valor_ganho - despesaTotal;
     const lucroPorKm = kmRodados > 0 ? lucroLiquido / kmRodados : 0;
     const ganhosPorHora = turno.total_horas > 0 ? turno.valor_ganho / turno.total_horas : 0;
     const totalHoras = turno.total_horas || 0;
@@ -164,7 +165,8 @@ const KM = () => {
     const despesaCombustivelTotal = dados.reduce((sum, t) => sum + (((t.km_final - t.km_inicial) / t.consumo_combustivel) * t.preco_combustivel), 0);
     const outrasDespesasTotal = dados.reduce((sum, t) => sum + (t.outras_despesas || 0), 0);
     const despesaTotalGeral = despesaCombustivelTotal + outrasDespesasTotal;
-    const lucroLiquidoTotal = dados.reduce((sum, t) => sum + (t.lucro_liquido || 0), 0);
+    // Lucro Líquido = Ganhos Brutos - Despesas Totais (combustível + outras despesas)
+    const lucroLiquidoTotal = ganhosBrutosTotal - despesaTotalGeral;
     const lucroPorKmMedio = kmRodadosTotal > 0 ? lucroLiquidoTotal / kmRodadosTotal : 0;
     const ganhosPorHoraMedio = horasTrabalhadasTotal > 0 ? ganhosBrutosTotal / horasTrabalhadasTotal : 0;
 
