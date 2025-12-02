@@ -109,18 +109,34 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 
-  /* Force calendar and clock icons to be white in dark mode */
+  /* Force calendar and clock icons to be white in dark mode - GLOBAL */
   .dark input[type="date"]::-webkit-calendar-picker-indicator,
   .dark input[type="time"]::-webkit-calendar-picker-indicator,
   .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    filter: invert(1) brightness(2);
     cursor: pointer;
+    opacity: 1;
   }
 
-  /* Global rule for auxiliary icons in dark mode */
-  .dark [class*="lucide-calendar"],
-  .dark [class*="lucide-clock"],
-  .dark [class*="lucide-chevron"] {
+  /* Firefox support */
+  .dark input[type="date"],
+  .dark input[type="time"],
+  .dark input[type="datetime-local"] {
+    color-scheme: dark;
+  }
+
+  /* Global rule for ALL auxiliary Lucide icons in dark mode */
+  .dark svg[class*="lucide"],
+  .dark [data-lucide] {
     color: hsl(var(--foreground));
+  }
+  
+  .dark .lucide-calendar,
+  .dark .lucide-clock,
+  .dark .lucide-chevron-down,
+  .dark .lucide-chevron-up,
+  .dark .lucide-chevron-left,
+  .dark .lucide-chevron-right {
+    color: hsl(var(--foreground)) !important;
   }
 }
