@@ -332,9 +332,10 @@ const Relatorios = () => {
       : 0;
     const outrasDespesas = turno.outras_despesas || 0;
     const despesaTotal = despesaCombustivel + outrasDespesas;
-    const lucroLiquido = turno.lucro_liquido || (turno.valor_ganho - despesaTotal);
+    // Lucro Líquido = Ganhos Brutos - Despesas Totais (combustível + outras despesas)
+    const lucroLiquido = (turno.valor_ganho || 0) - despesaTotal;
     const lucroPorKm = kmRodados > 0 ? lucroLiquido / kmRodados : 0;
-    const ganhosPorHora = turno.total_horas > 0 ? turno.valor_ganho / turno.total_horas : 0;
+    const ganhosPorHora = turno.total_horas > 0 ? (turno.valor_ganho || 0) / turno.total_horas : 0;
     
     return {
       kmRodados,
@@ -364,7 +365,8 @@ const Relatorios = () => {
     }, 0);
     const outrasDespesasTotal = resultados.reduce((sum, t) => sum + (t.outras_despesas || 0), 0);
     const despesaTotalGeral = despesaCombustivelTotal + outrasDespesasTotal;
-    const lucroLiquidoTotal = resultados.reduce((sum, t) => sum + (t.lucro_liquido || 0), 0);
+    // Lucro Líquido = Ganhos Brutos - Despesas Totais (combustível + outras despesas)
+    const lucroLiquidoTotal = ganhosBrutosTotal - despesaTotalGeral;
     const lucroPorKmMedio = kmRodadosTotal > 0 ? lucroLiquidoTotal / kmRodadosTotal : 0;
     const ganhosPorHoraMedio = horasTrabalhadasTotal > 0 ? ganhosBrutosTotal / horasTrabalhadasTotal : 0;
 
