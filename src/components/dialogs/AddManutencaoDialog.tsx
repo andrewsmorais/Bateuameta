@@ -437,23 +437,22 @@ export const AddManutencaoDialog = ({ onSuccess, preSelectedType, triggerButton 
                 />
               </div>
 
-              {/* Próximo KM - não exibir para Balanceamento e Alinhamento */}
-              {preSelectedType !== "balanceamento_alinhamento" && (
-                <div className="space-y-2">
-                  <Label htmlFor="proximo_km">
-                    {preSelectedType === "troca_oleo" 
-                      ? "Próximo KM da Troca do Óleo" 
-                      : "Próximo KM para Revisão"}
-                  </Label>
-                  <Input
-                    id="proximo_km"
-                    type="number"
-                    step="0.01"
-                    value={formData.proximo_km}
-                    onChange={(e) => setFormData({ ...formData, proximo_km: e.target.value })}
-                  />
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="proximo_km">
+                  {preSelectedType === "troca_oleo" 
+                    ? "Próximo KM da Troca do Óleo" 
+                    : preSelectedType === "balanceamento_alinhamento"
+                    ? "Próximo KM Balanceamento e Alinhamento"
+                    : "Próximo KM para Revisão"}
+                </Label>
+                <Input
+                  id="proximo_km"
+                  type="number"
+                  step="0.01"
+                  value={formData.proximo_km}
+                  onChange={(e) => setFormData({ ...formData, proximo_km: e.target.value })}
+                />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="comprovante">Anexar Comprovante</Label>

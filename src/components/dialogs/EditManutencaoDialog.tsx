@@ -344,25 +344,24 @@ export const EditManutencaoDialog = ({ manutencao, open, onOpenChange, onSuccess
             </div>
           )}
 
-          {/* Próximo KM - não exibir para Balanceamento e Alinhamento */}
-          {formData.tipo_manutencao !== "balanceamento_alinhamento" && (
-            <div className="space-y-2">
-              <Label htmlFor="proximo_km">
-                {formData.tipo_manutencao === "troca_oleo" 
-                  ? "Próximo KM da Troca do Óleo (opcional)" 
-                  : formData.tipo_manutencao === "revisao"
-                  ? "Próximo KM para Revisão (opcional)"
-                  : "Próximo KM para Manutenção (opcional)"}
-              </Label>
-              <Input
-                id="proximo_km"
-                type="number"
-                step="0.01"
-                value={formData.proximo_km}
-                onChange={(e) => setFormData({ ...formData, proximo_km: e.target.value })}
-              />
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="proximo_km">
+              {formData.tipo_manutencao === "troca_oleo" 
+                ? "Próximo KM da Troca do Óleo (opcional)" 
+                : formData.tipo_manutencao === "balanceamento_alinhamento"
+                ? "Próximo KM Balanceamento e Alinhamento (opcional)"
+                : formData.tipo_manutencao === "revisao"
+                ? "Próximo KM para Revisão (opcional)"
+                : "Próximo KM para Manutenção (opcional)"}
+            </Label>
+            <Input
+              id="proximo_km"
+              type="number"
+              step="0.01"
+              value={formData.proximo_km}
+              onChange={(e) => setFormData({ ...formData, proximo_km: e.target.value })}
+            />
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="observacoes">
