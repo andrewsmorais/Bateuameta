@@ -14,9 +14,8 @@ import autoTable from "jspdf-autotable";
 interface Filtros {
   dataInicio: string;
   dataFim: string;
-  tipo: string;
+  tipoRelatorio: string;
   veiculo: string;
-  fonteGanho: string;
 }
 
 interface Veiculo {
@@ -25,19 +24,26 @@ interface Veiculo {
   placa: string;
 }
 
+const tiposRelatorio = [
+  { value: "turnos", label: "Turnos" },
+  { value: "manutencoes", label: "Manutenções" },
+  { value: "ganhos", label: "Ganhos" },
+  { value: "despesas", label: "Despesas" },
+  { value: "metas", label: "Metas" },
+];
+
 const Relatorios = () => {
   const [filtros, setFiltros] = useState<Filtros>({
     dataInicio: "",
     dataFim: "",
-    tipo: "todos",
+    tipoRelatorio: "turnos",
     veiculo: "todos",
-    fonteGanho: "todos",
   });
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [resultados, setResultados] = useState<any[]>([]);
   const [metricas, setMetricas] = useState({
-    totalTurnos: 0,
-    lucroLiquido: 0,
+    totalRegistros: 0,
+    valorTotal: 0,
     totalHoras: 0,
     kmRodados: 0,
   });
@@ -71,52 +77,146 @@ const Relatorios = () => {
   };
 
   const aplicarFiltros = async () => {
+    if (!filtros.dataInicio || !filtros.dataFim) {
+      toast({
+        variant: "destructive",
+        title: "Campos obrigatórios",
+        description: "Preencha o período (Data Início e Data Fim)",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Construir query com todos os filtros (lógica AND)
-      let query = supabase
-        .from("turnos_km")
-        .select(`
-          *,
-          veiculos (modelo, placa)
-        `)
-        .eq("user_id", user.id);
+      let data: any[] = [];
+      let metricsData = { totalRegistros: 0, valorTotal: 0, totalHoras: 0, kmRodados: 0 };
 
-      // Aplicar filtros
-      if (filtros.dataInicio) {
-        query = query.gte("data", filtros.dataInicio);
+      switch (filtros.tipoRelatorio) {
+        case "turnos": {
+          let query = supabase
+            .from("turnos_km")
+            .select(`*, veiculos (modelo, placa), turno_fontes_ganho (id, fonte_ganho, quantidade_corridas, valor_ganho)`)
+            .eq("user_id", user.id)
+            .gte("data", filtros.dataInicio)
+            .lte("data", filtros.dataFim);
+
+          if (filtros.veiculo !== "todos") {
+            query = query.eq("veiculo_id", filtros.veiculo);
+          }
+
+          const { data: turnosData, error } = await query.order("data", { ascending: false });
+          if (error) throw error;
+
+          data = turnosData || [];
+          metricsData = {
+            totalRegistros: data.length,
+            valorTotal: data.reduce((sum, t) => sum + (t.lucro_liquido || 0), 0),
+            totalHoras: data.reduce((sum, t) => sum + (t.total_horas || 0), 0),
+            kmRodados: data.reduce((sum, t) => sum + (t.km_final - t.km_inicial), 0),
+          };
+          break;
+        }
+
+        case "manutencoes": {
+          let query = supabase
+            .from("manutencoes")
+            .select(`*, veiculos:veiculo_id (modelo, placa)`)
+            .eq("user_id", user.id)
+            .gte("data", filtros.dataInicio)
+            .lte("data", filtros.dataFim);
+
+          if (filtros.veiculo !== "todos") {
+            query = query.eq("veiculo_id", filtros.veiculo);
+          }
+
+          const { data: manutData, error } = await query.order("data", { ascending: false });
+          if (error) throw error;
+
+          data = manutData || [];
+          metricsData = {
+            totalRegistros: data.length,
+            valorTotal: data.reduce((sum, m) => sum + (m.valor || 0), 0),
+            totalHoras: 0,
+            kmRodados: 0,
+          };
+          break;
+        }
+
+        case "ganhos": {
+          const { data: ganhosData, error } = await supabase
+            .from("ganhos_despesas")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("tipo", "ganho")
+            .gte("data", filtros.dataInicio)
+            .lte("data", filtros.dataFim)
+            .order("data", { ascending: false });
+
+          if (error) throw error;
+
+          data = ganhosData || [];
+          metricsData = {
+            totalRegistros: data.length,
+            valorTotal: data.reduce((sum, g) => sum + (g.valor || 0), 0),
+            totalHoras: 0,
+            kmRodados: 0,
+          };
+          break;
+        }
+
+        case "despesas": {
+          const { data: despesasData, error } = await supabase
+            .from("ganhos_despesas")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("tipo", "despesa")
+            .gte("data", filtros.dataInicio)
+            .lte("data", filtros.dataFim)
+            .order("data", { ascending: false });
+
+          if (error) throw error;
+
+          data = despesasData || [];
+          metricsData = {
+            totalRegistros: data.length,
+            valorTotal: data.reduce((sum, d) => sum + (d.valor || 0), 0),
+            totalHoras: 0,
+            kmRodados: 0,
+          };
+          break;
+        }
+
+        case "metas": {
+          const { data: metasData, error } = await supabase
+            .from("metas")
+            .select("*")
+            .eq("user_id", user.id)
+            .gte("data_inicio", filtros.dataInicio)
+            .lte("data_fim", filtros.dataFim)
+            .order("data_inicio", { ascending: false });
+
+          if (error) throw error;
+
+          data = metasData || [];
+          metricsData = {
+            totalRegistros: data.length,
+            valorTotal: data.reduce((sum, m) => sum + (m.valor_meta || 0), 0),
+            totalHoras: 0,
+            kmRodados: 0,
+          };
+          break;
+        }
       }
-      if (filtros.dataFim) {
-        query = query.lte("data", filtros.dataFim);
-      }
-      if (filtros.veiculo !== "todos") {
-        query = query.eq("veiculo_id", filtros.veiculo);
-      }
-      if (filtros.fonteGanho !== "todos") {
-        query = query.eq("fonte_ganho", filtros.fonteGanho);
-      }
 
-      query = query.order("data", { ascending: false });
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      setResultados(data || []);
-
-      // Calcular métricas
-      const totalTurnos = data?.length || 0;
-      const lucroLiquido = data?.reduce((sum, t) => sum + (t.lucro_liquido || 0), 0) || 0;
-      const totalHoras = data?.reduce((sum, t) => sum + (t.total_horas || 0), 0) || 0;
-      const kmRodados = data?.reduce((sum, t) => sum + (t.km_final - t.km_inicial), 0) || 0;
-
-      setMetricas({ totalTurnos, lucroLiquido, totalHoras, kmRodados });
+      setResultados(data);
+      setMetricas(metricsData);
 
       toast({
         title: "Relatório gerado",
-        description: `${totalTurnos} registros encontrados`,
+        description: `${metricsData.totalRegistros} registros encontrados`,
       });
     } catch (error: any) {
       toast({
@@ -140,63 +240,163 @@ const Relatorios = () => {
     }
 
     const doc = new jsPDF();
-    
-    // Title
+    const tipoLabel = tiposRelatorio.find(t => t.value === filtros.tipoRelatorio)?.label || filtros.tipoRelatorio;
+
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("Relatório - Bateu a Meta", 14, 20);
-    
-    // Summary metrics
+    doc.text(`Relatório de ${tipoLabel} - Bateu a Meta`, 14, 20);
+
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    doc.text(`Total de Turnos: ${metricas.totalTurnos}`, 14, 35);
-    doc.text(`Lucro Líquido: R$ ${metricas.lucroLiquido.toFixed(2)}`, 14, 42);
-    doc.text(`Total de Horas: ${metricas.totalHoras.toFixed(2)}h`, 14, 49);
-    doc.text(`KM Rodados: ${metricas.kmRodados.toFixed(0)} km`, 14, 56);
-    
-    // Table data
-    const tableData = resultados.map((r) => [
-      format(new Date(r.data), "dd/MM/yyyy"),
-      `${r.veiculos.modelo}`,
-      r.km_inicial.toString(),
-      r.km_final.toString(),
-      (r.km_final - r.km_inicial).toFixed(0),
-      `${r.hora_inicio} - ${r.hora_fim}`,
-      r.total_horas?.toFixed(2) || "0",
-      `R$ ${r.lucro_liquido?.toFixed(2) || "0.00"}`,
-    ]);
+    doc.text(`Total de Registros: ${metricas.totalRegistros}`, 14, 35);
+    doc.text(`Valor Total: R$ ${metricas.valorTotal.toFixed(2)}`, 14, 42);
 
-    autoTable(doc, {
-      startY: 65,
-      head: [["Data", "Veículo", "KM Ini", "KM Fim", "KM Rod", "Horário", "Horas", "Lucro"]],
-      body: tableData,
-      theme: 'grid',
-      styles: { 
-        fontSize: 8,
-        cellPadding: 2,
-      },
-      headStyles: { 
-        fillColor: [41, 128, 185],
-        fontStyle: 'bold',
-      },
-      columnStyles: {
-        0: { cellWidth: 22 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 18 },
-        3: { cellWidth: 18 },
-        4: { cellWidth: 18 },
-        5: { cellWidth: 32 },
-        6: { cellWidth: 16 },
-        7: { cellWidth: 24 },
-      },
-    });
+    if (filtros.tipoRelatorio === "turnos") {
+      doc.text(`Total de Horas: ${metricas.totalHoras.toFixed(2)}h`, 14, 49);
+      doc.text(`KM Rodados: ${metricas.kmRodados.toFixed(0)} km`, 14, 56);
 
-    doc.save(`relatorio_bateu_a_meta_${format(new Date(), "yyyy-MM-dd")}.pdf`);
+      const tableData = resultados.map((r) => [
+        format(new Date(r.data), "dd/MM/yyyy"),
+        `${r.veiculos?.modelo || "N/A"}`,
+        r.km_inicial?.toString() || "0",
+        r.km_final?.toString() || "0",
+        ((r.km_final || 0) - (r.km_inicial || 0)).toFixed(0),
+        `${r.hora_inicio || ""} - ${r.hora_fim || ""}`,
+        r.total_horas?.toFixed(2) || "0",
+        `R$ ${r.lucro_liquido?.toFixed(2) || "0.00"}`,
+      ]);
+
+      autoTable(doc, {
+        startY: 65,
+        head: [["Data", "Veículo", "KM Ini", "KM Fim", "KM Rod", "Horário", "Horas", "Lucro"]],
+        body: tableData,
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [41, 128, 185], fontStyle: 'bold' },
+      });
+    } else {
+      const tableData = resultados.map((r) => {
+        if (filtros.tipoRelatorio === "manutencoes") {
+          return [
+            format(new Date(r.data), "dd/MM/yyyy"),
+            r.tipo_manutencao || "",
+            r.veiculos?.modelo || "N/A",
+            `R$ ${r.valor?.toFixed(2) || "0.00"}`,
+          ];
+        } else if (filtros.tipoRelatorio === "ganhos" || filtros.tipoRelatorio === "despesas") {
+          return [
+            format(new Date(r.data), "dd/MM/yyyy"),
+            r.categoria || "",
+            `R$ ${r.valor?.toFixed(2) || "0.00"}`,
+            r.observacoes || "",
+          ];
+        } else {
+          return [
+            r.nome_personalizado || r.tipo || "",
+            format(new Date(r.data_inicio), "dd/MM/yyyy"),
+            format(new Date(r.data_fim), "dd/MM/yyyy"),
+            `R$ ${r.valor_meta?.toFixed(2) || "0.00"}`,
+          ];
+        }
+      });
+
+      const headers = filtros.tipoRelatorio === "manutencoes"
+        ? [["Data", "Tipo", "Veículo", "Valor"]]
+        : filtros.tipoRelatorio === "metas"
+          ? [["Nome", "Início", "Fim", "Valor"]]
+          : [["Data", "Categoria", "Valor", "Obs"]];
+
+      autoTable(doc, {
+        startY: 50,
+        head: headers,
+        body: tableData,
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [41, 128, 185], fontStyle: 'bold' },
+      });
+    }
+
+    doc.save(`relatorio_${filtros.tipoRelatorio}_${format(new Date(), "yyyy-MM-dd")}.pdf`);
 
     toast({
       title: "Relatório exportado",
       description: "O arquivo PDF foi baixado com sucesso",
     });
+  };
+
+  const renderResultados = () => {
+    if (resultados.length === 0) return null;
+
+    switch (filtros.tipoRelatorio) {
+      case "turnos":
+        return resultados.map((resultado) => (
+          <div key={resultado.id} className="p-4 border rounded-lg space-y-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">
+                  {format(new Date(resultado.data), "dd/MM/yyyy")} - {resultado.veiculos?.modelo}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {resultado.hora_inicio} - {resultado.hora_fim} ({resultado.total_horas?.toFixed(2)}h)
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-success">R$ {resultado.lucro_liquido?.toFixed(2) || "0.00"}</p>
+                <p className="text-sm text-muted-foreground">{(resultado.km_final - resultado.km_inicial).toFixed(0)} km</p>
+              </div>
+            </div>
+          </div>
+        ));
+
+      case "manutencoes":
+        return resultados.map((resultado) => (
+          <div key={resultado.id} className="p-4 border rounded-lg space-y-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">{resultado.tipo_manutencao}</p>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(resultado.data), "dd/MM/yyyy")} - {resultado.veiculos?.modelo}
+                </p>
+              </div>
+              <p className="text-lg font-bold text-destructive">R$ {resultado.valor?.toFixed(2) || "0.00"}</p>
+            </div>
+          </div>
+        ));
+
+      case "ganhos":
+      case "despesas":
+        return resultados.map((resultado) => (
+          <div key={resultado.id} className="p-4 border rounded-lg space-y-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">{resultado.categoria}</p>
+                <p className="text-sm text-muted-foreground">{format(new Date(resultado.data), "dd/MM/yyyy")}</p>
+              </div>
+              <p className={`text-lg font-bold ${filtros.tipoRelatorio === "ganhos" ? "text-success" : "text-destructive"}`}>
+                R$ {resultado.valor?.toFixed(2) || "0.00"}
+              </p>
+            </div>
+          </div>
+        ));
+
+      case "metas":
+        return resultados.map((resultado) => (
+          <div key={resultado.id} className="p-4 border rounded-lg space-y-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">{resultado.nome_personalizado || resultado.tipo}</p>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(resultado.data_inicio), "dd/MM/yyyy")} - {format(new Date(resultado.data_fim), "dd/MM/yyyy")}
+                </p>
+              </div>
+              <p className="text-lg font-bold text-primary">R$ {resultado.valor_meta?.toFixed(2) || "0.00"}</p>
+            </div>
+          </div>
+        ));
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -209,13 +409,31 @@ const Relatorios = () => {
         </Button>
       </div>
 
-      {/* Filtros */}
       <Card>
         <CardHeader>
           <CardTitle>Filtros de Relatório</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="tipoRelatorio">Tipo de Relatório</Label>
+              <Select
+                value={filtros.tipoRelatorio}
+                onValueChange={(value) => setFiltros({ ...filtros, tipoRelatorio: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tiposRelatorio.map((tipo) => (
+                    <SelectItem key={tipo.value} value={tipo.value}>
+                      {tipo.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="dataInicio">Data Início</Label>
               <Input
@@ -243,34 +461,15 @@ const Relatorios = () => {
                 onValueChange={(value) => setFiltros({ ...filtros, veiculo: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
+                  <SelectValue placeholder="Todos os Veículos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="todos">Todos os Veículos</SelectItem>
                   {veiculos.map((v) => (
                     <SelectItem key={v.id} value={v.id}>
                       {v.modelo} - {v.placa}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="fonteGanho">Fonte de Ganho</Label>
-              <Select
-                value={filtros.fonteGanho}
-                onValueChange={(value) => setFiltros({ ...filtros, fonteGanho: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="uber">Uber</SelectItem>
-                  <SelectItem value="99">99</SelectItem>
-                  <SelectItem value="cabify">Cabify</SelectItem>
-                  <SelectItem value="outros">Outros</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -283,84 +482,58 @@ const Relatorios = () => {
         </CardContent>
       </Card>
 
-      {/* Métricas */}
       {resultados.length > 0 && (
         <>
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total de Turnos</CardTitle>
+                <CardTitle className="text-sm font-medium">Total de Registros</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{metricas.totalTurnos}</div>
+                <div className="text-2xl font-bold">{metricas.totalRegistros}</div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Lucro Líquido</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {filtros.tipoRelatorio === "turnos" ? "Lucro Líquido" : "Valor Total"}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-success">
-                  R$ {metricas.lucroLiquido.toFixed(2)}
-                </div>
+                <div className="text-2xl font-bold text-success">R$ {metricas.valorTotal.toFixed(2)}</div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total de Horas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metricas.totalHoras.toFixed(2)}h</div>
-              </CardContent>
-            </Card>
+            {filtros.tipoRelatorio === "turnos" && (
+              <>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Total de Horas</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{metricas.totalHoras.toFixed(2)}h</div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">KM Rodados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metricas.kmRodados.toFixed(0)} km</div>
-              </CardContent>
-            </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">KM Rodados</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{metricas.kmRodados.toFixed(0)} km</div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
 
-          {/* Resultados */}
           <Card>
             <CardHeader>
               <CardTitle>Resultados ({resultados.length} registros)</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {resultados.map((resultado) => (
-                  <div
-                    key={resultado.id}
-                    className="p-4 border rounded-lg space-y-2"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">
-                          {format(new Date(resultado.data), "dd/MM/yyyy")} -{" "}
-                          {resultado.veiculos.modelo}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {resultado.hora_inicio} - {resultado.hora_fim} (
-                          {resultado.total_horas?.toFixed(2)}h)
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-success">
-                          R$ {resultado.lucro_liquido?.toFixed(2) || "0.00"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {(resultado.km_final - resultado.km_inicial).toFixed(0)} km
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <div className="space-y-4">{renderResultados()}</div>
             </CardContent>
           </Card>
         </>

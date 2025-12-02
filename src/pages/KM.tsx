@@ -56,6 +56,9 @@ const KM = () => {
   const [editingTurno, setEditingTurno] = useState<Turno | null>(null);
   const { toast } = useToast();
 
+  // Limit display to 5 shifts per day (show only 5 most recent)
+  const turnosExibidos = turnos.slice(0, 5);
+
   const loadTurnos = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -142,8 +145,13 @@ const KM = () => {
         </Card>
       ) : (
         <>
+        {turnos.length > 5 && (
+          <p className="text-sm text-muted-foreground">
+            Exibindo os 5 turnos mais recentes. Acesse o <span className="font-bold text-primary">Menu Relatórios</span> para ver o histórico completo.
+          </p>
+        )}
         <div className="grid gap-4">
-          {turnos.map((turno) => {
+          {turnosExibidos.map((turno) => {
             return (
               <Card key={turno.id}>
                 <CardHeader>
@@ -189,57 +197,57 @@ const KM = () => {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Data:</span>
-                      <span>{format(new Date(turno.data), "dd/MM/yyyy", { locale: ptBR })}</span>
+                      <span className="font-bold text-foreground text-base">Data:</span>
+                      <span className="text-[#15a249]">{format(new Date(turno.data), "dd/MM/yyyy", { locale: ptBR })}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Valor Ganho:</span>
-                      <span>R$ {turno.valor_ganho.toFixed(2)}</span>
+                      <span className="font-bold text-foreground text-base">Valor Ganho:</span>
+                      <span className="text-[#15a249]">R$ {turno.valor_ganho.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">KM Inicial:</span>
-                      <span>{turno.km_inicial.toFixed(2)} km</span>
+                      <span className="font-bold text-foreground text-base">KM Inicial:</span>
+                      <span className="text-[#15a249]">{turno.km_inicial.toFixed(2)} km</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">KM Final:</span>
-                      <span>{turno.km_final.toFixed(2)} km</span>
+                      <span className="font-bold text-foreground text-base">KM Final:</span>
+                      <span className="text-[#15a249]">{turno.km_final.toFixed(2)} km</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Hora Início:</span>
-                      <span>{turno.hora_inicio}</span>
+                      <span className="font-bold text-foreground text-base">Hora Início:</span>
+                      <span className="text-[#15a249]">{turno.hora_inicio}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Hora Fim:</span>
-                      <span>{turno.hora_fim}</span>
+                      <span className="font-bold text-foreground text-base">Hora Fim:</span>
+                      <span className="text-[#15a249]">{turno.hora_fim}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Tipo Combustível:</span>
-                      <span>{turno.tipo_combustivel}</span>
+                      <span className="font-bold text-foreground text-base">Tipo Combustível:</span>
+                      <span className="text-[#15a249]">{turno.tipo_combustivel}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Preço Combustível:</span>
-                      <span>R$ {turno.preco_combustivel.toFixed(2)}</span>
+                      <span className="font-bold text-foreground text-base">Preço Combustível:</span>
+                      <span className="text-[#15a249]">R$ {turno.preco_combustivel.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Consumo:</span>
-                      <span>{turno.consumo_combustivel.toFixed(1)} km/L</span>
+                      <span className="font-bold text-foreground text-base">Consumo:</span>
+                      <span className="text-[#15a249]">{turno.consumo_combustivel.toFixed(1)} km/L</span>
                     </div>
                     <div className="col-span-full mt-2">
-                      <p className="font-bold text-foreground mb-2">Fontes de Ganho:</p>
+                      <p className="font-bold text-foreground text-base mb-2">Fontes de Ganho:</p>
                       <div className="ml-4 space-y-2">
                         {turno.turno_fontes_ganho && turno.turno_fontes_ganho.length > 0 ? (
                           turno.turno_fontes_ganho.map((fonte) => (
                             <div key={fonte.id} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-1 border-l-2 border-primary/30 pl-3">
                               <span className="font-semibold text-primary capitalize">{fonte.fonte_ganho}</span>
                               <span className="text-muted-foreground">{fonte.quantidade_corridas} corridas</span>
-                              <span className="font-medium">R$ {fonte.valor_ganho.toFixed(2)}</span>
+                              <span className="font-medium text-[#15a249]">R$ {fonte.valor_ganho.toFixed(2)}</span>
                             </div>
                           ))
                         ) : (
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-1 border-l-2 border-primary/30 pl-3">
                             <span className="font-semibold text-primary capitalize">{turno.fonte_ganho}</span>
                             <span className="text-muted-foreground">{turno.quantidade_corridas} corridas</span>
-                            <span className="font-medium">R$ {turno.valor_ganho.toFixed(2)}</span>
+                            <span className="font-medium text-[#15a249]">R$ {turno.valor_ganho.toFixed(2)}</span>
                           </div>
                         )}
                       </div>

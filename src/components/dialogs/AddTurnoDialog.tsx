@@ -131,6 +131,39 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validação de todos os campos obrigatórios
+    if (!formData.veiculo_id || !formData.data || !formData.km_inicial || !formData.km_final ||
+        !formData.hora_inicio || !formData.hora_fim || !formData.tipo_combustivel ||
+        !formData.preco_combustivel || !formData.consumo_combustivel) {
+      toast({
+        variant: "destructive",
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos do formulário",
+      });
+      return;
+    }
+
+    // Validar fontes de ganho
+    for (const fonte of fontesGanhoList) {
+      if (!fonte.fonte_ganho || !fonte.quantidade_corridas || !fonte.valor_ganho) {
+        toast({
+          variant: "destructive",
+          title: "Campos obrigatórios",
+          description: "Preencha todos os campos das fontes de ganho",
+        });
+        return;
+      }
+      if (fonte.fonte_ganho === "outros" && !fonte.fonte_ganho_outros) {
+        toast({
+          variant: "destructive",
+          title: "Campos obrigatórios",
+          description: "Informe o nome da fonte de ganho personalizada",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -327,13 +360,17 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="preco_combustivel">Preço Combustível</Label>
-              <Input
-                id="preco_combustivel"
-                type="text"
-                value={formData.preco_combustivel}
-                onChange={(e) => handleMoneyChange("preco_combustivel", e.target.value)}
-                required
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                <Input
+                  id="preco_combustivel"
+                  type="text"
+                  className="pl-10"
+                  value={formData.preco_combustivel}
+                  onChange={(e) => handleMoneyChange("preco_combustivel", e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -416,16 +453,20 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
 
                   <div className="space-y-2">
                     <Label htmlFor={`valor_ganho_${index}`}>Valor Ganho</Label>
-                    <Input
-                      id={`valor_ganho_${index}`}
-                      type="text"
-                      value={fonte.valor_ganho}
-                      onChange={(e) => {
-                        const formatted = formatMoney(e.target.value);
-                        updateFonteGanho(index, "valor_ganho", formatted);
-                      }}
-                      required
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                      <Input
+                        id={`valor_ganho_${index}`}
+                        type="text"
+                        className="pl-10"
+                        value={fonte.valor_ganho}
+                        onChange={(e) => {
+                          const formatted = formatMoney(e.target.value);
+                          updateFonteGanho(index, "valor_ganho", formatted);
+                        }}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
