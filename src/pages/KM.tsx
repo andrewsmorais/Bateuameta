@@ -191,6 +191,9 @@ const KM = () => {
     <div className="space-y-6">
       <div className="flex flex-col items-center gap-2">
         <h1 className="text-3xl font-bold text-center">Relatórios dos Turnos</h1>
+        <p className="text-sm text-muted-foreground text-center">
+          Exibindo os 5 turnos mais recentes. Acesse o Menu Relatórios para ver o histórico completo.
+        </p>
         <AddTurnoDialog onSuccess={loadTurnos} />
       </div>
 
@@ -471,9 +474,6 @@ const KM = () => {
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground text-center">
-            Exibindo os 5 turnos mais recentes. Acesse o Menu Relatórios para ver o histórico completo.
-          </p>
         </>
       )}
       </>
