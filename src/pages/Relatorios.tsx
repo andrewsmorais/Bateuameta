@@ -47,6 +47,18 @@ const getCategoriaLabel = (categoria: string) => {
   return labels[categoria] || categoria;
 };
 
+// Safe date formatting to prevent "Invalid time value" errors
+const formatDateSafe = (dateValue: string | null | undefined, formatStr: string = "dd/MM/yyyy"): string => {
+  if (!dateValue) return "N/A";
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return "N/A";
+    return format(date, formatStr);
+  } catch {
+    return "N/A";
+  }
+};
+
 const Relatorios = () => {
   const [filtros, setFiltros] = useState<Filtros>({
     dataInicio: "",
@@ -271,7 +283,7 @@ const Relatorios = () => {
       doc.text(`KM Rodados: ${metricas.kmRodados.toFixed(0)} km`, 14, 56);
 
       const tableData = resultados.map((r) => [
-        format(new Date(r.data), "dd/MM/yyyy"),
+        formatDateSafe(r.data),
         `${r.veiculos?.modelo || "N/A"}`,
         r.km_inicial?.toString() || "0",
         r.km_final?.toString() || "0",
@@ -293,14 +305,14 @@ const Relatorios = () => {
       const tableData = resultados.map((r) => {
         if (filtros.tipoRelatorio === "manutencoes") {
           return [
-            format(new Date(r.data), "dd/MM/yyyy"),
+            formatDateSafe(r.data),
             r.tipo_manutencao || "",
             r.veiculos?.modelo || "N/A",
             `R$ ${r.valor?.toFixed(2) || "0.00"}`,
           ];
         } else if (filtros.tipoRelatorio === "ganhos" || filtros.tipoRelatorio === "despesas") {
           return [
-            format(new Date(r.data), "dd/MM/yyyy"),
+            formatDateSafe(r.data),
             r.categoria || "",
             `R$ ${r.valor?.toFixed(2) || "0.00"}`,
             r.observacoes || "",
@@ -308,8 +320,8 @@ const Relatorios = () => {
         } else {
           return [
             r.nome_personalizado || r.tipo || "",
-            format(new Date(r.data_inicio), "dd/MM/yyyy"),
-            format(new Date(r.data_fim), "dd/MM/yyyy"),
+            formatDateSafe(r.data_inicio),
+            formatDateSafe(r.data_fim),
             `R$ ${r.valor_meta?.toFixed(2) || "0.00"}`,
           ];
         }
@@ -430,7 +442,7 @@ const Relatorios = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   <div>
                     <p className="text-sm font-bold text-foreground mb-1">Data</p>
-                    <p className="text-xl font-bold text-[#15a249]">{format(new Date(resultado.data), "dd/MM/yyyy")}</p>
+                    <p className="text-xl font-bold text-[#15a249]">{formatDateSafe(resultado.data)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-bold text-foreground mb-1">Outras Despesas</p>
@@ -559,7 +571,7 @@ const Relatorios = () => {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground mb-1">Data</p>
-                  <p className="text-xl font-bold text-[#15a249]">{format(new Date(resultado.data), "dd/MM/yyyy")}</p>
+                  <p className="text-xl font-bold text-[#15a249]">{formatDateSafe(resultado.data)}</p>
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground mb-1">Valor</p>
@@ -626,7 +638,7 @@ const Relatorios = () => {
                 <div>
                   <p className="text-sm font-bold text-foreground mb-1">Data</p>
                   <p className="text-xl font-bold text-[#15a249]">
-                    {format(new Date(resultado.data), "dd/MM/yyyy")}
+                    {formatDateSafe(resultado.data)}
                   </p>
                 </div>
                 <div>
@@ -645,7 +657,7 @@ const Relatorios = () => {
                   <div>
                     <p className="text-sm font-bold text-foreground mb-1">Válido Até</p>
                     <p className="text-xl font-bold text-[#15a249]">
-                      {format(new Date(resultado.data_fim), "dd/MM/yyyy")}
+                      {formatDateSafe(resultado.data_fim)}
                     </p>
                   </div>
                 )}
@@ -666,8 +678,8 @@ const Relatorios = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-medium">{resultado.nome_personalizado || resultado.tipo}</p>
-                <p className="text-sm text-muted-foreground">
-                  {format(new Date(resultado.data_inicio), "dd/MM/yyyy")} - {format(new Date(resultado.data_fim), "dd/MM/yyyy")}
+              <p className="text-sm text-muted-foreground">
+                  {formatDateSafe(resultado.data_inicio)} - {formatDateSafe(resultado.data_fim)}
                 </p>
               </div>
               <p className="text-lg font-bold text-primary">R$ {resultado.valor_meta?.toFixed(2) || "0.00"}</p>
