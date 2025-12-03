@@ -331,9 +331,6 @@ export const UsersManagement = () => {
               <DialogContent className="max-w-md">
                 <DialogHeader>
                   <DialogTitle>Adicionar Novo Usuário</DialogTitle>
-                  <DialogDescription>
-                    Crie uma conta com senha provisória (1234)
-                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -381,21 +378,10 @@ export const UsersManagement = () => {
                         <SelectValue placeholder="Selecione um plano" />
                       </SelectTrigger>
                       <SelectContent>
-                        {plans?.map((plan) => (
-                          <SelectItem key={plan.id} value={plan.id}>
-                            {plan.price > 0 ? `R$ ${plan.price.toFixed(2).replace('.', ',')} Anual` : plan.name}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="free">Free</SelectItem>
+                        <SelectItem value="pago">Pago R$ 97,90</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Senha provisória:</strong> 1234
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      O usuário deverá trocar a senha no primeiro acesso.
-                    </p>
                   </div>
                 </div>
                 <DialogFooter>
