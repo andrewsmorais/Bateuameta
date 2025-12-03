@@ -536,7 +536,12 @@ const Relatorios = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Layout Vertical - cada campo em linha separada */}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground mb-1">Veículo</p>
+                  <p className="text-xl font-bold text-[#15a249]">{resultado.veiculos?.modelo} - {resultado.veiculos?.placa}</p>
+                </div>
                 <div>
                   <p className="text-sm font-bold text-foreground mb-1">Data</p>
                   <p className="text-xl font-bold text-[#15a249]">{format(new Date(resultado.data), "dd/MM/yyyy")}</p>
@@ -546,7 +551,7 @@ const Relatorios = () => {
                   <p className="text-xl font-bold text-[#15a249]">R$ {resultado.valor?.toFixed(2) || "0.00"}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground mb-1">KM Inicial</p>
+                  <p className="text-sm font-bold text-foreground mb-1">KM Atual</p>
                   <p className="text-xl font-bold text-[#15a249]">{resultado.km_atual?.toFixed(0) || "0"} km</p>
                 </div>
                 {resultado.km_final && (
@@ -555,31 +560,31 @@ const Relatorios = () => {
                     <p className="text-xl font-bold text-[#15a249]">{resultado.km_final?.toFixed(0)} km</p>
                   </div>
                 )}
+                {resultado.nome_oficina_produto && (
+                  <div>
+                    <p className="text-sm font-bold text-foreground mb-1">Oficina/Produto</p>
+                    <p className="text-xl font-bold text-[#15a249]">{resultado.nome_oficina_produto}</p>
+                  </div>
+                )}
+                {resultado.peca_trocada && (
+                  <div>
+                    <p className="text-sm font-bold text-foreground mb-1">Peça Trocada</p>
+                    <p className="text-xl font-bold text-[#15a249]">{resultado.peca_trocada}</p>
+                  </div>
+                )}
+                {resultado.proximo_km && (
+                  <div>
+                    <p className="text-sm font-bold text-foreground mb-1">Próximo KM</p>
+                    <p className="text-xl font-bold text-[#15a249]">{resultado.proximo_km?.toFixed(0)} km</p>
+                  </div>
+                )}
+                {resultado.observacoes && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm font-bold text-foreground mb-1">Observações</p>
+                    <p className="text-xl font-bold text-[#15a249]">{resultado.observacoes}</p>
+                  </div>
+                )}
               </div>
-              {resultado.nome_oficina_produto && (
-                <div className="mt-4">
-                  <p className="text-sm font-bold text-foreground mb-1">Oficina/Produto</p>
-                  <p className="text-xl font-bold text-[#15a249]">{resultado.nome_oficina_produto}</p>
-                </div>
-              )}
-              {resultado.peca_trocada && (
-                <div className="mt-4">
-                  <p className="text-sm font-bold text-foreground mb-1">Peça Trocada</p>
-                  <p className="text-xl font-bold text-[#15a249]">{resultado.peca_trocada}</p>
-                </div>
-              )}
-              {resultado.proximo_km && (
-                <div className="mt-4">
-                  <p className="text-sm font-bold text-foreground mb-1">Próximo KM</p>
-                  <p className="text-xl font-bold text-[#15a249]">{resultado.proximo_km?.toFixed(0)} km</p>
-                </div>
-              )}
-              {resultado.observacoes && (
-                <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <p className="text-sm font-bold text-foreground mb-1">Observações</p>
-                  <p className="text-xl font-bold text-[#15a249]">{resultado.observacoes}</p>
-                </div>
-              )}
             </CardContent>
           </Card>
         ));
@@ -707,10 +712,16 @@ const Relatorios = () => {
 
       {resultados.length > 0 && (
         <>
-          {/* Seção A: Relatórios de Turnos */}
+          {/* Seção A: Título dinâmico baseado no tipo */}
           <Card>
             <CardHeader>
-              <CardTitle>Relatórios de Turnos</CardTitle>
+              <CardTitle>
+                {filtros.tipoRelatorio === "turnos" && "Relatórios de Turnos"}
+                {filtros.tipoRelatorio === "manutencoes" && "Relatórios de Manutenções"}
+                {filtros.tipoRelatorio === "ganhos" && "Relatórios de Ganhos"}
+                {filtros.tipoRelatorio === "despesas" && "Relatórios de Despesas"}
+                {filtros.tipoRelatorio === "metas" && "Relatórios de Metas"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">{renderResultados()}</div>
@@ -820,7 +831,11 @@ const Relatorios = () => {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {filtros.tipoRelatorio === "manutencoes" 
+                      ? "Valor Total das Manutenções Realizadas" 
+                      : "Valor Total"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-[#15a249]">R$ {metricas.valorTotal.toFixed(2)}</div>
