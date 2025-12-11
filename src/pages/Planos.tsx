@@ -44,6 +44,7 @@ const isValidCPF = (cpf: string): boolean => {
 const Planos = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -56,8 +57,10 @@ const Planos = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
       
-      // If authenticated with active subscription, redirect to dashboard
+      // If authenticated, store user email
       if (session) {
+        setUserEmail(session.user.email || null);
+        
         const { data } = await supabase.functions.invoke("check-subscription", {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
@@ -114,13 +117,25 @@ const Planos = () => {
       }
     }
 
+    // Determine which email to use
+    const emailToUse = isAuthenticated ? userEmail : email;
+    
+    if (!emailToUse) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Email não encontrado. Faça login novamente.",
+      });
+      return;
+    }
+
     setLoading(planType);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { 
           priceId: PRICE_IDS[planType],
-          email: isAuthenticated ? undefined : email,
+          email: emailToUse,
           nomeCompleto: isAuthenticated ? undefined : nomeCompleto,
           telefone: isAuthenticated ? undefined : telefone.replace(/\D/g, ""),
           cpf: isAuthenticated ? undefined : cpf.replace(/\D/g, ""),
