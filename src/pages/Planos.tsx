@@ -92,8 +92,17 @@ const Planos = () => {
   };
 
   const handleSelectPlan = async (planType: "mensal" | "anual") => {
-    // If not authenticated, validate user data first
-    if (!isAuthenticated) {
+    // Get fresh session data at click time to avoid race conditions
+    const { data: { session } } = await supabase.auth.getSession();
+    const isCurrentlyAuthenticated = !!session;
+    
+    let emailToUse: string | null = null;
+    
+    if (isCurrentlyAuthenticated) {
+      emailToUse = session.user.email || null;
+      console.log("Authenticated user email:", emailToUse);
+    } else {
+      // If not authenticated, validate user data first
       try {
         userSchema.parse({ email, nomeCompleto, telefone, cpf });
       } catch (error) {
@@ -115,10 +124,9 @@ const Planos = () => {
         });
         return;
       }
+      
+      emailToUse = email;
     }
-
-    // Determine which email to use
-    const emailToUse = isAuthenticated ? userEmail : email;
     
     if (!emailToUse) {
       toast({
@@ -131,15 +139,19 @@ const Planos = () => {
 
     setLoading(planType);
 
+    const requestBody = { 
+      priceId: PRICE_IDS[planType],
+      email: emailToUse,
+      nomeCompleto: isCurrentlyAuthenticated ? undefined : nomeCompleto,
+      telefone: isCurrentlyAuthenticated ? undefined : telefone.replace(/\D/g, ""),
+      cpf: isCurrentlyAuthenticated ? undefined : cpf.replace(/\D/g, ""),
+    };
+    
+    console.log("Sending to create-checkout:", requestBody);
+
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { 
-          priceId: PRICE_IDS[planType],
-          email: emailToUse,
-          nomeCompleto: isAuthenticated ? undefined : nomeCompleto,
-          telefone: isAuthenticated ? undefined : telefone.replace(/\D/g, ""),
-          cpf: isAuthenticated ? undefined : cpf.replace(/\D/g, ""),
-        },
+        body: requestBody,
       });
 
       if (error) {

@@ -12,9 +12,14 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId, email, nomeCompleto, telefone, cpf } = await req.json();
+    const body = await req.json();
+    console.log("Received body:", JSON.stringify(body));
+    
+    const { priceId, email, nomeCompleto, telefone, cpf } = body;
+    console.log("Parsed values - priceId:", priceId, "email:", email);
 
     if (!priceId) {
+      console.log("Error: Price ID is missing");
       return new Response(JSON.stringify({ error: "Price ID is required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
@@ -22,6 +27,7 @@ serve(async (req) => {
     }
 
     if (!email) {
+      console.log("Error: Email is missing");
       return new Response(JSON.stringify({ error: "Email is required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
