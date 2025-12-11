@@ -40,9 +40,9 @@ const PagamentoSucesso = () => {
             <div className="flex items-start gap-3">
               <Mail className="h-5 w-5 text-primary mt-0.5" />
               <div>
-                <p className="font-medium text-foreground">Verifique seu Email</p>
+                <p className="font-medium text-foreground">Email de Acesso</p>
                 <p className="text-sm text-muted-foreground">
-                  Enviamos suas credenciais de acesso para o email informado no checkout.
+                  Use o email informado no checkout para fazer login.
                 </p>
               </div>
             </div>
@@ -50,8 +50,11 @@ const PagamentoSucesso = () => {
               <Key className="h-5 w-5 text-primary mt-0.5" />
               <div>
                 <p className="font-medium text-foreground">Senha Temporária</p>
-                <p className="text-sm text-muted-foreground">
-                  Use a senha enviada no email para fazer seu primeiro login.
+                <p className="text-lg font-bold text-primary bg-primary/10 px-3 py-2 rounded mt-1 font-mono">
+                  MudeAgora123
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Anote esta senha antes de continuar!
                 </p>
               </div>
             </div>

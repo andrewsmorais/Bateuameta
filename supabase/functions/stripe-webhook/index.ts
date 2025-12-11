@@ -12,17 +12,8 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-// Generate a secure random password
-function generateSecurePassword(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
-  let password = "";
-  const array = new Uint8Array(12);
-  crypto.getRandomValues(array);
-  for (let i = 0; i < 12; i++) {
-    password += chars[array[i] % chars.length];
-  }
-  return password;
-}
+// Temporary fixed password (until email integration)
+const TEMPORARY_PASSWORD = 'MudeAgora123';
 
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
@@ -70,8 +61,8 @@ serve(async (req) => {
           userId = existingUser.id;
           console.log("User already exists:", userId);
         } else {
-          // Create new user with generated password
-          generatedPassword = generateSecurePassword();
+          // Use temporary fixed password
+          generatedPassword = TEMPORARY_PASSWORD;
           
           const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
             email: customerEmail,
