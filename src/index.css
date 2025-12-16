@@ -197,3 +197,55 @@ All colors MUST be HSL.
   -webkit-text-fill-color: hsl(var(--foreground)) !important;
   caret-color: hsl(var(--foreground)) !important;
 }
+
+/* ============================================
+   iOS PWA Safe Area Optimizations
+   Only applies to iOS devices in standalone mode
+   ============================================ */
+
+/* iOS PWA Safe Areas - viewport-fit for notch support */
+@supports (padding: env(safe-area-inset-top)) {
+  /* iOS PWA standalone mode safe area handling */
+  @media screen and (display-mode: standalone) {
+    /* Ensure body respects safe areas */
+    body.ios-pwa {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    /* iOS PWA header adjustment */
+    .ios-pwa-header {
+      padding-top: env(safe-area-inset-top) !important;
+      min-height: calc(4rem + env(safe-area-inset-top)) !important;
+    }
+
+    /* iOS PWA main content adjustment */
+    .ios-pwa-content {
+      padding-bottom: env(safe-area-inset-bottom) !important;
+      min-height: calc(100vh - 4rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    }
+
+    /* iOS PWA sidebar adjustment */
+    .ios-pwa-sidebar {
+      padding-top: env(safe-area-inset-top) !important;
+      padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+    /* iOS PWA sidebar header */
+    .ios-pwa-sidebar-header {
+      margin-top: env(safe-area-inset-top) !important;
+    }
+  }
+}
+
+/* Fallback for older iOS versions */
+@media screen and (display-mode: standalone) {
+  body.ios-pwa {
+    padding-top: constant(safe-area-inset-top);
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-left: constant(safe-area-inset-left);
+    padding-right: constant(safe-area-inset-right);
+  }
+}

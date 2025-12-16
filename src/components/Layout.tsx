@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { useIOSPWA } from "@/hooks/useIOSPWA";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ThemeToggle } from "./ThemeToggle";
@@ -59,6 +60,19 @@ export const Layout = ({
   } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
   const { isInstalled } = usePWAInstall();
+  const { isIOSPWA } = useIOSPWA();
+
+  // Apply iOS PWA class to body
+  useEffect(() => {
+    if (isIOSPWA) {
+      document.body.classList.add('ios-pwa');
+    } else {
+      document.body.classList.remove('ios-pwa');
+    }
+    return () => {
+      document.body.classList.remove('ios-pwa');
+    };
+  }, [isIOSPWA]);
 
   const handleInstallApp = () => {
     setInstallDialogOpen(true);
@@ -186,8 +200,15 @@ export const Layout = ({
 
       {/* Mobile Sidebar */}
       {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform md:hidden", sidebarOpen ? "translate-x-0" : "-translate-x-full")}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform md:hidden",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full",
+        isIOSPWA && "ios-pwa-sidebar"
+      )}>
+        <div className={cn(
+          "flex items-center justify-between h-16 px-6 border-b border-sidebar-border",
+          isIOSPWA && "ios-pwa-sidebar-header"
+        )}>
           <h1 className="text-lg font-bold text-sidebar-foreground">
             Bateu a Meta
           </h1>
@@ -243,7 +264,10 @@ export const Layout = ({
       {/* Main Content */}
       <div className="flex-1 md:pl-64">
         {/* Mobile Header */}
-        <header className="flex items-center justify-between h-16 px-4 border-b border-border md:hidden bg-card">
+        <header className={cn(
+          "flex items-center justify-between h-16 px-4 border-b border-border md:hidden bg-card",
+          isIOSPWA && "ios-pwa-header"
+        )}>
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
               <Menu className="w-5 h-5" />
@@ -281,7 +305,7 @@ export const Layout = ({
         </header>
 
         {/* Page Content */}
-        <main className="p-6">{children}</main>
+        <main className={cn("p-6", isIOSPWA && "ios-pwa-content")}>{children}</main>
       </div>
 
       {/* PWA Install Dialog */}
