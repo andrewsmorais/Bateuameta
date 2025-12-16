@@ -389,7 +389,7 @@ const LandingPage = () => {
                     { icon: Headphones, text: "Suporte", bold: "prioritário" }
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-black">
-                      <item.icon className="h-5 w-5 text-green-500" />
+                      <item.icon className="h-5 w-5 text-green-600" />
                       <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
                     </li>
                   ))}
@@ -427,7 +427,7 @@ const LandingPage = () => {
                     { icon: CalendarX, text: "Cancele", bold: "quando quiser" }
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-black">
-                      <item.icon className="h-5 w-5 text-green-500" />
+                      <item.icon className="h-5 w-5 text-green-600" />
                       <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
                     </li>
                   ))}
