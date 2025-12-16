@@ -389,7 +389,7 @@ const LandingPage = () => {
                     { icon: Headphones, text: "Suporte", bold: "prioritário" }
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-black">
-                      <item.icon className="h-5 w-5 text-green-600" />
+                      <item.icon className="h-5 w-5 stroke-green-600 text-green-600" strokeWidth={2} />
                       <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
                     </li>
                   ))}
@@ -427,14 +427,14 @@ const LandingPage = () => {
                     { icon: CalendarX, text: "Cancele", bold: "quando quiser" }
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-black">
-                      <item.icon className="h-5 w-5 text-green-600" />
+                      <item.icon className="h-5 w-5 stroke-green-600 text-green-600" strokeWidth={2} />
                       <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
                     </li>
                   ))}
                 </ul>
 
                 <Button 
-                  className="w-full py-6 text-lg font-bold bg-[#3c83f6] hover:bg-[#2a6ad9] text-white"
+                  className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
                   onClick={() => handleSelectPlan("mensal")}
                   disabled={loadingPlan === "mensal"}
                 >
