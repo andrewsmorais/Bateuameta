@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Check, Share, MoreVertical, Plus, X } from "lucide-react";
+import { Download, Check, Share, MoreVertical, Plus } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { toast } from "sonner";
 
@@ -16,15 +16,8 @@ interface PWAInstallDialogProps {
 }
 
 export const PWAInstallDialog = ({ open, onOpenChange }: PWAInstallDialogProps) => {
-  const { isInstallable, isInstalled, isIOS, isAndroid, browserName, install } = usePWAInstall();
+  const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
   const [showInstructions, setShowInstructions] = useState(false);
-
-  useEffect(() => {
-    // Auto-trigger install prompt when dialog opens and is installable
-    if (open && isInstallable && !isInstalled) {
-      handleInstallClick();
-    }
-  }, [open, isInstallable, isInstalled]);
 
   const handleInstallClick = async () => {
     if (isInstalled) {
@@ -129,7 +122,7 @@ export const PWAInstallDialog = ({ open, onOpenChange }: PWAInstallDialogProps) 
               <img 
                 src="/pwa-icon.png" 
                 alt="Bateu A Meta" 
-                className="w-12 h-12 rounded-xl"
+                className="w-12 h-12 rounded-xl object-cover"
               />
               <span>Bateu A Meta</span>
             </DialogTitle>
@@ -153,7 +146,7 @@ export const PWAInstallDialog = ({ open, onOpenChange }: PWAInstallDialogProps) 
             <img 
               src="/pwa-icon.png" 
               alt="Bateu A Meta" 
-              className="w-12 h-12 rounded-xl"
+              className="w-12 h-12 rounded-xl object-cover"
             />
             <span>Instalar Bateu A Meta</span>
           </DialogTitle>
@@ -161,7 +154,7 @@ export const PWAInstallDialog = ({ open, onOpenChange }: PWAInstallDialogProps) 
 
         <div className="space-y-4">
           {/* Install Button */}
-          {isInstallable && !showInstructions && (
+          {!showInstructions && (
             <Button
               onClick={handleInstallClick}
               size="lg"
@@ -173,7 +166,7 @@ export const PWAInstallDialog = ({ open, onOpenChange }: PWAInstallDialogProps) 
           )}
 
           {/* Instructions */}
-          {(showInstructions || !isInstallable) && (
+          {showInstructions && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground text-center">
                 Siga os passos abaixo para instalar:
@@ -183,7 +176,7 @@ export const PWAInstallDialog = ({ open, onOpenChange }: PWAInstallDialogProps) 
           )}
 
           {/* Show instructions toggle */}
-          {isInstallable && !showInstructions && (
+          {!showInstructions && (
             <button
               onClick={() => setShowInstructions(true)}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
