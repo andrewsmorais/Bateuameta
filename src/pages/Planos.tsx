@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { EmailCheckDialog } from "@/components/dialogs/EmailCheckDialog";
 import logoImage from "@/assets/bateu-a-meta-logo.png";
 
 const PRICE_IDS = {
@@ -17,8 +16,6 @@ const PRICE_IDS = {
 const Planos = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"mensal" | "anual">("anual");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,17 +40,12 @@ const Planos = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleSelectPlan = (planType: "mensal" | "anual") => {
-    setSelectedPlan(planType);
-    setEmailDialogOpen(true);
-  };
-
-  const handleProceedToCheckout = async (email: string) => {
-    setLoading(selectedPlan);
+  const handleSelectPlan = async (planType: "mensal" | "anual") => {
+    setLoading(planType);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId: PRICE_IDS[selectedPlan], email },
+        body: { priceId: PRICE_IDS[planType] },
       });
 
       if (error) {
@@ -244,13 +236,6 @@ const Planos = () => {
           )}
         </div>
       </div>
-
-      <EmailCheckDialog
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-        planType={selectedPlan}
-        onProceedToCheckout={handleProceedToCheckout}
-      />
     </div>
   );
 };
