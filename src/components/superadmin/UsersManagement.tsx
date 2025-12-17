@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Edit, Trash2, Lock, Unlock, UserPlus, Key, Search, AlertTriangle, Copy, Eye } from "lucide-react";
+import { Edit, Trash2, Lock, Unlock, UserPlus, Key, Search, AlertTriangle, Copy, Eye, MessageCircle, StickyNote } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
@@ -32,6 +33,8 @@ interface UserData {
   lastPaymentDate?: string | null;
   paymentMethod?: string | null;
   netAmount?: number | null;
+  daysRemaining?: number | null;
+  admin_notes?: string | null;
 }
 
 export const UsersManagement = () => {
@@ -42,7 +45,9 @@ export const UsersManagement = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
+  const [adminNotes, setAdminNotes] = useState("");
   
   // Form states
   const [editForm, setEditForm] = useState({
@@ -96,8 +101,7 @@ export const UsersManagement = () => {
         .from("user_roles")
         .select("user_id, role");
 
-      // Get emails from auth if possible (need edge function for this)
-      // For now, we'll use pending_registrations as backup
+      // Get emails from pending_registrations
       const { data: pendingRegs } = await supabase
         .from("pending_registrations")
         .select("email, stripe_customer_id");
@@ -128,6 +132,15 @@ export const UsersManagement = () => {
           renewal_status = "expired";
         }
 
+        // Calculate days remaining
+        let daysRemaining: number | null = null;
+        if (expiresAt && expiresAt > now) {
+          const diffTime = expiresAt.getTime() - now.getTime();
+          daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        } else if (expiresAt && expiresAt < now) {
+          daysRemaining = 0;
+        }
+
         return {
           ...profile,
           email: `user-${profile.id.slice(0, 8)}@app.com`,
@@ -141,6 +154,8 @@ export const UsersManagement = () => {
           lastPaymentDate: null,
           paymentMethod: null,
           netAmount: null,
+          daysRemaining,
+          admin_notes: (profile as any).admin_notes || null,
         };
       });
 
@@ -230,6 +245,25 @@ export const UsersManagement = () => {
     },
   });
 
+  // Update admin notes mutation
+  const updateNotesMutation = useMutation({
+    mutationFn: async ({ userId, notes }: { userId: string; notes: string }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ admin_notes: notes })
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("Notas salvas!");
+      setIsNotesOpen(false);
+    },
+    onError: (error) => {
+      toast.error("Erro ao salvar notas: " + error.message);
+    },
+  });
+
   // Create user mutation
   const createUserMutation = useMutation({
     mutationFn: async (userData: typeof addForm) => {
@@ -268,7 +302,6 @@ export const UsersManagement = () => {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      // Delete from profiles first (cascade will handle related data)
       const { error: profileError } = await supabase
         .from("profiles")
         .delete()
@@ -277,9 +310,6 @@ export const UsersManagement = () => {
       if (profileError) {
         throw profileError;
       }
-
-      // Try to delete from auth (requires admin access)
-      // This will be handled by the edge function in production
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
@@ -328,7 +358,6 @@ export const UsersManagement = () => {
       toast.success("Senha resetada com sucesso!");
     },
     onError: () => {
-      // Fallback - show default provisional password
       setGeneratedPassword("1234");
       toast.success("Senha definida como provisória: 1234");
     },
@@ -365,9 +394,35 @@ export const UsersManagement = () => {
     setIsDeleteOpen(true);
   };
 
+  const handleNotesClick = (user: UserData) => {
+    setSelectedUser(user);
+    setAdminNotes(user.admin_notes || "");
+    setIsNotesOpen(true);
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copiado para a área de transferência!");
+  };
+
+  const formatWhatsAppLink = (phone: string | null) => {
+    if (!phone) return null;
+    const cleaned = phone.replace(/\D/g, '');
+    const fullNumber = cleaned.startsWith('55') ? cleaned : `55${cleaned}`;
+    return `https://wa.me/${fullNumber}`;
+  };
+
+  const getDaysRemainingBadge = (days: number | null | undefined) => {
+    if (days === null || days === undefined) return null;
+    if (days <= 0) {
+      return <Badge variant="destructive">Expirado</Badge>;
+    } else if (days <= 7) {
+      return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30">{days} dias</Badge>;
+    } else if (days <= 30) {
+      return <Badge variant="outline" className="bg-[hsl(217,91%,60%)]/10 text-[hsl(217,91%,60%)] border-[hsl(217,91%,60%)]/30">{days} dias</Badge>;
+    } else {
+      return <Badge variant="outline" className="bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30">{days} dias</Badge>;
+    }
   };
 
   if (isLoading) {
@@ -456,7 +511,8 @@ export const UsersManagement = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="free">Free</SelectItem>
-                        <SelectItem value="pago">Pago R$ 97,90</SelectItem>
+                        <SelectItem value="mensal">Mensal R$ 12,90</SelectItem>
+                        <SelectItem value="anual">Anual R$ 97,90</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -491,15 +547,15 @@ export const UsersManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome Completo</TableHead>
+                  <TableHead>Nome</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
                   <TableHead>CPF</TableHead>
-                  <TableHead>Último Pagamento</TableHead>
-                  <TableHead>Forma Pagamento</TableHead>
-                  <TableHead>Valor Líquido</TableHead>
+                  <TableHead>Último Pag.</TableHead>
+                  <TableHead>Forma</TableHead>
+                  <TableHead>Valor Líq.</TableHead>
                   <TableHead>Plano</TableHead>
-                  <TableHead>Renovação</TableHead>
+                  <TableHead>Dias Restantes</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -520,7 +576,19 @@ export const UsersManagement = () => {
                       <TableCell className="text-sm">
                         {user.email || user.id.slice(0, 8) + "..."}
                       </TableCell>
-                      <TableCell>{user.telefone || "-"}</TableCell>
+                      <TableCell>
+                        {user.telefone ? (
+                          <a 
+                            href={formatWhatsAppLink(user.telefone) || "#"} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[hsl(142,76%,36%)] hover:underline"
+                          >
+                            <MessageCircle className="h-3 w-3" />
+                            {user.telefone}
+                          </a>
+                        ) : "-"}
+                      </TableCell>
                       <TableCell>{user.cpf || "-"}</TableCell>
                       <TableCell className="text-sm">
                         {user.lastPaymentDate 
@@ -545,13 +613,11 @@ export const UsersManagement = () => {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={user.planPrice > 0 ? "bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30" : ""}>
-                          {user.planPrice > 0 ? `R$ ${user.planPrice.toFixed(2).replace('.', ',')}` : "Free"}
+                          {user.planPrice === 12.9 ? "Mensal" : user.planPrice === 97.9 ? "Anual" : "Free"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {user.expires_at 
-                          ? new Date(user.expires_at).toLocaleDateString('pt-BR')
-                          : "-"}
+                      <TableCell>
+                        {getDaysRemainingBadge(user.daysRemaining)}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -570,6 +636,14 @@ export const UsersManagement = () => {
                             title="Editar"
                           >
                             <Edit className="h-4 w-4 text-[hsl(217,91%,60%)]" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleNotesClick(user)}
+                            title="Notas do Admin"
+                          >
+                            <StickyNote className={`h-4 w-4 ${user.admin_notes ? "text-yellow-500" : "text-muted-foreground"}`} />
                           </Button>
                           <Button
                             variant="ghost"
@@ -695,7 +769,7 @@ export const UsersManagement = () => {
                 <SelectContent>
                   {plans?.map((plan) => (
                     <SelectItem key={plan.id} value={plan.id}>
-                      {plan.price > 0 ? `R$ ${plan.price.toFixed(2).replace('.', ',')} Anual` : plan.name}
+                      {plan.price === 12.9 ? "Mensal R$ 12,90" : plan.price === 97.9 ? "Anual R$ 97,90" : plan.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -726,6 +800,44 @@ export const UsersManagement = () => {
               disabled={updateUserMutation.isPending}
             >
               {updateUserMutation.isPending ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Notes Dialog */}
+      <Dialog open={isNotesOpen} onOpenChange={setIsNotesOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Notas do Admin</DialogTitle>
+            <DialogDescription>
+              Adicione anotações sobre {selectedUser?.nome_completo || "o usuário"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={adminNotes}
+              onChange={(e) => setAdminNotes(e.target.value)}
+              placeholder="Adicione notas sobre este usuário..."
+              rows={6}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNotesOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedUser) {
+                  updateNotesMutation.mutate({
+                    userId: selectedUser.id,
+                    notes: adminNotes,
+                  });
+                }
+              }}
+              disabled={updateNotesMutation.isPending}
+            >
+              {updateNotesMutation.isPending ? "Salvando..." : "Salvar Notas"}
             </Button>
           </DialogFooter>
         </DialogContent>

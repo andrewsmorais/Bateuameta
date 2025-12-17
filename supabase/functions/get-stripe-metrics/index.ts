@@ -7,6 +7,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Valid plan amounts in cents (BRL)
+const MONTHLY_PLAN_AMOUNT = 1290; // R$ 12,90
+const ANNUAL_PLAN_AMOUNT = 9790; // R$ 97,90
+const VALID_AMOUNTS = [MONTHLY_PLAN_AMOUNT, ANNUAL_PLAN_AMOUNT];
+
+// Stripe fee calculation for Brazil
+const calculateStripeFee = (amount: number): number => {
+  // 3.99% + R$ 0.39 for cards (most common)
+  return (amount * 0.0399) + 0.39;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -99,14 +110,15 @@ serve(async (req) => {
       limit: 100,
     });
 
-    // Calculate metrics
+    // Calculate metrics - ONLY FOR VALID PLAN AMOUNTS
     let grossRevenue = 0;
     let totalFees = 0;
     let totalRefunds = 0;
     let monthlyPlanCount = 0;
     let annualPlanCount = 0;
+    let validChargesCount = 0;
 
-    // Process charges
+    // Process charges - FILTER ONLY R$ 12,90 and R$ 97,90
     const monthlyData: { [key: string]: { gross: number; fees: number; refunds: number } } = {};
     const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
@@ -119,12 +131,14 @@ serve(async (req) => {
     }
 
     for (const charge of charges.data) {
-      if (charge.status === "succeeded") {
+      // ONLY count charges with valid plan amounts (R$ 12,90 or R$ 97,90)
+      if (charge.status === "succeeded" && VALID_AMOUNTS.includes(charge.amount)) {
         const amountBRL = charge.amount / 100; // Convert from cents
         grossRevenue += amountBRL;
+        validChargesCount++;
 
-        // Estimate Stripe fees (3.99% + R$ 0.39 for cards)
-        const fee = (amountBRL * 0.0399) + 0.39;
+        // Calculate Stripe fees
+        const fee = calculateStripeFee(amountBRL);
         totalFees += fee;
 
         // Add to monthly data
@@ -134,12 +148,16 @@ serve(async (req) => {
           monthlyData[key].gross += amountBRL;
           monthlyData[key].fees += fee;
         }
+
+        console.log(`Valid charge: R$ ${amountBRL.toFixed(2)} - ${charge.id}`);
+      } else if (charge.status === "succeeded") {
+        console.log(`Ignored charge (test/invalid): R$ ${(charge.amount / 100).toFixed(2)} - ${charge.id}`);
       }
     }
 
-    // Process refunds
+    // Process refunds - only for valid amounts
     for (const refund of refunds.data) {
-      if (refund.status === "succeeded") {
+      if (refund.status === "succeeded" && VALID_AMOUNTS.includes(refund.amount)) {
         const refundAmount = refund.amount / 100;
         totalRefunds += refundAmount;
 
@@ -155,12 +173,12 @@ serve(async (req) => {
     for (const sub of subscriptions.data) {
       if (sub.items.data.length > 0) {
         const price = sub.items.data[0].price;
-        const amount = (price.unit_amount || 0) / 100;
+        const amount = price.unit_amount || 0;
         
-        // R$ 12.90 = monthly, R$ 97.90 = annual
-        if (amount >= 12 && amount <= 13) {
+        // R$ 12.90 = monthly (1290 cents), R$ 97.90 = annual (9790 cents)
+        if (amount === MONTHLY_PLAN_AMOUNT) {
           monthlyPlanCount++;
-        } else if (amount >= 97 && amount <= 98) {
+        } else if (amount === ANNUAL_PLAN_AMOUNT) {
           annualPlanCount++;
         }
       }
@@ -197,10 +215,10 @@ serve(async (req) => {
       annualPlanCount,
       webhookHealthy,
       monthlyHistory,
-      totalCharges: charges.data.length,
+      totalCharges: validChargesCount,
     };
 
-    console.log("Stripe metrics calculated:", response);
+    console.log("Stripe metrics calculated (filtered):", response);
 
     return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
