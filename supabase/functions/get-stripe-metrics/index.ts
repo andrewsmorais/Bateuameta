@@ -42,20 +42,27 @@ serve(async (req) => {
       });
     }
 
+    console.log("User ID:", user.id);
+
     // Check if user is super admin using service role
-    const { data: roleData } = await supabaseAdmin
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
       .eq("role", "super_admin")
       .maybeSingle();
 
+    console.log("Role data:", roleData, "Role error:", roleError);
+
     if (!roleData) {
+      console.log("User is not super admin");
       return new Response(JSON.stringify({ error: "Unauthorized - Super admin only" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    console.log("User is super admin, proceeding...");
 
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeSecretKey) {
