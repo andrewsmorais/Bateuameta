@@ -100,6 +100,95 @@ async function sendWelcomeEmail(email: string, password: string, nome: string) {
   }
 }
 
+async function sendRenewalEmail(email: string, nome: string, planType: string, expiresAt: string) {
+  if (!BREVO_API_KEY) {
+    console.error("BREVO_API_KEY not configured");
+    return;
+  }
+
+  const planName = planType === "anual" ? "Anual (R$ 97,90)" : "Mensal (R$ 12,90)";
+  const expirationDate = new Date(expiresAt).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
+  const emailContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">
+          Olá, ${nome}! 🎉
+        </h1>
+        <p style="font-size: 20px; color: #15a249; line-height: 1.6; font-weight: bold;">
+          Sua assinatura foi renovada com sucesso!
+        </p>
+      </div>
+      
+      <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #15a249;">
+        <h2 style="color: #333; margin-bottom: 15px; font-size: 18px;">📋 DETALHES DA RENOVAÇÃO:</h2>
+        <p style="font-size: 16px; margin: 10px 0; color: #333;">
+          <strong>Plano:</strong> ${planName}
+        </p>
+        <p style="font-size: 16px; margin: 10px 0; color: #333;">
+          <strong>Válido até:</strong> ${expirationDate}
+        </p>
+      </div>
+      
+      <div style="background-color: #e8f5e9; padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center;">
+        <p style="font-size: 16px; color: #333; margin: 0;">
+          ✅ Seu acesso continua ativo.<br/>
+          Continue acompanhando seus ganhos e batendo suas metas!
+        </p>
+      </div>
+      
+      <div style="text-align: center; margin: 35px 0;">
+        <a href="${APP_URL}/auth" style="display: inline-block; background-color: #15a249; color: white; padding: 18px 50px; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;">
+          🚀 ACESSAR O APLICATIVO
+        </a>
+      </div>
+      
+      <div style="border-top: 2px solid #eee; padding-top: 25px; text-align: center;">
+        <p style="color: #333; font-size: 16px; margin-bottom: 15px; font-weight: bold;">Dúvidas?</p>
+        <p style="color: #666; font-size: 15px; margin: 8px 0;">
+          📱 WhatsApp: <a href="https://wa.me/5512981796135" style="color: #25D366; text-decoration: none;">(12) 98179-6135</a>
+        </p>
+        <p style="color: #666; font-size: 15px; margin: 8px 0;">
+          📸 Instagram: <a href="https://www.instagram.com/bateu_meta/" style="color: #E1306C; text-decoration: none;">@bateu_meta</a>
+        </p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "api-key": BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "Bateu A Meta",
+          email: "suporte@bateuameta.com",
+        },
+        to: [{ email }],
+        subject: "🔄 Assinatura Renovada! Continue batendo suas metas - Bateu A Meta",
+        htmlContent: emailContent,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Brevo API error (renewal):", errorData);
+    } else {
+      console.log("Renewal email sent successfully to:", email);
+    }
+  } catch (error) {
+    console.error("Error sending renewal email:", error);
+  }
+}
+
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
@@ -145,6 +234,8 @@ serve(async (req) => {
         let user = existingUsers?.users?.find(u => u.email === customerEmail);
         
         const defaultPassword = "1234";
+        const customerName = session.customer_details?.name || customerEmail.split("@")[0];
+        let isNewUser = false;
 
         if (!user) {
           // Create new user with default password
@@ -153,7 +244,7 @@ serve(async (req) => {
             password: defaultPassword,
             email_confirm: true,
             user_metadata: {
-              full_name: customerEmail.split("@")[0],
+              full_name: customerName,
             },
           });
 
@@ -163,13 +254,13 @@ serve(async (req) => {
           }
 
           user = newUser.user;
+          isNewUser = true;
           console.log("New user created:", user.id);
 
           // Send welcome email with credentials
-          const customerName = session.customer_details?.name || customerEmail.split("@")[0];
           await sendWelcomeEmail(customerEmail, defaultPassword, customerName);
         } else {
-          console.log("User already exists:", user.id);
+          console.log("User already exists, will send renewal email:", user.id);
         }
 
         // Create or update profile
@@ -252,7 +343,12 @@ serve(async (req) => {
           console.error("Error adding premium role:", roleError);
         }
 
-        console.log("User setup completed for:", customerEmail, "Plan:", planType);
+        // Send renewal email for existing users
+        if (!isNewUser) {
+          await sendRenewalEmail(customerEmail, customerName, planType, expiresAt);
+        }
+
+        console.log("User setup completed for:", customerEmail, "Plan:", planType, "New user:", isNewUser);
         break;
       }
 
