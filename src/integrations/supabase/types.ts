@@ -237,6 +237,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_notes: string | null
           avatar_url: string | null
           cpf: string | null
           created_at: string | null
@@ -248,6 +249,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          admin_notes?: string | null
           avatar_url?: string | null
           cpf?: string | null
           created_at?: string | null
@@ -259,6 +261,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          admin_notes?: string | null
           avatar_url?: string | null
           cpf?: string | null
           created_at?: string | null
