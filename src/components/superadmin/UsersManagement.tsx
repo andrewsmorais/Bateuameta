@@ -77,99 +77,33 @@ export const UsersManagement = () => {
     },
   });
 
-  // Fetch users with their emails
+  // Fetch users with their emails from edge function (includes auth.users emails)
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      // Get profiles with subscriptions
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select(`
-          *,
-          subscriptions(
-            id,
-            status,
-            plan_id,
-            started_at,
-            expires_at,
-            plans(name, price)
-          )
-        `);
-
-      // Get user roles
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id, role");
-
-      // Get emails from pending_registrations
-      const { data: pendingRegs } = await supabase
-        .from("pending_registrations")
-        .select("email, stripe_customer_id");
-
-      const emailMap = new Map<string, string>();
-      pendingRegs?.forEach(reg => {
-        if (reg.email && reg.stripe_customer_id) {
-          emailMap.set(reg.stripe_customer_id, reg.email);
-        }
-      });
-
-      const now = new Date();
-      
-      const usersWithRoles = profiles?.map((profile) => {
-        const subscription = profile.subscriptions;
-        const planPrice = subscription?.plans?.price || 0;
-        const expiresAt = subscription?.expires_at ? new Date(subscription.expires_at) : null;
+      try {
+        const { data, error } = await supabase.functions.invoke("get-admin-users");
         
-        // Calculate renewal status
-        let renewal_status: "active" | "expired" | "churned" | "free" = "free";
-        if (planPrice === 0 || !subscription) {
-          renewal_status = "free";
-        } else if (subscription.status === "active" && (!expiresAt || expiresAt > now)) {
-          renewal_status = "active";
-        } else if (expiresAt && expiresAt < now) {
-          renewal_status = "churned";
-        } else {
-          renewal_status = "expired";
+        if (error) {
+          console.error("Error fetching admin users:", error);
+          throw error;
         }
-
-        // Calculate days remaining
-        let daysRemaining: number | null = null;
-        if (expiresAt && expiresAt > now) {
-          const diffTime = expiresAt.getTime() - now.getTime();
-          daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        } else if (expiresAt && expiresAt < now) {
-          daysRemaining = 0;
-        }
-
-        return {
-          ...profile,
-          email: `user-${profile.id.slice(0, 8)}@app.com`,
-          role: roles?.find((r) => r.user_id === profile.id)?.role || "free",
-          plan: subscription?.plans?.name || "Free",
-          planPrice,
-          plan_id: subscription?.plan_id,
-          renewal_status,
-          expires_at: subscription?.expires_at,
-          started_at: subscription?.started_at,
-          lastPaymentDate: null,
-          paymentMethod: null,
-          netAmount: null,
-          daysRemaining,
-          admin_notes: (profile as any).admin_notes || null,
-        };
-      });
-
-      return usersWithRoles || [];
+        
+        return data?.users || [];
+      } catch (err) {
+        console.error("Failed to fetch admin users:", err);
+        return [];
+      }
     },
   });
 
-  // Fetch payment details from Stripe for all users
+  // Fetch payment details from Stripe for all users with valid emails
   const { data: paymentDetails } = useQuery({
-    queryKey: ["admin-payment-details", users?.map(u => u.email)],
+    queryKey: ["admin-payment-details", users?.map(u => u.email).filter(Boolean)],
     queryFn: async () => {
       if (!users || users.length === 0) return {};
       
-      const emails = users.map(u => u.email).filter(Boolean);
+      const emails = users.map(u => u.email).filter(Boolean) as string[];
       if (emails.length === 0) return {};
 
       try {
@@ -186,7 +120,7 @@ export const UsersManagement = () => {
         return {};
       }
     },
-    enabled: !!users && users.length > 0,
+    enabled: !!users && users.length > 0 && users.some(u => u.email),
   });
 
   // Merge payment details with users
