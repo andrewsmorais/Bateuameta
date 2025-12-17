@@ -13,6 +13,12 @@ serve(async (req) => {
   }
 
   try {
+    // Use service role for admin checks
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
@@ -36,8 +42,8 @@ serve(async (req) => {
       });
     }
 
-    // Check if user is super admin
-    const { data: roleData } = await supabaseClient
+    // Check if user is super admin using service role
+    const { data: roleData } = await supabaseAdmin
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
