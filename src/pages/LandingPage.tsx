@@ -27,7 +27,6 @@ import {
   ShieldCheck
 } from "lucide-react";
 import logo from "@/assets/bateu-a-meta-logo.png";
-import { EmailCheckDialog } from "@/components/dialogs/EmailCheckDialog";
 
 // Testimonial images
 import whatsapp1 from "@/assets/testimonials/whatsapp-1.jpeg";
@@ -52,24 +51,17 @@ const PRICE_IDS = {
 const LandingPage = () => {
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"mensal" | "anual">("anual");
 
   const scrollToPricing = () => {
     document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSelectPlan = (planType: "mensal" | "anual") => {
-    setSelectedPlan(planType);
-    setEmailDialogOpen(true);
-  };
-
-  const handleProceedToCheckout = async (email: string) => {
-    setLoadingPlan(selectedPlan);
+  const handleSelectPlan = async (planType: "mensal" | "anual") => {
+    setLoadingPlan(planType);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId: PRICE_IDS[selectedPlan], email },
+        body: { priceId: PRICE_IDS[planType] },
       });
 
       if (error) throw error;
@@ -559,12 +551,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <EmailCheckDialog
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-        planType={selectedPlan}
-        onProceedToCheckout={handleProceedToCheckout}
-      />
     </div>
   );
 };
