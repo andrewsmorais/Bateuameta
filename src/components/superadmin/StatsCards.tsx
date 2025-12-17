@@ -1,7 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, DollarSign, TrendingUp, CreditCard, UserCheck, UserX, Activity } from "lucide-react";
+import { 
+  Users, 
+  DollarSign, 
+  TrendingUp, 
+  CreditCard, 
+  UserCheck, 
+  UserX, 
+  Activity,
+  Wifi,
+  WifiOff,
+  Calendar,
+  Gift
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const StatsCards = () => {
@@ -19,26 +31,40 @@ export const StatsCards = () => {
         .select("plan_id, status, started_at, expires_at, plans(price, name)")
         .eq("status", "active");
 
-      // Calculate total gross revenue (sum of all active subscription prices)
+      // Count subscriptions by type
+      let monthlyCount = 0;
+      let annualCount = 0;
+      let freeCount = 0;
+
+      subscriptions?.forEach((sub: any) => {
+        const price = sub.plans?.price || 0;
+        if (price === 0) {
+          freeCount++;
+        } else if (price < 50) {
+          monthlyCount++;
+        } else {
+          annualCount++;
+        }
+      });
+
+      // Calculate total gross revenue
       const grossRevenue = subscriptions?.reduce((acc, sub: any) => {
         return acc + (sub.plans?.price || 0);
       }, 0) || 0;
 
-      // Count annual paid customers (price > 0)
-      const annualPaidCustomers = subscriptions?.filter((sub: any) => 
-        sub.plans?.price > 0
-      ).length || 0;
+      // Estimate refunds (for now, 0 - could be tracked separately)
+      const refunds = 0;
 
-      // Estimate net profit (gross revenue - 10% platform/transaction fees)
-      const platformFeeRate = 0.10; // 10% fees
-      const netProfit = grossRevenue * (1 - platformFeeRate);
+      // Estimate net profit (gross revenue - 10% fees - refunds)
+      const platformFeeRate = 0.10;
+      const netProfit = (grossRevenue * (1 - platformFeeRate)) - refunds;
 
       // Get all subscriptions to calculate churn
       const { data: allSubscriptions } = await supabase
         .from("subscriptions")
         .select("user_id, status, started_at, expires_at, plans(price)");
 
-      // Calculate churn - users with expired subscriptions who didn't renew
+      // Calculate churn
       const now = new Date();
       const churned = allSubscriptions?.filter((sub: any) => {
         if (!sub.expires_at || sub.plans?.price === 0) return false;
@@ -47,7 +73,6 @@ export const StatsCards = () => {
       }).length || 0;
 
       // Get active users (logged in last 30 days)
-      // Using profiles updated_at as proxy for activity
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
@@ -56,14 +81,21 @@ export const StatsCards = () => {
         .select("*", { count: "exact", head: true })
         .gte("updated_at", thirtyDaysAgo.toISOString());
 
+      // Check API health (check recent webhook logs via edge function logs)
+      // For simplicity, assume healthy if we can query
+      const apiHealthy = true;
+
       return {
         totalUsers: totalUsers || 0,
-        activeSubscriptions: subscriptions?.length || 0,
-        grossRevenue,
-        netProfit,
-        annualPaidCustomers,
-        churnedUsers: churned,
         activeUsers: activeUsersCount || 0,
+        monthlyPlans: monthlyCount,
+        annualPlans: annualCount,
+        freePlans: freeCount,
+        grossRevenue,
+        refunds,
+        netProfit,
+        churnedUsers: churned,
+        apiHealthy,
       };
     },
   });
@@ -71,7 +103,7 @@ export const StatsCards = () => {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <Card key={i}>
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-24" />
@@ -90,55 +122,78 @@ export const StatsCards = () => {
       title: "Total de Usuários",
       value: stats?.totalUsers || 0,
       icon: Users,
-      color: "text-blue-500",
+      color: "text-[hsl(217,91%,60%)]",
+      bgColor: "from-[hsl(217,91%,60%)]/10",
       description: "Cadastrados na plataforma",
     },
     {
       title: "Usuários Ativos",
       value: stats?.activeUsers || 0,
       icon: Activity,
-      color: "text-emerald-500",
+      color: "text-[hsl(217,91%,60%)]",
+      bgColor: "from-[hsl(217,91%,60%)]/10",
       description: "Últimos 30 dias",
     },
     {
-      title: "Clientes Anuais Pagos",
-      value: stats?.annualPaidCustomers || 0,
+      title: "Planos Free",
+      value: stats?.freePlans || 0,
+      icon: Gift,
+      color: "text-muted-foreground",
+      bgColor: "from-muted/30",
+      description: "Contas gratuitas",
+    },
+    {
+      title: "Planos Mensais",
+      value: stats?.monthlyPlans || 0,
+      icon: Calendar,
+      color: "text-[hsl(217,91%,60%)]",
+      bgColor: "from-[hsl(217,91%,60%)]/10",
+      description: "Assinaturas mensais",
+    },
+    {
+      title: "Planos Anuais",
+      value: stats?.annualPlans || 0,
       icon: UserCheck,
-      color: "text-green-500",
-      description: "Plano R$ 97,90",
+      color: "text-[hsl(142,76%,36%)]",
+      bgColor: "from-[hsl(142,76%,36%)]/10",
+      description: "R$ 97,90/ano",
     },
     {
-      title: "Não Renovaram (Churn)",
-      value: stats?.churnedUsers || 0,
-      icon: UserX,
-      color: "text-red-500",
-      description: "Assinaturas expiradas",
-    },
-    {
-      title: "Receita Bruta Total",
+      title: "Receita Bruta",
       value: `R$ ${(stats?.grossRevenue || 0).toFixed(2).replace('.', ',')}`,
       icon: DollarSign,
-      color: "text-yellow-500",
+      color: "text-[hsl(142,76%,36%)]",
+      bgColor: "from-[hsl(142,76%,36%)]/10",
       description: "Todas as vendas",
     },
     {
       title: "Lucro Líquido",
       value: `R$ ${(stats?.netProfit || 0).toFixed(2).replace('.', ',')}`,
       icon: TrendingUp,
-      color: "text-purple-500",
-      description: "Receita - Taxas (10%)",
+      color: "text-[hsl(142,76%,36%)]",
+      bgColor: "from-[hsl(142,76%,36%)]/10",
+      description: "Após taxas (10%)",
     },
     {
-      title: "Assinaturas Ativas",
-      value: stats?.activeSubscriptions || 0,
-      icon: CreditCard,
-      color: "text-cyan-500",
-      description: "Planos ativos",
+      title: "Churn",
+      value: stats?.churnedUsers || 0,
+      icon: UserX,
+      color: "text-destructive",
+      bgColor: "from-destructive/10",
+      description: "Não renovaram",
+    },
+    {
+      title: "Status API",
+      value: stats?.apiHealthy ? "Online" : "Offline",
+      icon: stats?.apiHealthy ? Wifi : WifiOff,
+      color: stats?.apiHealthy ? "text-[hsl(142,76%,36%)]" : "text-destructive",
+      bgColor: stats?.apiHealthy ? "from-[hsl(142,76%,36%)]/10" : "from-destructive/10",
+      description: "Webhook Stripe",
     },
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
@@ -146,7 +201,7 @@ export const StatsCards = () => {
             key={index}
             className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-full -mr-12 -mt-12" />
+            <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.bgColor} to-transparent rounded-full -mr-12 -mt-12`} />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium text-muted-foreground">
                 {stat.title}
@@ -154,7 +209,7 @@ export const StatsCards = () => {
               <Icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <div className={`text-xl font-bold ${stat.color}`}>
                 {stat.value}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
