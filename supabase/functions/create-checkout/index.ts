@@ -44,7 +44,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/pagamento-sucesso?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/auth?payment_success=true`,
       cancel_url: `${origin}/planos`,
     });
 
