@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { StatsCards } from "@/components/superadmin/StatsCards";
 import { UsersManagement } from "@/components/superadmin/UsersManagement";
 import { WebhookConfig } from "@/components/superadmin/WebhookConfig";
+import { RevenueChart } from "@/components/superadmin/RevenueChart";
+import { RecentActivities } from "@/components/superadmin/RecentActivities";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -69,7 +71,7 @@ export default function SuperAdmin() {
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-[hsl(217,91%,60%)]">
                 Super Admin Dashboard
               </h1>
               <p className="text-muted-foreground mt-2">
@@ -77,11 +79,17 @@ export default function SuperAdmin() {
               </p>
             </div>
           </div>
-          <Shield className="h-12 w-12 text-primary animate-pulse" />
+          <Shield className="h-12 w-12 text-[hsl(217,91%,60%)] animate-pulse" />
         </div>
 
         {/* Stats Cards */}
         <StatsCards />
+
+        {/* Charts and Activities Section */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <RevenueChart />
+          <RecentActivities />
+        </div>
 
         {/* Main Tabs */}
         <Tabs defaultValue="users" className="space-y-6">

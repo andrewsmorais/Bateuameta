@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Edit, Trash2, Lock, Unlock, UserPlus, Key, Search, AlertTriangle, Copy } from "lucide-react";
+import { Edit, Trash2, Lock, Unlock, UserPlus, Key, Search, AlertTriangle, Copy, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
@@ -28,6 +28,7 @@ interface UserData {
   plan_id?: string | null;
   renewal_status?: "active" | "expired" | "churned" | "free";
   expires_at?: string | null;
+  started_at?: string | null;
 }
 
 export const UsersManagement = () => {
@@ -120,6 +121,7 @@ export const UsersManagement = () => {
           plan_id: subscription?.plan_id,
           renewal_status,
           expires_at: subscription?.expires_at,
+          started_at: subscription?.started_at,
         };
       });
 
@@ -440,10 +442,10 @@ export const UsersManagement = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
                   <TableHead>CPF</TableHead>
-                  <TableHead>Função</TableHead>
                   <TableHead>Plano</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Contratação</TableHead>
                   <TableHead>Renovação</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -466,38 +468,26 @@ export const UsersManagement = () => {
                       <TableCell>{user.telefone || "-"}</TableCell>
                       <TableCell>{user.cpf || "-"}</TableCell>
                       <TableCell>
-                        <Badge variant={user.role === "free" ? "secondary" : "default"}>
-                          {user.role === "free" ? "Free" : "Pago"}
+                        <Badge variant="outline" className={user.planPrice > 0 ? "bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30" : ""}>
+                          {user.planPrice > 0 ? `R$ ${user.planPrice.toFixed(2).replace('.', ',')}` : "Free"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {user.planPrice > 0 ? `R$ ${user.planPrice.toFixed(2).replace('.', ',')} Anual` : "Free"}
-                        </Badge>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {user.started_at 
+                          ? new Date(user.started_at).toLocaleDateString('pt-BR')
+                          : "-"}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {user.expires_at 
+                          ? new Date(user.expires_at).toLocaleDateString('pt-BR')
+                          : "-"}
                       </TableCell>
                       <TableCell>
                         <Badge
                           variant={user.status === "active" ? "default" : "destructive"}
+                          className={user.status === "active" ? "bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30" : ""}
                         >
                           {user.status === "active" ? "Ativo" : "Bloqueado"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            user.renewal_status === "active" ? "default" :
-                            user.renewal_status === "churned" ? "destructive" :
-                            user.renewal_status === "expired" ? "secondary" : "outline"
-                          }
-                          className={
-                            user.renewal_status === "active" ? "bg-green-500/20 text-green-500 border-green-500/30" :
-                            user.renewal_status === "churned" ? "bg-red-500/20 text-red-500 border-red-500/30" :
-                            ""
-                          }
-                        >
-                          {user.renewal_status === "active" ? "Ativo" :
-                           user.renewal_status === "churned" ? "Não Renovou" :
-                           user.renewal_status === "expired" ? "Expirado" : "Free"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -508,7 +498,15 @@ export const UsersManagement = () => {
                             onClick={() => handleEditClick(user)}
                             title="Editar"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4 text-[hsl(217,91%,60%)]" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => window.open(`/dashboard?simulate=${user.id}`, '_blank')}
+                            title="Simular Visão do Usuário"
+                          >
+                            <Eye className="h-4 w-4 text-[hsl(217,91%,60%)]" />
                           </Button>
                           <Button
                             variant="ghost"
