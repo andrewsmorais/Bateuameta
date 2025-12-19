@@ -170,6 +170,7 @@ const KM = () => {
     const lucroPorKmMedio = kmRodadosTotal > 0 ? lucroLiquidoTotal / kmRodadosTotal : 0;
     const ganhosPorHoraMedio = horasTrabalhadasTotal > 0 ? ganhosBrutosTotal / horasTrabalhadasTotal : 0;
     const custoCombustivelPorKm = kmRodadosTotal > 0 ? despesaCombustivelTotal / kmRodadosTotal : 0;
+    const ganhoBrutoPorKm = kmRodadosTotal > 0 ? ganhosBrutosTotal / kmRodadosTotal : 0;
 
     return {
       kmRodadosTotal,
@@ -183,7 +184,8 @@ const KM = () => {
       lucroLiquidoTotal,
       lucroPorKmMedio,
       ganhosPorHoraMedio,
-      custoCombustivelPorKm
+      custoCombustivelPorKm,
+      ganhoBrutoPorKm
     };
   };
 
@@ -385,15 +387,21 @@ const KM = () => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground mb-1">Lucro/KM Médio</p>
+                  <p className="text-sm font-bold text-foreground mb-1">Ganho Bruto/KM</p>
                   <p className="text-xl font-bold text-[#15a249]">
-                    R$ {metricas.lucroPorKmMedio.toFixed(2)}
+                    R$ {metricas.ganhoBrutoPorKm.toFixed(2)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground mb-1">Custo de Combustível/KM</p>
                   <p className="text-xl font-bold text-red-500">
                     R$ {metricas.custoCombustivelPorKm.toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground mb-1">Lucro Líquido/KM</p>
+                  <p className="text-xl font-bold text-[#15a249]">
+                    R$ {metricas.lucroPorKmMedio.toFixed(2)}
                   </p>
                 </div>
                 <div>
