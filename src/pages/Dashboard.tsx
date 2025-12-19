@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, CalendarIcon, Filter } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, CalendarIcon, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format, eachDayOfInterval, parseISO } from "date-fns";
@@ -301,7 +301,8 @@ const Dashboard = () => {
     loadDashboardData();
   }, [appliedDateRange]);
 
-  const aplicarFiltros = () => {
+  const aplicarFiltros = async () => {
+    setLoading(true);
     setAppliedDateRange(selectedDateRange);
   };
 
@@ -350,9 +351,13 @@ const Dashboard = () => {
             </PopoverContent>
           </Popover>
           
-          <Button onClick={aplicarFiltros} className="gap-2">
-            <Filter className="w-4 h-4" />
-            Aplicar Filtros
+          <Button 
+            onClick={aplicarFiltros} 
+            disabled={loading}
+            className="w-[280px] gap-2 bg-[#3c83f6] hover:bg-[#2563eb] text-white"
+          >
+            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+            {loading ? "Atualizando..." : "Atualizar Dashboard"}
           </Button>
         </div>
       </div>
