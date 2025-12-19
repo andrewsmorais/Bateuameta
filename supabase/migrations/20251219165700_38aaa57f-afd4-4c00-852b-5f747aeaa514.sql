@@ -1,0 +1,1 @@
+UPDATE turnos_km SET data = '2025-12-18' WHERE id = '9e56c5e4-c3c4-4f1f-8b5b-b0e2a2b18006';
