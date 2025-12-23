@@ -545,45 +545,26 @@ const Relatorios = () => {
                   </div>
                 </div>
 
-                {/* Métricas Calculadas do Turno Individual */}
+                {/* Resumo do Turno */}
                 <div className="mt-4 pt-4 border-t border-border">
-                  <p className="font-bold text-foreground text-base mb-3">Métricas do Turno:</p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">KM Rodados</p>
-                      <p className="text-xl font-bold text-[#15a249]">{metricasTurno.kmRodados.toFixed(2)} km</p>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-blue-500/10 rounded-lg p-3">
+                      <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">Ganhos do Turno</p>
+                      <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        R$ {metricasTurno.ganhoBruto.toFixed(2)}
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Total de Horas Trabalhadas</p>
-                      <p className="text-xl font-bold text-[#15a249]">{(resultado.total_horas || 0).toFixed(1)} h</p>
+                    <div className="bg-red-500/10 rounded-lg p-3">
+                      <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">Despesas do Turno</p>
+                      <p className="text-lg font-bold text-red-600 dark:text-red-400">
+                        R$ {metricasTurno.despesaTotal.toFixed(2)}
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Ganho Bruto</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.ganhoBruto.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Desp. Combustível</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.despesaCombustivel.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Outras Despesas</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.outrasDespesas.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Despesa Total</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.despesaTotal.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Lucro Líquido</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.lucroLiquido.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Lucro/KM</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.lucroPorKm.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Ganhos/Hora</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurno.ganhosPorHora.toFixed(2)}</p>
+                    <div className="bg-green-500/10 rounded-lg p-3">
+                      <p className="text-xs font-bold text-green-600 dark:text-green-400 mb-1">Lucro Líquido</p>
+                      <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                        R$ {metricasTurno.lucroLiquido.toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -945,39 +926,59 @@ const Relatorios = () => {
                 </CardContent>
               </Card>
 
-              {/* Seção C: Destaque dos Totais */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-blue-500/10 border-blue-500/30">
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2">Ganhos Totais</p>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                        R$ {metricasTurnos.ganhosBrutosTotal.toFixed(2)}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-red-500/10 border-red-500/30">
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-2">Despesas Totais</p>
-                      <p className="text-3xl font-bold text-red-600 dark:text-red-400">
-                        R$ {metricasTurnos.despesaTotalGeral.toFixed(2)}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-green-500/10 border-green-500/30">
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-2">Lucro Líquido</p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-                        R$ {metricasTurnos.lucroLiquidoTotal.toFixed(2)}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Seção C: Fechamento do Período */}
+              <Card className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 border-2 border-primary/20">
+                <CardHeader>
+                  <CardTitle className="text-xl text-white text-center">
+                    📊 Fechamento do Período
+                  </CardTitle>
+                  <p className="text-center text-slate-300 text-sm">
+                    {formatDateSafe(filtros.dataInicio)} até {formatDateSafe(filtros.dataFim)} • {resultados.length} {resultados.length === 1 ? 'turno' : 'turnos'}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Card Ganhos Acumulados */}
+                    <Card className="bg-blue-500/20 border-blue-500/50">
+                      <CardContent className="pt-6 pb-6">
+                        <div className="text-center">
+                          <p className="text-sm font-bold text-blue-400 mb-2">💰 Ganhos Totais Acumulados</p>
+                          <p className="text-4xl font-bold text-blue-400">
+                            R$ {metricasTurnos.ganhosBrutosTotal.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-blue-300 mt-2">Soma de todos os ganhos brutos</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Card Despesas Acumuladas */}
+                    <Card className="bg-red-500/20 border-red-500/50">
+                      <CardContent className="pt-6 pb-6">
+                        <div className="text-center">
+                          <p className="text-sm font-bold text-red-400 mb-2">📉 Despesas Totais Acumuladas</p>
+                          <p className="text-4xl font-bold text-red-400">
+                            R$ {metricasTurnos.despesaTotalGeral.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-red-300 mt-2">Combustível + Outras Despesas</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Card Lucro Final */}
+                    <Card className="bg-green-500/20 border-green-500/50">
+                      <CardContent className="pt-6 pb-6">
+                        <div className="text-center">
+                          <p className="text-sm font-bold text-green-400 mb-2">✅ Lucro Líquido Final</p>
+                          <p className="text-4xl font-bold text-green-400">
+                            R$ {metricasTurnos.lucroLiquidoTotal.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-green-300 mt-2">Ganhos - Despesas</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
             </>
           )}
 
