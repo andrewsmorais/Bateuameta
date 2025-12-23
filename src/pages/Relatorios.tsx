@@ -899,57 +899,7 @@ const Relatorios = () => {
           {/* Seção B: Métricas Calculadas (apenas para Turnos) */}
           {filtros.tipoRelatorio === "turnos" && metricasTurnos && (
             <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Métricas Calculadas</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">KM Rodados Total</p>
-                      <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.kmRodadosTotal.toFixed(2)} km</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Total de Horas Trabalhadas</p>
-                      <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.horasTrabalhadasTotal.toFixed(1)} h</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Consumo Médio do Período</p>
-                      <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.consumoMedio.toFixed(2)} km/L</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Preço Médio Combustível/Litro</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.precoMedioCombustivel.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Ganhos Brutos Total</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.ganhosBrutosTotal.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Despesa Combustível Total</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.despesaCombustivelTotal.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Outras Despesas Total</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.outrasDespesasTotal.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Lucro Líquido Total</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.lucroLiquidoTotal.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Lucro/KM Médio</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.lucroPorKmMedio.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground mb-1">Ganhos/Hora Médio</p>
-                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.ganhosPorHoraMedio.toFixed(2)}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Seção C: Fechamento do Período */}
+              {/* Fechamento do Período - PRIMEIRO */}
               <Card className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 border-2 border-primary/20">
                 <CardHeader>
                   <CardTitle className="text-xl text-white text-center">
@@ -999,6 +949,57 @@ const Relatorios = () => {
                         </div>
                       </CardContent>
                     </Card>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Métricas Calculadas - DEPOIS */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Métricas Calculadas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">KM Rodados Total</p>
+                      <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.kmRodadosTotal.toFixed(2)} km</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Total de Horas Trabalhadas</p>
+                      <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.horasTrabalhadasTotal.toFixed(1)} h</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Consumo Médio do Período</p>
+                      <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.consumoMedio.toFixed(2)} km/L</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Preço Médio Combustível/Litro</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.precoMedioCombustivel.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Ganhos Brutos Total</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.ganhosBrutosTotal.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Despesa Combustível Total</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.despesaCombustivelTotal.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Outras Despesas Total</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.outrasDespesasTotal.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Lucro Líquido Total</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.lucroLiquidoTotal.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Lucro/KM Médio</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.lucroPorKmMedio.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Ganhos/Hora Médio</p>
+                      <p className="text-xl font-bold text-[#15a249]">R$ {metricasTurnos.ganhosPorHoraMedio.toFixed(2)}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
