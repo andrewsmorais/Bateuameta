@@ -677,7 +677,7 @@ const Relatorios = () => {
               {resultado.observacoes && (
                 <div className="mt-4 p-3 bg-muted rounded-lg">
                   <p className="text-sm font-bold text-foreground mb-1">Observações</p>
-                  <p className="text-xl font-bold text-[#15a249]">{resultado.observacoes}</p>
+                  <p className="text-base text-muted-foreground">{resultado.observacoes}</p>
                 </div>
               )}
               {resultado.comprovante_url && (
