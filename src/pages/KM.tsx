@@ -59,6 +59,7 @@ const KM = () => {
 
   const loadTurnos = async () => {
     try {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -77,10 +78,16 @@ const KM = () => {
         .eq("user_id", user.id)
         .order("data", { ascending: false })
         .order("hora_fim", { ascending: false })
-        .limit(1);
+        .order("created_at", { ascending: false })
+        .range(0, 0);
 
       if (error) throw error;
-      setTurnos(data || []);
+      
+      // BLINDAGEM: Sempre pegar apenas o primeiro item, mesmo se vier mais
+      const latestTurno = data?.[0] ?? null;
+      setTurnos(latestTurno ? [latestTurno] : []);
+      
+      console.log('[KM Debug] Turnos retornados:', data?.length, 'Exibindo:', latestTurno?.id);
     } catch (error: any) {
       toast({
         variant: "destructive",

@@ -23,17 +23,20 @@ import PagamentoSucesso from "./pages/PagamentoSucesso";
 import LandingPage from "./pages/LandingPage";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { OfflineProvider } from "./contexts/OfflineContext";
+import { usePWAUpdate } from "./hooks/usePWAUpdate";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <OfflineProvider>
-        <Toaster />
-        <Sonner />
-        <PWAInstallBanner />
-        <BrowserRouter>
+const AppContent = () => {
+  // Ativa o hook para detectar e notificar sobre atualizações do PWA
+  usePWAUpdate();
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <PWAInstallBanner />
+      <BrowserRouter>
       <Routes>
         <Route path="/" element={
           <PublicRoute>
@@ -144,6 +147,15 @@ const App = () => (
         <Route path="*" element={<NotFound />} />
       </Routes>
         </BrowserRouter>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
+      <OfflineProvider>
+        <AppContent />
       </OfflineProvider>
     </ThemeProvider>
   </QueryClientProvider>
