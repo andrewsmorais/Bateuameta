@@ -5,13 +5,12 @@ import { LayoutDashboard, Navigation, TrendingUp, Wrench, Target, FileText, Menu
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
-import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useIOSPWA } from "@/hooks/useIOSPWA";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ThemeToggle } from "./ThemeToggle";
+import { PWAFloatingButton } from "./PWAFloatingButton";
 import { PWAInstallDialog } from "./PWAInstallDialog";
-import { PWAInstallBanner } from "./PWAInstallBanner";
 import { OfflineIndicator } from "./OfflineIndicator";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -54,6 +53,7 @@ export const Layout = ({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -61,7 +61,6 @@ export const Layout = ({
     signOut
   } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
-  const { isInstalled } = usePWAInstall();
   const { isIOSPWA } = useIOSPWA();
 
   // Apply iOS PWA class to body
@@ -78,6 +77,11 @@ export const Layout = ({
 
   const handleInstallApp = () => {
     setInstallDialogOpen(true);
+    setShowFloatingButton(true);
+  };
+
+  const handleCloseFloatingButton = () => {
+    setShowFloatingButton(false);
   };
   useEffect(() => {
     loadProfile();
@@ -169,19 +173,17 @@ export const Layout = ({
               </Link>;
         })}
         
-        {/* Install App Button */}
-        {!isInstalled && (
-          <button
-            onClick={handleInstallApp}
-            className={cn(
-              "flex items-center px-4 py-3 rounded-lg transition-colors w-full text-left",
-              "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Download className="w-5 h-5 mr-3" />
-            <span className="font-medium">Instalar App</span>
-          </button>
-        )}
+        {/* Install App Button - Always visible */}
+        <button
+          onClick={handleInstallApp}
+          className={cn(
+            "flex items-center px-4 py-3 rounded-lg transition-colors w-full text-left",
+            "text-sidebar-foreground hover:bg-sidebar-accent/50"
+          )}
+        >
+          <Download className="w-5 h-5 mr-3" />
+          <span className="font-medium">Instalar App</span>
+        </button>
 
         {isSuperAdmin && (
           <Link
@@ -228,22 +230,20 @@ export const Layout = ({
               </Link>;
         })}
         
-        {/* Install App Button - Mobile */}
-        {!isInstalled && (
-          <button
-            onClick={() => {
-              handleInstallApp();
-              setSidebarOpen(false);
-            }}
-            className={cn(
-              "flex items-center px-4 py-3 rounded-lg transition-colors w-full text-left",
-              "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Download className="w-5 h-5 mr-3" />
-            <span className="font-medium">Instalar App</span>
-          </button>
-        )}
+        {/* Install App Button - Mobile - Always visible */}
+        <button
+          onClick={() => {
+            handleInstallApp();
+            setSidebarOpen(false);
+          }}
+          className={cn(
+            "flex items-center px-4 py-3 rounded-lg transition-colors w-full text-left",
+            "text-sidebar-foreground hover:bg-sidebar-accent/50"
+          )}
+        >
+          <Download className="w-5 h-5 mr-3" />
+          <span className="font-medium">Instalar App</span>
+        </button>
 
         {isSuperAdmin && (
           <Link
@@ -313,8 +313,8 @@ export const Layout = ({
       {/* PWA Install Dialog */}
       <PWAInstallDialog open={installDialogOpen} onOpenChange={setInstallDialogOpen} />
       
-      {/* PWA Install Banner - Apenas em páginas autenticadas */}
-      <PWAInstallBanner />
+      {/* PWA Floating Button - Appears after clicking "Instalar App" */}
+      <PWAFloatingButton visible={showFloatingButton} onClose={handleCloseFloatingButton} />
       
       {/* Offline Indicator */}
       <OfflineIndicator />
