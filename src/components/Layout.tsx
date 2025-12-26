@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ThemeToggle } from "./ThemeToggle";
 import { PWAInstallDialog } from "./PWAInstallDialog";
+import { PWAInstallBanner } from "./PWAInstallBanner";
 import { OfflineIndicator } from "./OfflineIndicator";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -311,6 +312,9 @@ export const Layout = ({
 
       {/* PWA Install Dialog */}
       <PWAInstallDialog open={installDialogOpen} onOpenChange={setInstallDialogOpen} />
+      
+      {/* PWA Install Banner - Apenas em páginas autenticadas */}
+      <PWAInstallBanner />
       
       {/* Offline Indicator */}
       <OfflineIndicator />
