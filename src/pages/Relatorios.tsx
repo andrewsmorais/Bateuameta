@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Filter } from "lucide-react";
+import { Download, Filter, FileDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -678,6 +678,19 @@ const Relatorios = () => {
                 <div className="mt-4 p-3 bg-muted rounded-lg">
                   <p className="text-sm font-bold text-foreground mb-1">Observações</p>
                   <p className="text-xl font-bold text-[#15a249]">{resultado.observacoes}</p>
+                </div>
+              )}
+              {resultado.comprovante_url && (
+                <div className="flex justify-end mt-4 pt-3 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-primary"
+                    onClick={() => window.open(resultado.comprovante_url, '_blank')}
+                  >
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Baixar Comprovante
+                  </Button>
                 </div>
               )}
             </CardContent>
