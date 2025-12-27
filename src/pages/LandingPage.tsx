@@ -5,7 +5,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Play } from "lucide-react";
+
 import { toast } from "sonner";
 import { 
   BarChart3, 
@@ -53,8 +53,6 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [videoStarted, setVideoStarted] = useState(false);
-
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
   }, []);
@@ -174,70 +172,37 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section - #fafafa */}
-      <section className="relative overflow-hidden py-6 md:py-20 px-4 bg-[#fafafa]">
+      {/* Hero Section - Dark Mode */}
+      <section className="relative overflow-hidden py-6 md:py-20 bg-[#0a0a0a]">
         <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="flex flex-col items-center text-center space-y-4 md:space-y-6">
-            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold leading-tight max-w-4xl text-black">
+          <div className="flex flex-col items-center text-center space-y-4 md:space-y-6 px-4">
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold leading-tight max-w-4xl text-white">
               <span className="text-brand-red">Bateu A Meta:</span> Transforme Sua Gestão Financeira Pessoal em{" "}
               <span className="text-brand-blue">Resultados Reais!</span>
             </h1>
             
-            <h2 className="text-base md:text-xl lg:text-2xl text-gray-600 max-w-2xl">
+            <h2 className="text-base md:text-xl lg:text-2xl text-gray-300 max-w-2xl">
               Conquiste Seus Objetivos Financeiros Com O Poder Da Organização E Planejamento Inteligente.
             </h2>
 
-            {/* VSL Video with Play Overlay - Responsivo */}
-            <div 
-              className={`w-full rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] bg-black cursor-pointer relative ring-4 ring-[#3c83f6]/30
-                ${isMobile 
-                  ? 'aspect-[9/16] max-w-sm mx-auto'
-                  : 'aspect-video max-w-3xl'
-                }`}
-              onClick={() => {
-                if (!videoStarted) {
-                  setVideoStarted(true);
-                }
-              }}
-            >
-              {/* Play Overlay - Shows before video starts */}
-              {!videoStarted && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-                  {/* YouTube Thumbnail */}
-                  <img 
-                    src="https://img.youtube.com/vi/UGWMWiYPZt4/maxresdefault.jpg"
-                    alt="Clique para assistir"
-                    className="absolute inset-0 w-full h-full object-cover opacity-80"
-                  />
-                  {/* Play Button */}
-                  <div className="relative z-10 flex flex-col items-center gap-3">
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#3c83f6] flex items-center justify-center shadow-[0_0_40px_rgba(60,131,246,0.6)] animate-pulse">
-                      <Play className="w-10 h-10 md:w-12 md:h-12 text-white fill-white ml-1" />
-                    </div>
-                    <span className="text-white font-semibold text-sm md:text-base bg-black/50 px-4 py-1 rounded-full">
-                      Clique para assistir
-                    </span>
-                  </div>
-                </div>
-              )}
-              
-              {/* Video iframe - Only loads after click */}
-              {videoStarted && (
+            {/* VSL Video - YouTube Embed - 100% width no mobile */}
+            <div className="w-full max-w-4xl mx-auto px-0 sm:px-4">
+              <div className="relative w-full aspect-video rounded-none sm:rounded-xl overflow-hidden shadow-2xl ring-2 ring-[#3c83f6]/40">
                 <iframe
-                  id="vsl-video"
                   className="w-full h-full"
-                  src={`https://www.youtube.com/embed/UGWMWiYPZt4?rel=0&modestbranding=1&showinfo=0&autoplay=1&fs=1${isMobile ? '' : '&playsinline=1'}`}
-                  title="Bateu a Meta - Apresentação"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  src="https://www.youtube.com/embed/N0UlzGzuWpY?rel=0&modestbranding=1"
+                  title="Bateu a Meta - VSL"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
-              )}
+              </div>
             </div>
 
             <Button 
               size="lg" 
               onClick={scrollToPricing}
-              className="text-lg px-8 py-6 bg-[#3c83f6] hover:bg-[#2563eb] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+              className="text-lg px-8 py-6 bg-[#15a249] hover:bg-[#128a3d] text-white font-bold shadow-lg hover:shadow-xl transition-all"
             >
               QUERO BATER MINHAS METAS AGORA
               <ChevronDown className="ml-2 h-5 w-5 animate-bounce" />
