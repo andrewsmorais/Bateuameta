@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,7 +26,9 @@ import {
   FileText,
   Headphones,
   CalendarX,
-  ShieldCheck
+  ShieldCheck,
+  Play,
+  X
 } from "lucide-react";
 import logo from "@/assets/bateu-a-meta-logo.png";
 
@@ -53,6 +56,8 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
+  
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
   }, []);
@@ -185,19 +190,56 @@ const LandingPage = () => {
               Conquiste Seus Objetivos Financeiros Com O Poder Da Organização E Planejamento Inteligente.
             </h2>
 
-            {/* VSL Video - YouTube Embed - 100% width no mobile */}
+            {/* VSL Video - Thumbnail clicável que abre modal */}
             <div className="w-full max-w-4xl mx-auto px-0 sm:px-4">
-              <div className="relative w-full aspect-video rounded-none sm:rounded-xl overflow-hidden shadow-2xl ring-2 ring-[#3c83f6]/40">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/N0UlzGzuWpY?rel=0&modestbranding=1"
-                  title="Bateu a Meta - VSL"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
+              <button
+                onClick={() => setVideoOpen(true)}
+                className="relative w-full aspect-video rounded-none sm:rounded-xl overflow-hidden shadow-2xl ring-2 ring-[#3c83f6]/40 group cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#3c83f6]/60"
+              >
+                {/* Thumbnail do YouTube */}
+                <img
+                  src="https://img.youtube.com/vi/N0UlzGzuWpY/maxresdefault.jpg"
+                  alt="Assistir vídeo - Bateu a Meta"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-              </div>
+                {/* Overlay escuro */}
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+                {/* Botão de Play */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 md:w-24 md:h-24 bg-[#c41313] rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                    <Play className="w-8 h-8 md:w-12 md:h-12 text-white ml-1" fill="white" />
+                  </div>
+                </div>
+                {/* Texto indicativo */}
+                <div className="absolute bottom-4 left-0 right-0 text-center">
+                  <span className="bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium">
+                    Clique para assistir
+                  </span>
+                </div>
+              </button>
             </div>
+
+            {/* Modal do Vídeo */}
+            <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
+              <DialogContent className="max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw] w-full p-0 bg-black border-none">
+                <button
+                  onClick={() => setVideoOpen(false)}
+                  className="absolute -top-12 right-0 md:top-2 md:right-2 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                >
+                  <X className="w-6 h-6 text-white" />
+                </button>
+                <div className="relative w-full aspect-video">
+                  <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/N0UlzGzuWpY?rel=0&modestbranding=1&autoplay=1"
+                    title="Bateu a Meta - VSL"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
 
             <Button 
               size="lg" 
