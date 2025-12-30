@@ -346,7 +346,7 @@ const Dashboard = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Ganhos Totais</CardTitle>
+            <CardTitle className="text-sm font-medium">Ganhos Brutos</CardTitle>
             <TrendingUp className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -358,7 +358,7 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Despesas Totais</CardTitle>
+            <CardTitle className="text-sm font-medium">Despesas</CardTitle>
             <TrendingDown className="w-4 h-4 text-destructive" />
           </CardHeader>
           <CardContent>

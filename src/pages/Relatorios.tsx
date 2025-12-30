@@ -975,7 +975,7 @@ const Relatorios = () => {
                     <Card className="bg-blue-500/20 border-blue-500/50">
                       <CardContent className="pt-6 pb-6">
                         <div className="text-center">
-                          <p className="text-sm font-bold text-blue-400 mb-2">💰 Ganhos Totais Acumulados</p>
+                          <p className="text-sm font-bold text-blue-400 mb-2">💰 Ganhos Bruto</p>
                           <p className="text-4xl font-bold text-blue-400">
                             R$ {metricasTurnos.ganhosBrutosTotal.toFixed(2)}
                           </p>
@@ -988,7 +988,7 @@ const Relatorios = () => {
                     <Card className="bg-red-500/20 border-red-500/50">
                       <CardContent className="pt-6 pb-6">
                         <div className="text-center">
-                          <p className="text-sm font-bold text-red-400 mb-2">📉 Despesas Totais Acumuladas</p>
+                          <p className="text-sm font-bold text-red-400 mb-2">📉 Despesas</p>
                           <p className="text-4xl font-bold text-red-400">
                             R$ {metricasTurnos.despesaTotalGeral.toFixed(2)}
                           </p>
@@ -1001,7 +1001,7 @@ const Relatorios = () => {
                     <Card className="bg-green-500/20 border-green-500/50">
                       <CardContent className="pt-6 pb-6">
                         <div className="text-center">
-                          <p className="text-sm font-bold text-green-400 mb-2">✅ Lucro Líquido Final</p>
+                          <p className="text-sm font-bold text-green-400 mb-2">✅ Lucro Líquido</p>
                           <p className="text-4xl font-bold text-green-400">
                             R$ {metricasTurnos.lucroLiquidoTotal.toFixed(2)}
                           </p>
