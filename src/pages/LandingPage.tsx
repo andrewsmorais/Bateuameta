@@ -28,6 +28,8 @@ import {
   CalendarX,
   ShieldCheck,
   Play,
+  Check,
+  Sparkles,
   X
 } from "lucide-react";
 import logo from "@/assets/bateu-a-meta-logo.png";
@@ -244,9 +246,9 @@ const LandingPage = () => {
             <Button 
               size="lg" 
               onClick={scrollToPricing}
-              className="text-lg px-8 py-6 bg-[#15a249] hover:bg-[#128a3d] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+              className="text-lg px-8 py-6 bg-cta-action cta-glow text-white font-bold transition-all"
             >
-              QUERO BATER MINHAS METAS AGORA
+              QUERO COMEÇAR A LUCRAR MAIS HOJE
               <ChevronDown className="ml-2 h-5 w-5 animate-bounce" />
             </Button>
           </div>
@@ -406,57 +408,8 @@ const LandingPage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Annual Plan */}
-            <Card className="relative border-2 border-[#3c83f6] shadow-xl scale-105 bg-white">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-gradient-to-r from-[#c41313] to-[#3c83f6] text-white px-4 py-1 rounded-full text-sm font-bold">
-                  MAIS POPULAR
-                </span>
-              </div>
-              <CardContent className="p-8 space-y-6">
-                <div className="text-center space-y-2">
-                  <h3 className="text-2xl font-bold text-black">Plano Anual</h3>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl md:text-5xl font-bold text-[#3c83f6]">R$ 97,90</span>
-                    <span className="text-gray-500">/ano</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Equivale a R$ 8,16/mês</p>
-                </div>
-
-                <div className="p-4 rounded-lg bg-green-500/20 border border-green-500/30">
-                  <p className="text-lg font-bold text-center text-green-700">
-                    🎉 Economia de R$ 56,90 por ano!
-                  </p>
-                </div>
-
-                <ul className="space-y-3">
-                  {[
-                    { icon: LayoutDashboard, text: "Dashboard", bold: "completo" },
-                    { icon: Clock, text: "Controle de turnos", bold: "ilimitado" },
-                    { icon: Target, text: "Metas", bold: "personalizadas" },
-                    { icon: FileText, text: "Relatórios em", bold: "PDF" },
-                    { icon: Wrench, text: "Gestão de", bold: "manutenções" },
-                    { icon: Headphones, text: "Suporte", bold: "prioritário" }
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-black">
-                      <item.icon className="h-5 w-5 stroke-green-600 text-green-600" strokeWidth={2} />
-                      <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button 
-                  className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
-                  onClick={() => handleSelectPlan("anual")}
-                  disabled={loadingPlan === "anual"}
-                >
-                  {loadingPlan === "anual" ? "Processando..." : "ASSINAR AGORA"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Monthly Plan */}
-            <Card className="border border-gray-200 bg-white">
+            {/* Monthly Plan - Secondary Position */}
+            <Card className="border border-gray-200 bg-white order-2 md:order-1">
               <CardContent className="p-8 space-y-6">
                 <div className="text-center space-y-2">
                   <h3 className="text-2xl font-bold text-black">Plano Mensal</h3>
@@ -477,18 +430,73 @@ const LandingPage = () => {
                     { icon: CalendarX, text: "Cancele", bold: "quando quiser" }
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-black">
-                      <item.icon className="h-5 w-5 stroke-green-600 text-green-600" strokeWidth={2} />
+                      <Check className="h-5 w-5 text-green-600" strokeWidth={2.5} />
                       <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
                     </li>
                   ))}
                 </ul>
 
                 <Button 
-                  className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
+                  className="w-full py-6 text-base font-bold bg-cta-action cta-glow text-white border-0"
                   onClick={() => handleSelectPlan("mensal")}
                   disabled={loadingPlan === "mensal"}
                 >
-                  {loadingPlan === "mensal" ? "Processando..." : "ESCOLHER MENSAL"}
+                  {loadingPlan === "mensal" ? "Processando..." : "QUERO COMEÇAR A LUCRAR MAIS HOJE"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Annual Plan - Primary Position with Enhanced Highlight */}
+            <Card className="relative border-2 border-[#ff6b35] shadow-2xl scale-105 bg-white order-1 md:order-2">
+              {/* Best Value Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                  <Sparkles className="h-4 w-4" />
+                  MELHOR CUSTO-BENEFÍCIO
+                </span>
+              </div>
+              <CardContent className="p-8 space-y-6 pt-10">
+                <div className="text-center space-y-2">
+                  <h3 className="text-2xl font-bold text-black">Plano Anual</h3>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl md:text-5xl font-bold text-[#ff6b35]">R$ 97,90</span>
+                    <span className="text-gray-500">/ano</span>
+                  </div>
+                  {/* Price Anchoring - Monthly Equivalent */}
+                  <p className="text-base font-semibold text-green-600">
+                    Apenas R$ 8,15 por mês
+                  </p>
+                  <p className="text-xs text-gray-500">Menos que o valor de uma corrida!</p>
+                </div>
+
+                <div className="p-4 rounded-lg bg-green-500/20 border border-green-500/30">
+                  <p className="text-lg font-bold text-center text-green-700">
+                    🎉 Economia de R$ 56,90 por ano!
+                  </p>
+                </div>
+
+                <ul className="space-y-3">
+                  {[
+                    { icon: LayoutDashboard, text: "Dashboard", bold: "completo" },
+                    { icon: Clock, text: "Controle de turnos", bold: "ilimitado" },
+                    { icon: Target, text: "Metas", bold: "personalizadas" },
+                    { icon: FileText, text: "Relatórios em", bold: "PDF" },
+                    { icon: Wrench, text: "Gestão de", bold: "manutenções" },
+                    { icon: Headphones, text: "Suporte", bold: "prioritário" }
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-black">
+                      <Check className="h-5 w-5 text-green-600" strokeWidth={2.5} />
+                      <span>{item.text} <strong className="text-black">{item.bold}</strong></span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button 
+                  className="w-full py-6 text-base font-bold bg-cta-action cta-glow text-white border-0"
+                  onClick={() => handleSelectPlan("anual")}
+                  disabled={loadingPlan === "anual"}
+                >
+                  {loadingPlan === "anual" ? "Processando..." : "QUERO COMEÇAR A LUCRAR MAIS HOJE"}
                 </Button>
               </CardContent>
             </Card>
