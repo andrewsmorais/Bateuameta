@@ -13,7 +13,69 @@ const supabaseAdmin = createClient(
 );
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
+const FB_ACCESS_TOKEN = Deno.env.get("FB_ACCESS_TOKEN");
+const FB_PIXEL_ID = "1290319795205025";
 const APP_URL = "https://bateuameta.lovable.app";
+
+// Função auxiliar para hash SHA256 (requisito do Facebook)
+async function hashSHA256(str: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Função para enviar evento para Facebook Conversions API
+async function sendFacebookConversionEvent(
+  eventName: string,
+  email: string,
+  value: number,
+  currency: string = "BRL"
+) {
+  if (!FB_ACCESS_TOKEN) {
+    console.log("[FB Conversions API] Token não configurado, pulando envio");
+    return;
+  }
+
+  const hashedEmail = await hashSHA256(email.toLowerCase().trim());
+
+  const eventData = {
+    data: [{
+      event_name: eventName,
+      event_time: Math.floor(Date.now() / 1000),
+      action_source: "website",
+      user_data: {
+        em: [hashedEmail],
+      },
+      custom_data: {
+        value: value,
+        currency: currency,
+      },
+    }],
+  };
+
+  try {
+    const response = await fetch(
+      `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events?access_token=${FB_ACCESS_TOKEN}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventData),
+      }
+    );
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      console.log("[FB Conversions API] Evento enviado com sucesso:", eventName, result);
+    } else {
+      console.error("[FB Conversions API] Erro ao enviar evento:", result);
+    }
+  } catch (error) {
+    console.error("[FB Conversions API] Erro de conexão:", error);
+  }
+}
 
 async function sendWelcomeEmail(email: string, password: string, nome: string) {
   if (!BREVO_API_KEY) {
@@ -349,6 +411,10 @@ serve(async (req) => {
         if (!isNewUser) {
           await sendRenewalEmail(customerEmail, customerName, planType, expiresAt);
         }
+
+        // Enviar evento Purchase para Facebook Conversions API
+        const purchaseValue = isAnnual ? 97.90 : 12.90;
+        await sendFacebookConversionEvent("Purchase", customerEmail, purchaseValue, "BRL");
 
         console.log("User setup completed for:", customerEmail, "Plan:", planType, "New user:", isNewUser);
         break;
