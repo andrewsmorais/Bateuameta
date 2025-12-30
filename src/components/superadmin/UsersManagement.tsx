@@ -243,6 +243,11 @@ export const UsersManagement = () => {
         body: { email, userId, motivo },
       });
 
+      // Check if response contains an error message (even with 404 status)
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       if (error) throw error;
       return data;
     },
@@ -255,8 +260,24 @@ export const UsersManagement = () => {
       setRefundReason("");
       setSelectedUser(null);
     },
-    onError: (error) => {
-      toast.error("Erro ao processar reembolso: " + error.message);
+    onError: (error: Error) => {
+      const message = error.message;
+      // Check if it's the "already refunded" case
+      if (message.includes("já foram reembolsados") || message.includes("reembolsados anteriormente")) {
+        toast.warning("Este pagamento já foi reembolsado anteriormente", {
+          description: message,
+        });
+      } else if (message.includes("Cliente não encontrado")) {
+        toast.error("Cliente não encontrado no Stripe", {
+          description: "Este usuário não possui registro de pagamento no Stripe.",
+        });
+      } else {
+        toast.error("Erro ao processar reembolso", {
+          description: message,
+        });
+      }
+      setIsRefundOpen(false);
+      setRefundReason("");
     },
   });
 
