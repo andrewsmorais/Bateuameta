@@ -6,7 +6,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
 import { toast } from "sonner";
 import { 
   BarChart3, 
@@ -58,16 +58,25 @@ const LandingPage = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
   
+  // Facebook Pixel - inicializa e dispara PageView automaticamente
+  const { trackLead, trackInitiateCheckout, trackViewContent, trackContact } = useFacebookPixel();
+  
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
   }, []);
 
+  // Scroll para preços + dispara evento Lead
   const scrollToPricing = () => {
+    trackLead('Ver Planos - CTA Hero');
     document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSelectPlan = async (planType: "mensal" | "anual") => {
     setLoadingPlan(planType);
+    
+    // Facebook Pixel - InitiateCheckout
+    const valor = planType === "anual" ? 97.90 : 12.90;
+    trackInitiateCheckout(planType === "anual" ? "Anual" : "Mensal", valor);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
@@ -83,6 +92,11 @@ const LandingPage = () => {
     } finally {
       setLoadingPlan(null);
     }
+  };
+
+  // Rastreia cliques em contato (WhatsApp/Instagram)
+  const handleContactClick = (method: string) => {
+    trackContact(method);
   };
 
   const features = [
@@ -193,7 +207,10 @@ const LandingPage = () => {
             {/* VSL Video - Thumbnail clicável que abre modal */}
             <div className="w-full max-w-4xl mx-auto px-0 sm:px-4">
               <button
-                onClick={() => setVideoOpen(true)}
+                onClick={() => {
+                  trackViewContent('VSL Video', 'Video');
+                  setVideoOpen(true);
+                }}
                 className="relative w-full aspect-video rounded-none sm:rounded-xl overflow-hidden shadow-2xl ring-2 ring-[#3c83f6]/40 group cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#3c83f6]/60"
               >
                 {/* Thumbnail do YouTube */}
@@ -558,6 +575,7 @@ const LandingPage = () => {
               href="https://www.instagram.com/bateu_meta/" 
               target="_blank" 
               rel="noopener noreferrer"
+              onClick={() => handleContactClick('Instagram')}
               className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity font-medium"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
@@ -578,6 +596,7 @@ const LandingPage = () => {
               href="https://wa.me/5512981796135" 
               target="_blank" 
               rel="noopener noreferrer"
+              onClick={() => handleContactClick('WhatsApp Footer')}
               className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity font-medium"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#25D366">
@@ -606,6 +625,7 @@ const LandingPage = () => {
         href="https://wa.me/5512981796135?text=Ol%C3%A1%0A%0AQuero%20saber%20mais%20sobre%20o%20Aplicativo%20Bateu%20A%20Meta%20"
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => handleContactClick('WhatsApp Floating')}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 md:w-16 md:h-16 bg-[#25D366] hover:bg-[#128C7E] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 animate-bounce"
         aria-label="Fale conosco pelo WhatsApp"
       >
