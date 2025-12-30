@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import logoImage from "@/assets/bateu-a-meta-logo.png";
 import { z } from "zod";
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
 
 const registrationSchema = z.object({
   nomeCompleto: z.string().min(2, "Nome completo é obrigatório"),
@@ -42,7 +43,9 @@ const PagamentoSucesso = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { trackAddPaymentInfo } = useFacebookPixel();
   const sessionId = searchParams.get("session_id");
+  const hasTrackedPixel = useRef(false);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -82,6 +85,13 @@ const PagamentoSucesso = () => {
         }
 
         setEmail(data.email);
+        
+        // Dispara evento AddPaymentInfo quando carrega com sucesso
+        if (!hasTrackedPixel.current) {
+          trackAddPaymentInfo(data.plan_type || 'Premium', 29.90);
+          hasTrackedPixel.current = true;
+        }
+        
         setLoading(false);
       } catch (err) {
         console.error("Error:", err);

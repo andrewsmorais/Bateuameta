@@ -114,6 +114,19 @@ export const useFacebookPixel = () => {
     }
   }, []);
 
+  // Evento: AddPaymentInfo - quando o usuário chega na página de completar cadastro após pagamento
+  const trackAddPaymentInfo = useCallback((planType: string, value: number) => {
+    if (window.fbq) {
+      window.fbq('track', 'AddPaymentInfo', {
+        content_name: `Plano ${planType}`,
+        content_category: 'Subscription',
+        value: value,
+        currency: 'BRL',
+      });
+      console.log('[FB Pixel] Evento: AddPaymentInfo -', planType, value);
+    }
+  }, []);
+
   // Evento: Contact - clique no WhatsApp ou suporte
   const trackContact = useCallback((method: string) => {
     if (window.fbq) {
@@ -149,6 +162,7 @@ export const useFacebookPixel = () => {
     trackViewContent,
     trackInitiateCheckout,
     trackAddToCart,
+    trackAddPaymentInfo,
     trackContact,
     trackCompleteRegistration,
     trackCustomEvent,
