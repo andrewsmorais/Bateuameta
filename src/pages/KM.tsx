@@ -419,7 +419,7 @@ const KM = () => {
             <Card className="bg-blue-500/10 border-blue-500/30">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2">Ganhos do Turno</p>
+                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2">Ganhos Bruto</p>
                   <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                     R$ {metricas.ganhosBrutosTotal.toFixed(2)}
                   </p>
@@ -429,7 +429,7 @@ const KM = () => {
             <Card className="bg-red-500/10 border-red-500/30">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-2">Despesas do Turno</p>
+                  <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-2">Despesas</p>
                   <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                     R$ {metricas.despesaTotalGeral.toFixed(2)}
                   </p>
@@ -439,7 +439,7 @@ const KM = () => {
             <Card className="bg-green-500/10 border-green-500/30">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-2">Lucro do Turno</p>
+                  <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-2">Lucro Líquido</p>
                   <p className="text-3xl font-bold text-green-600 dark:text-green-400">
                     R$ {metricas.lucroLiquidoTotal.toFixed(2)}
                   </p>
