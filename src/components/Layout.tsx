@@ -76,7 +76,6 @@ export const Layout = ({
   }, [isIOSPWA]);
 
   const handleInstallApp = () => {
-    setInstallDialogOpen(true);
     setShowFloatingButton(true);
   };
 
