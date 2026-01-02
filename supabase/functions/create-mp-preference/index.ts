@@ -31,7 +31,7 @@ serve(async (req) => {
     const body = await req.json();
     console.log("[MP Preference] Received body:", JSON.stringify(body));
 
-    const { planType } = body;
+    const { planType, email } = body;
 
     if (!planType || !PLANS[planType as keyof typeof PLANS]) {
       console.log("[MP Preference] Error: Invalid plan type:", planType);
@@ -59,8 +59,8 @@ serve(async (req) => {
     const plan = PLANS[planType as keyof typeof PLANS];
 
     // Criar Preference (pagamento único) no Mercado Pago
-    // Isso permite PIX, Boleto e Cartão
-    const preferenceData = {
+    // Permite PIX e Cartão de Crédito
+    const preferenceData: Record<string, unknown> = {
       items: [
         {
           title: plan.title,
@@ -70,10 +70,10 @@ serve(async (req) => {
         },
       ],
       payment_methods: {
-        // Apenas PIX e Boleto - exclui cartões
+        // Permite PIX e Cartão de Crédito (exclui débito e boleto)
         excluded_payment_types: [
-          { id: "credit_card" },
-          { id: "debit_card" }
+          { id: "debit_card" },
+          { id: "ticket" }
         ],
         excluded_payment_methods: [],
         installments: 1,
@@ -87,6 +87,12 @@ serve(async (req) => {
       external_reference: `${planType}_${Date.now()}`, // Para identificar o plano no webhook
       notification_url: "https://grfyoqsbypvvuzdudtgu.supabase.co/functions/v1/mercadopago-payment-webhook",
     };
+
+    // Adiciona email do pagador se fornecido
+    if (email) {
+      preferenceData.payer = { email };
+      console.log("[MP Preference] Adding payer email:", email);
+    }
 
     console.log("[MP Preference] Creating preference:", JSON.stringify(preferenceData));
 
