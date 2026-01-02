@@ -77,17 +77,11 @@ const LandingPage = () => {
     trackInitiateCheckout(planType === "anual" ? "Anual" : "Mensal", valor);
 
     try {
-      // Get user email if logged in
+      // Pegar email do usuário se estiver logado (opcional)
       const { data: { session } } = await supabase.auth.getSession();
       const email = session?.user?.email;
 
-      // Se não tiver email, redirecionar para página de coleta de email
-      if (!email) {
-        navigate(`/finalizar-assinatura?planType=${planType}`);
-        setLoadingPlan(null);
-        return;
-      }
-
+      // Chamar checkout - email é opcional, MP vai coletar se não tiver
       const { data, error } = await supabase.functions.invoke("create-mp-checkout", {
         body: { planType, email },
       });

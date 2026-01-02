@@ -39,20 +39,11 @@ const Planos = () => {
     setLoading(planType);
 
     try {
-      // Pegar email do usuário logado
+      // Pegar email do usuário se estiver logado (opcional)
       const { data: { session } } = await supabase.auth.getSession();
       const email = session?.user?.email;
 
-      if (!email) {
-        toast({
-          variant: "destructive",
-          title: "Email não encontrado",
-          description: "Faça login novamente para continuar.",
-        });
-        setLoading(null);
-        return;
-      }
-
+      // Chamar checkout - email é opcional, MP vai coletar se não tiver
       const { data, error } = await supabase.functions.invoke("create-mp-checkout", {
         body: { planType, email },
       });

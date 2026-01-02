@@ -52,21 +52,6 @@ serve(async (req) => {
       );
     }
 
-    const origin = req.headers.get("origin") || "https://bateuameta.com";
-
-    // Se não tiver email, redirecionar para página React de coleta de email
-    if (!email) {
-      const emailFormUrl = `${origin}/finalizar-assinatura?planType=${planType}`;
-      console.log("[MP Checkout] No email provided, redirecting to React page:", emailFormUrl);
-      return new Response(
-        JSON.stringify({ url: emailFormUrl }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200,
-        }
-      );
-    }
-
     if (!MP_ACCESS_TOKEN) {
       console.error("[MP Checkout] MP_ACCESS_TOKEN not configured");
       return new Response(
@@ -78,15 +63,21 @@ serve(async (req) => {
       );
     }
 
+    const origin = req.headers.get("origin") || "https://bateuameta.com";
     const plan = PLANS[planType as keyof typeof PLANS];
 
     // Criar PreApproval (assinatura) no Mercado Pago
-    const preapprovalData = {
+    // Email é opcional - se não tiver, o MP vai coletar no checkout
+    const preapprovalData: Record<string, unknown> = {
       reason: plan.reason,
       auto_recurring: plan.auto_recurring,
       back_url: `${origin}/auth?payment_success=true`,
-      payer_email: email,
     };
+
+    // Só adiciona payer_email se foi fornecido
+    if (email) {
+      preapprovalData.payer_email = email;
+    }
 
     console.log("[MP Checkout] Creating preapproval:", JSON.stringify(preapprovalData));
 
