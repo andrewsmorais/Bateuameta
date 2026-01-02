@@ -68,11 +68,11 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "https://bateuameta.com";
     const supabaseUrl = "https://grfyoqsbypvvuzdudtgu.supabase.co";
 
-    // Se não tiver email, redirecionar para Edge Function HTML de coleta de email
-    // Isso funciona para qualquer versão do app (inclusive cache/PWA antigo)
+    // Se não tiver email, redirecionar para página frontend de coleta de email
+    // A página frontend renderiza corretamente (Edge Functions não podem servir HTML)
     if (!email) {
-      const redirectUrl = `${supabaseUrl}/functions/v1/mp-email?planType=${planType}&origin=${encodeURIComponent(origin)}`;
-      console.log("[create-checkout -> MP] No email provided, redirecting to mp-email:", redirectUrl);
+      const redirectUrl = `${origin}/finalizar-assinatura?planType=${planType}`;
+      console.log("[create-checkout -> MP] No email provided, redirecting to frontend:", redirectUrl);
       return new Response(
         JSON.stringify({ url: redirectUrl }),
         {
