@@ -6,11 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { EmailCollectionDialog } from "@/components/dialogs/EmailCollectionDialog";
 import logoImage from "@/assets/bateu-a-meta-logo.png";
 
 const Planos = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"mensal" | "anual" | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,14 +39,24 @@ const Planos = () => {
   }, [navigate]);
 
   const handleSelectPlan = async (planType: "mensal" | "anual") => {
+    // Verificar se já tem email (usuário logado)
+    const { data: { session } } = await supabase.auth.getSession();
+    const email = session?.user?.email;
+
+    if (email) {
+      // Já tem email, vai direto pro checkout
+      await processCheckout(planType, email);
+    } else {
+      // Não tem email, abre o modal
+      setSelectedPlan(planType);
+      setEmailDialogOpen(true);
+    }
+  };
+
+  const processCheckout = async (planType: "mensal" | "anual", email: string) => {
     setLoading(planType);
 
     try {
-      // Pegar email do usuário se estiver logado (opcional)
-      const { data: { session } } = await supabase.auth.getSession();
-      const email = session?.user?.email;
-
-      // Chamar checkout - email é opcional, MP vai coletar se não tiver
       const { data, error } = await supabase.functions.invoke("create-mp-checkout", {
         body: { planType, email },
       });
@@ -68,6 +81,12 @@ const Planos = () => {
       });
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleEmailSubmit = (email: string) => {
+    if (selectedPlan) {
+      processCheckout(selectedPlan, email);
     }
   };
 
@@ -237,6 +256,14 @@ const Planos = () => {
           )}
         </div>
       </div>
+
+      <EmailCollectionDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        onSubmit={handleEmailSubmit}
+        isLoading={loading !== null}
+        planName={selectedPlan === "anual" ? "Plano Anual" : "Plano Mensal"}
+      />
     </div>
   );
 };

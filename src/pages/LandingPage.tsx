@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFacebookPixel } from "@/hooks/useFacebookPixel";
 import { toast } from "sonner";
+import { EmailCollectionDialog } from "@/components/dialogs/EmailCollectionDialog";
 import { 
   BarChart3, 
   Car, 
@@ -55,6 +56,8 @@ const LandingPage = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
   
   // Facebook Pixel - inicializa e dispara PageView automaticamente
   const { trackLead, trackInitiateCheckout, trackViewContent, trackContact } = useFacebookPixel();
@@ -70,18 +73,28 @@ const LandingPage = () => {
   };
 
   const handleSelectPlan = async (planType: PlanType) => {
-    setLoadingPlan(planType);
-    
     // Facebook Pixel - InitiateCheckout
     const valor = planType === "anual" ? 97.90 : 12.90;
     trackInitiateCheckout(planType === "anual" ? "Anual" : "Mensal", valor);
 
-    try {
-      // Pegar email do usuário se estiver logado (opcional)
-      const { data: { session } } = await supabase.auth.getSession();
-      const email = session?.user?.email;
+    // Verificar se já tem email (usuário logado)
+    const { data: { session } } = await supabase.auth.getSession();
+    const email = session?.user?.email;
 
-      // Chamar checkout - email é opcional, MP vai coletar se não tiver
+    if (email) {
+      // Já tem email, vai direto pro checkout
+      await processCheckout(planType, email);
+    } else {
+      // Não tem email, abre o modal
+      setSelectedPlan(planType);
+      setEmailDialogOpen(true);
+    }
+  };
+
+  const processCheckout = async (planType: PlanType, email: string) => {
+    setLoadingPlan(planType);
+
+    try {
       const { data, error } = await supabase.functions.invoke("create-mp-checkout", {
         body: { planType, email },
       });
@@ -92,11 +105,17 @@ const LandingPage = () => {
       } else {
         throw new Error("URL de checkout não retornada");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Checkout error:", error);
       toast.error("Erro ao processar. Tente novamente.");
     } finally {
       setLoadingPlan(null);
+    }
+  };
+
+  const handleEmailSubmit = (email: string) => {
+    if (selectedPlan) {
+      processCheckout(selectedPlan, email);
     }
   };
 
@@ -643,6 +662,13 @@ const LandingPage = () => {
         </svg>
       </a>
 
+      <EmailCollectionDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        onSubmit={handleEmailSubmit}
+        isLoading={loadingPlan !== null}
+        planName={selectedPlan === "anual" ? "Plano Anual" : "Plano Mensal"}
+      />
     </div>
   );
 };
