@@ -219,8 +219,18 @@ function renderHTML(planType: string, origin: string, error?: string): string {
 </html>`;
 }
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
 serve(async (req) => {
   const url = new URL(req.url);
+  
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
   
   // GET: Render HTML form
   if (req.method === "GET") {
@@ -230,8 +240,13 @@ serve(async (req) => {
     
     console.log("[mp-email] GET - planType:", planType, "origin:", origin);
     
+    const headers = new Headers(corsHeaders);
+    headers.set("content-type", "text/html; charset=utf-8");
+    headers.set("cache-control", "no-store");
+    
     return new Response(renderHTML(planType, origin, error ? decodeURIComponent(error) : undefined), {
-      headers: { "Content-Type": "text/html; charset=utf-8" },
+      status: 200,
+      headers,
     });
   }
   
