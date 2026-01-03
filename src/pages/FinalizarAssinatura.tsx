@@ -426,42 +426,42 @@ const FinalizarAssinatura = () => {
 
   return (
     <div className="min-h-screen bg-[#f9fafb]">
-      {/* Header with Plan Details - Hotmart Style */}
-      <header className="bg-white border-b border-[#e5e7eb]">
-        <div className="max-w-5xl mx-auto px-4 py-4">
+      {/* Header with Plan Details - Enhanced Style */}
+      <header className="bg-gradient-to-r from-[#25D366] to-[#128C7E] border-b border-[#e5e7eb]">
+        <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             {/* Left side - Product info */}
-            <div className="flex items-center gap-4">
-              <img src={logo} alt="Bateu a Meta" className="w-12 h-12 object-contain rounded-lg" />
+            <div className="flex items-center gap-5">
+              <img src={logo} alt="Bateu a Meta" className="w-20 h-20 object-contain rounded-xl shadow-lg bg-white p-2" />
               <div>
-                <h1 className="font-semibold text-gray-900 text-lg">Bateu a Meta - {planName}</h1>
-                <p className="text-sm text-gray-500">Aplicativo de Gestão para Motoristas</p>
+                <h1 className="font-bold text-white text-2xl">Bateu a Meta - {planName}</h1>
+                <p className="text-base text-white/80 mt-1">Aplicativo de Gestão para Motoristas</p>
               </div>
             </div>
             
           </div>
           
           {/* Price details row */}
-          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+          <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
             {planType === "anual" ? (
               <>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-gray-900">12x de R$ {installmentValue}</span>
-                  <span className="text-gray-500">/ano</span>
+                  <span className="text-3xl font-bold text-white">12x de R$ {installmentValue}</span>
+                  <span className="text-white/70">/ano</span>
                 </div>
-                <span className="text-gray-400">ou</span>
-                <span className="text-gray-600">R$ {planPrice.toFixed(2).replace(".", ",")} à vista</span>
-                <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">
+                <span className="text-white/50">ou</span>
+                <span className="text-white/80">R$ {planPrice.toFixed(2).replace(".", ",")} à vista</span>
+                <span className="bg-white text-[#25D366] text-sm font-bold px-4 py-2 rounded-full shadow-md">
                   Plano Anual - Parcelado
                 </span>
               </>
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-gray-900">R$ {planPrice.toFixed(2).replace(".", ",")}</span>
-                  <span className="text-gray-500">/mês</span>
+                  <span className="text-3xl font-bold text-white">R$ {planPrice.toFixed(2).replace(".", ",")}</span>
+                  <span className="text-white/70">/mês</span>
                 </div>
-                <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">
+                <span className="bg-white text-[#25D366] text-sm font-bold px-4 py-2 rounded-full shadow-md">
                   Plano Mensal
                 </span>
               </>
