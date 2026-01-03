@@ -31,7 +31,7 @@ serve(async (req) => {
     const body = await req.json();
     console.log("[MP PIX Payment] Received body:", JSON.stringify(body));
 
-    const { planType, email } = body;
+    const { planType, email, fullName, phone } = body;
 
     if (!planType || !PLANS[planType as keyof typeof PLANS]) {
       console.log("[MP PIX Payment] Error: Invalid plan type:", planType);
@@ -69,6 +69,11 @@ serve(async (req) => {
     const plan = PLANS[planType as keyof typeof PLANS];
     const idempotencyKey = `pix_${planType}_${email}_${Date.now()}`;
 
+    // Separar nome em primeiro e último
+    const nameParts = (fullName || "").trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
     // Criar Payment direto com PIX
     const paymentData = {
       transaction_amount: plan.unit_price,
@@ -76,8 +81,15 @@ serve(async (req) => {
       payment_method_id: "pix",
       payer: {
         email: email,
+        first_name: firstName,
+        last_name: lastName,
       },
-      external_reference: `${planType}_${Date.now()}`,
+      external_reference: JSON.stringify({
+        planType,
+        fullName: fullName || "",
+        phone: phone || "",
+        timestamp: Date.now(),
+      }),
       notification_url: "https://grfyoqsbypvvuzdudtgu.supabase.co/functions/v1/mercadopago-payment-webhook",
     };
 

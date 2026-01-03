@@ -249,24 +249,49 @@ serve(async (req) => {
 
     console.log("[MP Payment Webhook] Status:", status, "Email:", payerEmail, "Amount:", transactionAmount);
 
-    // Determinar tipo do plano baseado no external_reference ou valor
-    const isAnnual = externalReference.toLowerCase().includes("anual") || transactionAmount >= 90;
+    // Parse external_reference como JSON para obter dados do cliente
+    let refData = { planType: "", fullName: "", phone: "" };
+    try {
+      refData = JSON.parse(externalReference);
+      console.log("[MP Payment Webhook] Parsed external_reference:", refData);
+    } catch {
+      // Fallback: formato antigo (ex: "anual_1234567890")
+      refData.planType = externalReference.split("_")[0];
+      console.log("[MP Payment Webhook] Legacy external_reference format, planType:", refData.planType);
+    }
+
+    // Determinar tipo do plano
+    const isAnnual = refData.planType === "anual" || externalReference.toLowerCase().includes("anual") || transactionAmount >= 90;
     const planType = isAnnual ? "anual" : "mensal";
+
+    // Obter nome do cliente - prioridade: external_reference > payer > email
+    const customerName = refData.fullName || 
+      (payment.payer?.first_name && payment.payer?.last_name 
+        ? `${payment.payer.first_name} ${payment.payer.last_name}`.trim()
+        : payment.payer?.first_name || payerEmail.split("@")[0]);
 
     // Processar apenas pagamentos aprovados
     if (status === "approved") {
-      console.log("[MP Payment Webhook] Processing approved payment for:", payerEmail);
+      console.log("[MP Payment Webhook] Processing approved payment for:", payerEmail, "Name:", customerName);
 
       // Check if user already exists
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
       let user = existingUsers?.users?.find(u => u.email === payerEmail);
       
-      const defaultPassword = "1234";
-      const customerName = payment.payer?.first_name || payerEmail.split("@")[0];
+      // Gerar senha de 7 números aleatórios
+      const generateRandomPassword = (): string => {
+        let password = '';
+        for (let i = 0; i < 7; i++) {
+          password += Math.floor(Math.random() * 10).toString();
+        }
+        return password;
+      };
+      
+      const defaultPassword = generateRandomPassword();
       let isNewUser = false;
 
       if (!user) {
-        // Create new user with default password
+        // Create new user with random password
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
           email: payerEmail,
           password: defaultPassword,
@@ -283,12 +308,12 @@ serve(async (req) => {
 
         user = newUser.user;
         isNewUser = true;
-        console.log("[MP Payment Webhook] New user created:", user.id);
+        console.log("[MP Payment Webhook] New user created:", user.id, "with 7-digit password");
 
         // Send welcome email with credentials
         await sendWelcomeEmail(payerEmail, defaultPassword, customerName);
       } else {
-        console.log("[MP Payment Webhook] User already exists:", user.id);
+        console.log("[MP Payment Webhook] User already exists, renewing subscription:", user.id);
       }
 
       // Create or update profile
