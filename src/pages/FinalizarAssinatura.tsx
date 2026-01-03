@@ -428,7 +428,7 @@ const FinalizarAssinatura = () => {
   return (
     <div className="min-h-screen bg-[#f9fafb]">
       {/* Header with Plan Details - Enhanced Style */}
-      <header className="bg-gradient-to-r from-[#25D366] to-[#128C7E] border-b border-[#e5e7eb]">
+      <header className="bg-gradient-to-r from-[#3c83f6] to-[#2563eb] border-b border-[#e5e7eb]">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             {/* Left side - Product info */}
@@ -452,7 +452,7 @@ const FinalizarAssinatura = () => {
                 </div>
                 <span className="text-white/50">ou</span>
                 <span className="text-white/80">R$ {planPrice.toFixed(2).replace(".", ",")} à vista</span>
-                <span className="bg-white text-[#25D366] text-sm font-bold px-4 py-2 rounded-full shadow-md">
+                <span className="bg-white text-[#3c83f6] text-sm font-bold px-4 py-2 rounded-full shadow-md">
                   Plano Anual - Parcelado
                 </span>
               </>
@@ -462,7 +462,7 @@ const FinalizarAssinatura = () => {
                   <span className="text-3xl font-bold text-white">R$ {planPrice.toFixed(2).replace(".", ",")}</span>
                   <span className="text-white/70">/mês</span>
                 </div>
-                <span className="bg-white text-[#25D366] text-sm font-bold px-4 py-2 rounded-full shadow-md">
+                <span className="bg-white text-[#3c83f6] text-sm font-bold px-4 py-2 rounded-full shadow-md">
                   Plano Mensal
                 </span>
               </>
