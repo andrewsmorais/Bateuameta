@@ -326,7 +326,12 @@ const FinalizarAssinatura = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("create-mp-pix-payment", {
-        body: { planType, email: formData.email },
+        body: { 
+          planType, 
+          email: formData.email,
+          fullName: formData.fullName,
+          phone: formData.phone,
+        },
       });
 
       if (error) throw error;

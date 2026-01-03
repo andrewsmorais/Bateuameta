@@ -92,6 +92,9 @@ serve(async (req) => {
     const plan = PLANS[planType as keyof typeof PLANS];
     const idempotencyKey = `card_${planType}_${payer.email}_${Date.now()}`;
 
+    // Montar nome completo
+    const fullName = `${payer.first_name || ""} ${payer.last_name || ""}`.trim();
+
     // Create card payment
     const paymentData: Record<string, unknown> = {
       transaction_amount: plan.unit_price,
@@ -105,7 +108,11 @@ serve(async (req) => {
         first_name: payer.first_name,
         last_name: payer.last_name,
       },
-      external_reference: `${planType}_${Date.now()}`,
+      external_reference: JSON.stringify({
+        planType,
+        fullName,
+        timestamp: Date.now(),
+      }),
       notification_url: "https://grfyoqsbypvvuzdudtgu.supabase.co/functions/v1/mercadopago-payment-webhook",
     };
 
