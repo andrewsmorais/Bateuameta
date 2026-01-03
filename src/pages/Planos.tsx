@@ -5,17 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { EmailCollectionDialog } from "@/components/dialogs/EmailCollectionDialog";
 import logoImage from "@/assets/bateu-a-meta-logo.png";
 
 const Planos = () => {
-  const [loading, setLoading] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"mensal" | "anual" | null>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -41,27 +35,10 @@ const Planos = () => {
   const handleSelectPlan = async (planType: "mensal" | "anual") => {
     // Verificar se já tem email (usuário logado)
     const { data: { session } } = await supabase.auth.getSession();
-    const email = session?.user?.email;
+    const email = session?.user?.email || "";
 
-    if (email) {
-      // Já tem email, vai direto pro checkout
-      await processCheckout(planType, email);
-    } else {
-      // Não tem email, abre o modal
-      setSelectedPlan(planType);
-      setEmailDialogOpen(true);
-    }
-  };
-
-  const processCheckout = async (planType: "mensal" | "anual", email: string) => {
-    // Navegar para checkout customizado com email como parâmetro
-    navigate(`/finalizar-assinatura?planType=${planType}&email=${encodeURIComponent(email)}`);
-  };
-
-  const handleEmailSubmit = (email: string) => {
-    if (selectedPlan) {
-      processCheckout(selectedPlan, email);
-    }
+    // Ir direto para o checkout (email pode ser vazio, será preenchido lá)
+    navigate(`/finalizar-assinatura?planType=${planType}${email ? `&email=${encodeURIComponent(email)}` : ''}`);
   };
 
   const handleLogout = async () => {
@@ -141,9 +118,8 @@ const Planos = () => {
                 className="w-full" 
                 size="lg"
                 onClick={() => handleSelectPlan("mensal")}
-                disabled={loading !== null}
               >
-                {loading === "mensal" ? "Processando..." : "ASSINAR AGORA"}
+                ASSINAR AGORA
               </Button>
             </CardContent>
           </Card>
@@ -204,9 +180,8 @@ const Planos = () => {
                 className="w-full" 
                 size="lg"
                 onClick={() => handleSelectPlan("anual")}
-                disabled={loading !== null}
               >
-                {loading === "anual" ? "Processando..." : "ASSINAR AGORA"}
+                ASSINAR AGORA
               </Button>
             </CardContent>
           </Card>
@@ -231,13 +206,6 @@ const Planos = () => {
         </div>
       </div>
 
-      <EmailCollectionDialog
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-        onSubmit={handleEmailSubmit}
-        isLoading={loading !== null}
-        planName={selectedPlan === "anual" ? "Plano Anual" : "Plano Mensal"}
-      />
     </div>
   );
 };

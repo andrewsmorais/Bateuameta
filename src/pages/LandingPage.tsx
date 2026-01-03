@@ -8,8 +8,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFacebookPixel } from "@/hooks/useFacebookPixel";
 import { toast } from "sonner";
-import { EmailCollectionDialog } from "@/components/dialogs/EmailCollectionDialog";
-import { 
+import {
   BarChart3, 
   Car, 
   Target, 
@@ -53,11 +52,8 @@ type PlanType = "mensal" | "anual";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
   
   // Facebook Pixel - inicializa e dispara PageView automaticamente
   const { trackLead, trackInitiateCheckout, trackViewContent, trackContact } = useFacebookPixel();
@@ -79,27 +75,10 @@ const LandingPage = () => {
 
     // Verificar se já tem email (usuário logado)
     const { data: { session } } = await supabase.auth.getSession();
-    const email = session?.user?.email;
+    const email = session?.user?.email || "";
 
-    if (email) {
-      // Já tem email, vai direto pro checkout
-      await processCheckout(planType, email);
-    } else {
-      // Não tem email, abre o modal
-      setSelectedPlan(planType);
-      setEmailDialogOpen(true);
-    }
-  };
-
-  const processCheckout = async (planType: PlanType, email: string) => {
-    // Navegar para checkout customizado com email como parâmetro
-    navigate(`/finalizar-assinatura?planType=${planType}&email=${encodeURIComponent(email)}`);
-  };
-
-  const handleEmailSubmit = (email: string) => {
-    if (selectedPlan) {
-      processCheckout(selectedPlan, email);
-    }
+    // Ir direto para o checkout (email pode ser vazio, será preenchido lá)
+    navigate(`/finalizar-assinatura?planType=${planType}${email ? `&email=${encodeURIComponent(email)}` : ''}`);
   };
 
   // Rastreia cliques em contato (WhatsApp/Instagram)
@@ -473,9 +452,8 @@ const LandingPage = () => {
                 <Button 
                   className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
                   onClick={() => handleSelectPlan("anual")}
-                  disabled={loadingPlan !== null}
                 >
-                  {loadingPlan === "anual" ? "Processando..." : "ASSINAR AGORA"}
+                  ASSINAR AGORA
                 </Button>
               </CardContent>
             </Card>
@@ -511,9 +489,8 @@ const LandingPage = () => {
                 <Button 
                   className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
                   onClick={() => handleSelectPlan("mensal")}
-                  disabled={loadingPlan !== null}
                 >
-                  {loadingPlan === "mensal" ? "Processando..." : "ASSINAR AGORA"}
+                  ASSINAR AGORA
                 </Button>
               </CardContent>
             </Card>
@@ -645,13 +622,6 @@ const LandingPage = () => {
         </svg>
       </a>
 
-      <EmailCollectionDialog
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-        onSubmit={handleEmailSubmit}
-        isLoading={loadingPlan !== null}
-        planName={selectedPlan === "anual" ? "Plano Anual" : "Plano Mensal"}
-      />
     </div>
   );
 };
