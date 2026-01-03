@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Loader2, 
   CreditCard, 
@@ -17,7 +16,8 @@ import {
   Shield,
   ChevronDown,
   ChevronUp,
-  Phone
+  Phone,
+  Lock
 } from "lucide-react";
 import logo from "@/assets/bateu-a-meta-logo.png";
 
@@ -76,7 +76,7 @@ const FinalizarAssinatura = () => {
   
   // UI state
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("card");
+  const [activeTab, setActiveTab] = useState<"card" | "pix">("card");
   const [pixData, setPixData] = useState<PixData | null>(null);
   const [copied, setCopied] = useState(false);
   const [showCoupon, setShowCoupon] = useState(false);
@@ -382,11 +382,11 @@ const FinalizarAssinatura = () => {
 
   if (!planType) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-[#f9fafb] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-[#e5e7eb]">
           <CardContent className="pt-6 text-center">
             <p className="text-gray-600">Plano não selecionado.</p>
-            <Button onClick={() => navigate("/planos")} className="mt-4">
+            <Button onClick={() => navigate("/planos")} className="mt-4 bg-[#10b981] hover:bg-[#059669]">
               Ver Planos
             </Button>
           </CardContent>
@@ -396,50 +396,70 @@ const FinalizarAssinatura = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 py-4">
-        <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#f9fafb]">
+      {/* Clean Header */}
+      <header className="bg-white border-b border-[#e5e7eb] py-4">
+        <div className="max-w-5xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={logo} alt="Bateu a Meta" className="w-10 h-10 object-contain" />
             <div>
-              <h1 className="font-bold text-gray-900">{planName}</h1>
-              <p className="text-sm text-gray-500">Bateu a Meta</p>
+              <h1 className="font-semibold text-gray-900">{planName}</h1>
+              <p className="text-sm text-gray-500">Finalizar assinatura</p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-500">
-              {planType === "anual" ? "12x de" : ""}
-            </p>
-            <p className="text-2xl font-bold text-[#15a249]">
-              R$ {installmentValue}
-            </p>
-            {planType === "anual" && (
-              <p className="text-xs text-gray-500">ou R$ 97,90 à vista</p>
-            )}
+          <div className="flex items-center gap-2 text-gray-500">
+            <Lock className="w-4 h-4" />
+            <span className="text-sm">Checkout seguro</span>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Mobile Summary - Top */}
+        <div className="md:hidden mb-6">
+          <Card className="bg-white border border-[#e5e7eb] rounded-xl shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img src={logo} alt="Bateu a Meta" className="w-10 h-10 object-contain" />
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{planName}</p>
+                    <p className="text-xs text-gray-500">Bateu a Meta</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-gray-900">
+                    R$ {planPrice.toFixed(2).replace(".", ",")}
+                  </p>
+                  {planType === "anual" && (
+                    <p className="text-xs text-gray-500">ou 12x de R$ {installmentValue}</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid md:grid-cols-5 gap-8">
           {/* Form Column */}
           <div className="md:col-span-3 space-y-6">
-            {/* Personal Data */}
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <h2 className="font-bold text-gray-900 text-lg">Dados pessoais</h2>
+            {/* Personal Data Card */}
+            <Card className="bg-white border border-[#e5e7eb] rounded-xl shadow-sm">
+              <CardContent className="p-6 space-y-5">
+                <h2 className="font-semibold text-gray-900">Dados pessoais</h2>
                 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="email">Seu e-mail</Label>
+                    <Label htmlFor="email" className="text-sm text-gray-500 font-normal">
+                      Seu e-mail
+                    </Label>
                     <Input
                       id="email"
                       type="email"
                       placeholder="seu@email.com"
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      className={formErrors.email ? "border-red-500" : ""}
+                      className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${formErrors.email ? "border-red-400" : ""}`}
                     />
                     {formErrors.email && (
                       <p className="text-xs text-red-500 mt-1">{formErrors.email}</p>
@@ -447,14 +467,16 @@ const FinalizarAssinatura = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="confirmEmail">Confirme seu e-mail</Label>
+                    <Label htmlFor="confirmEmail" className="text-sm text-gray-500 font-normal">
+                      Confirme seu e-mail
+                    </Label>
                     <Input
                       id="confirmEmail"
                       type="email"
                       placeholder="seu@email.com"
                       value={formData.confirmEmail}
                       onChange={(e) => setFormData(prev => ({ ...prev, confirmEmail: e.target.value }))}
-                      className={formErrors.confirmEmail ? "border-red-500" : ""}
+                      className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${formErrors.confirmEmail ? "border-red-400" : ""}`}
                     />
                     {formErrors.confirmEmail && (
                       <p className="text-xs text-red-500 mt-1">{formErrors.confirmEmail}</p>
@@ -462,14 +484,16 @@ const FinalizarAssinatura = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="fullName">Nome completo</Label>
+                    <Label htmlFor="fullName" className="text-sm text-gray-500 font-normal">
+                      Nome completo
+                    </Label>
                     <Input
                       id="fullName"
                       type="text"
                       placeholder="João da Silva"
                       value={formData.fullName}
                       onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                      className={formErrors.fullName ? "border-red-500" : ""}
+                      className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${formErrors.fullName ? "border-red-400" : ""}`}
                     />
                     {formErrors.fullName && (
                       <p className="text-xs text-red-500 mt-1">{formErrors.fullName}</p>
@@ -478,14 +502,16 @@ const FinalizarAssinatura = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="cpf">CPF</Label>
+                      <Label htmlFor="cpf" className="text-sm text-gray-500 font-normal">
+                        CPF
+                      </Label>
                       <Input
                         id="cpf"
                         type="text"
                         placeholder="000.000.000-00"
                         value={formData.cpf}
                         onChange={(e) => setFormData(prev => ({ ...prev, cpf: formatCPF(e.target.value) }))}
-                        className={formErrors.cpf ? "border-red-500" : ""}
+                        className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${formErrors.cpf ? "border-red-400" : ""}`}
                         maxLength={14}
                       />
                       {formErrors.cpf && (
@@ -494,11 +520,13 @@ const FinalizarAssinatura = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone">Celular</Label>
-                      <div className="flex">
-                        <div className="flex items-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-md px-3">
-                          <Phone className="w-4 h-4 text-gray-400 mr-1" />
-                          <span className="text-sm text-gray-600">+55</span>
+                      <Label htmlFor="phone" className="text-sm text-gray-500 font-normal">
+                        Celular
+                      </Label>
+                      <div className="flex mt-1.5">
+                        <div className="flex items-center bg-gray-50 border border-r-0 border-gray-200 rounded-l-md px-3">
+                          <Phone className="w-3.5 h-3.5 text-gray-400 mr-1" />
+                          <span className="text-sm text-gray-500">+55</span>
                         </div>
                         <Input
                           id="phone"
@@ -506,7 +534,7 @@ const FinalizarAssinatura = () => {
                           placeholder="(00) 00000-0000"
                           value={formData.phone}
                           onChange={(e) => setFormData(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
-                          className={`rounded-l-none ${formErrors.phone ? "border-red-500" : ""}`}
+                          className={`rounded-l-none border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${formErrors.phone ? "border-red-400" : ""}`}
                           maxLength={15}
                         />
                       </div>
@@ -521,7 +549,7 @@ const FinalizarAssinatura = () => {
                     <button
                       type="button"
                       onClick={() => setShowCoupon(!showCoupon)}
-                      className="flex items-center text-sm text-[#15a249] hover:underline"
+                      className="flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       {showCoupon ? <ChevronUp className="w-4 h-4 mr-1" /> : <ChevronDown className="w-4 h-4 mr-1" />}
                       Possui cupom de desconto?
@@ -534,6 +562,7 @@ const FinalizarAssinatura = () => {
                           placeholder="Digite seu cupom"
                           value={formData.coupon}
                           onChange={(e) => setFormData(prev => ({ ...prev, coupon: e.target.value.toUpperCase() }))}
+                          className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
                         />
                       </div>
                     )}
@@ -542,39 +571,57 @@ const FinalizarAssinatura = () => {
               </CardContent>
             </Card>
 
-            {/* Payment Method */}
-            <Card>
-              <CardContent className="pt-6">
-                <h2 className="font-bold text-gray-900 text-lg mb-4">Forma de pagamento</h2>
+            {/* Payment Method Card */}
+            <Card className="bg-white border border-[#e5e7eb] rounded-xl shadow-sm">
+              <CardContent className="p-6">
+                <h2 className="font-semibold text-gray-900 mb-5">Forma de pagamento</h2>
                 
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
-                    <TabsTrigger value="card" className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4" />
-                      Cartão de Crédito
-                    </TabsTrigger>
-                    <TabsTrigger value="pix" className="flex items-center gap-2">
-                      <QrCode className="w-4 h-4" />
-                      PIX
-                    </TabsTrigger>
-                  </TabsList>
+                {/* Custom Tab Buttons */}
+                <div className="flex gap-3 mb-6">
+                  <button
+                    onClick={() => setActiveTab("card")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+                      activeTab === "card"
+                        ? "border-blue-400 bg-blue-50/50 text-gray-900"
+                        : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                    }`}
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span className="text-sm font-medium">Cartão de Crédito</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("pix")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+                      activeTab === "pix"
+                        ? "border-blue-400 bg-blue-50/50 text-gray-900"
+                        : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                    }`}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span className="text-sm font-medium">PIX</span>
+                  </button>
+                </div>
 
-                  <TabsContent value="card" className="space-y-4">
+                {/* Card Tab Content */}
+                {activeTab === "card" && (
+                  <div className="space-y-4">
                     <div>
-                      <Label htmlFor="cardNumber">Número do cartão</Label>
-                      <div className="relative">
+                      <Label htmlFor="cardNumber" className="text-sm text-gray-500 font-normal">
+                        Número do cartão
+                      </Label>
+                      <div className="relative mt-1.5">
                         <Input
                           id="cardNumber"
                           type="text"
                           placeholder="0000 0000 0000 0000"
                           value={cardData.cardNumber}
                           onChange={(e) => handleCardNumberChange(e.target.value)}
-                          className={`pr-12 ${cardErrors.cardNumber ? "border-red-500" : ""}`}
+                          className={`pr-16 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${cardErrors.cardNumber ? "border-red-400" : ""}`}
                           maxLength={19}
                         />
                         {cardBrand && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <span className="text-xs font-medium text-gray-500 uppercase">{cardBrand}</span>
+                            <span className="text-xs font-medium text-gray-400 uppercase">{cardBrand}</span>
                           </div>
                         )}
                       </div>
@@ -585,14 +632,16 @@ const FinalizarAssinatura = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="expiry">Validade</Label>
+                        <Label htmlFor="expiry" className="text-sm text-gray-500 font-normal">
+                          Validade
+                        </Label>
                         <Input
                           id="expiry"
                           type="text"
                           placeholder="MM/AA"
                           value={cardData.expiry}
                           onChange={(e) => setCardData(prev => ({ ...prev, expiry: formatExpiry(e.target.value) }))}
-                          className={cardErrors.expiry ? "border-red-500" : ""}
+                          className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${cardErrors.expiry ? "border-red-400" : ""}`}
                           maxLength={5}
                         />
                         {cardErrors.expiry && (
@@ -600,14 +649,16 @@ const FinalizarAssinatura = () => {
                         )}
                       </div>
                       <div>
-                        <Label htmlFor="cvv">CVV</Label>
+                        <Label htmlFor="cvv" className="text-sm text-gray-500 font-normal">
+                          CVV
+                        </Label>
                         <Input
                           id="cvv"
                           type="text"
                           placeholder="000"
                           value={cardData.cvv}
                           onChange={(e) => setCardData(prev => ({ ...prev, cvv: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
-                          className={cardErrors.cvv ? "border-red-500" : ""}
+                          className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${cardErrors.cvv ? "border-red-400" : ""}`}
                           maxLength={4}
                         />
                         {cardErrors.cvv && (
@@ -617,14 +668,16 @@ const FinalizarAssinatura = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="holderName">Nome impresso no cartão</Label>
+                      <Label htmlFor="holderName" className="text-sm text-gray-500 font-normal">
+                        Nome impresso no cartão
+                      </Label>
                       <Input
                         id="holderName"
                         type="text"
                         placeholder="JOÃO DA SILVA"
                         value={cardData.holderName}
                         onChange={(e) => setCardData(prev => ({ ...prev, holderName: e.target.value.toUpperCase() }))}
-                        className={cardErrors.holderName ? "border-red-500" : ""}
+                        className={`mt-1.5 border-gray-200 focus:border-blue-400 focus:ring-blue-400 ${cardErrors.holderName ? "border-red-400" : ""}`}
                       />
                       {cardErrors.holderName && (
                         <p className="text-xs text-red-500 mt-1">{cardErrors.holderName}</p>
@@ -632,12 +685,14 @@ const FinalizarAssinatura = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="installments">Parcelas</Label>
+                      <Label htmlFor="installments" className="text-sm text-gray-500 font-normal">
+                        Parcelas
+                      </Label>
                       <select
                         id="installments"
                         value={cardData.installments}
                         onChange={(e) => setCardData(prev => ({ ...prev, installments: parseInt(e.target.value) }))}
-                        className="w-full h-10 px-3 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#15a249]"
+                        className="mt-1.5 w-full h-10 px-3 border border-gray-200 rounded-md bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                       >
                         {getInstallmentOptions().map(opt => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -648,7 +703,7 @@ const FinalizarAssinatura = () => {
                     <Button
                       onClick={handleCardPayment}
                       disabled={loading}
-                      className="w-full bg-[#15a249] hover:bg-[#128a3d] text-white font-bold py-6 text-lg"
+                      className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold py-6 text-base mt-2 rounded-lg shadow-sm"
                     >
                       {loading ? (
                         <>
@@ -656,27 +711,27 @@ const FinalizarAssinatura = () => {
                           Processando...
                         </>
                       ) : (
-                        <>
-                          <CreditCard className="mr-2 h-5 w-5" />
-                          Finalizar Compra
-                        </>
+                        "Finalizar Compra"
                       )}
                     </Button>
-                  </TabsContent>
+                  </div>
+                )}
 
-                  <TabsContent value="pix" className="space-y-4">
+                {/* PIX Tab Content */}
+                {activeTab === "pix" && (
+                  <div className="space-y-4">
                     {!pixData ? (
                       <>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                          <p className="text-sm text-green-700 font-medium">
-                            ✅ O pagamento via PIX é aprovado instantaneamente e libera seu acesso na hora!
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                          <p className="text-sm text-gray-600">
+                            O pagamento via PIX é aprovado instantaneamente e libera seu acesso na hora!
                           </p>
                         </div>
 
                         <Button
                           onClick={handlePixPayment}
                           disabled={loading}
-                          className="w-full bg-[#32BCAD] hover:bg-[#2aa89a] text-white font-bold py-6 text-lg"
+                          className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold py-6 text-base rounded-lg shadow-sm"
                         >
                           {loading ? (
                             <>
@@ -695,7 +750,7 @@ const FinalizarAssinatura = () => {
                       <>
                         {/* QR Code */}
                         <div className="flex justify-center">
-                          <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
+                          <div className="bg-white p-4 rounded-lg border border-gray-200">
                             <img
                               src={`data:image/png;base64,${pixData.qr_code_base64}`}
                               alt="QR Code PIX"
@@ -706,22 +761,24 @@ const FinalizarAssinatura = () => {
 
                         {/* Copy Code */}
                         <div className="space-y-2">
-                          <Label>Ou copie o código PIX:</Label>
+                          <Label className="text-sm text-gray-500 font-normal">
+                            Ou copie o código PIX:
+                          </Label>
                           <div className="flex gap-2">
                             <Input
                               value={pixData.qr_code}
                               readOnly
-                              className="text-xs font-mono"
+                              className="text-xs font-mono border-gray-200"
                             />
                             <Button
                               onClick={handleCopyPixCode}
                               variant="outline"
-                              className="shrink-0"
+                              className="shrink-0 border-gray-200 hover:bg-gray-50"
                             >
                               {copied ? (
-                                <Check className="h-4 w-4 text-green-500" />
+                                <Check className="h-4 w-4 text-[#10b981]" />
                               ) : (
-                                <Copy className="h-4 w-4" />
+                                <Copy className="h-4 w-4 text-gray-500" />
                               )}
                             </Button>
                           </div>
@@ -741,23 +798,43 @@ const FinalizarAssinatura = () => {
                         <Button
                           variant="outline"
                           onClick={() => setPixData(null)}
-                          className="w-full"
+                          className="w-full border-gray-200 hover:bg-gray-50 text-gray-600"
                         >
                           Gerar Novo Código
                         </Button>
                       </>
                     )}
-                  </TabsContent>
-                </Tabs>
+                  </div>
+                )}
+
+                {/* Security Footer */}
+                <div className="mt-6 pt-6 border-t border-gray-100">
+                  <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+                    <Shield className="h-3.5 w-3.5" />
+                    <span>Pagamento processado com segurança via Mercado Pago</span>
+                  </div>
+                  
+                  {/* Card Brands - Monochromatic */}
+                  <div className="flex items-center justify-center gap-4 mt-4">
+                    {["Visa", "Master", "Elo", "Amex", "Hipercard"].map((brand) => (
+                      <span 
+                        key={brand} 
+                        className="text-[10px] font-medium text-gray-300 uppercase tracking-wide"
+                      >
+                        {brand}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Summary Column */}
-          <div className="md:col-span-2">
-            <Card className="sticky top-4">
-              <CardContent className="pt-6 space-y-4">
-                <h2 className="font-bold text-gray-900 text-lg">Resumo da compra</h2>
+          {/* Summary Column - Desktop Only */}
+          <div className="hidden md:block md:col-span-2">
+            <Card className="sticky top-4 bg-white border border-[#e5e7eb] rounded-xl shadow-sm">
+              <CardContent className="p-6 space-y-5">
+                <h2 className="font-semibold text-gray-900">Resumo da compra</h2>
                 
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <img src={logo} alt="Bateu a Meta" className="w-12 h-12 object-contain" />
@@ -767,7 +844,7 @@ const FinalizarAssinatura = () => {
                   </div>
                 </div>
 
-                <div className="border-t pt-4 space-y-2">
+                <div className="border-t border-gray-100 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="text-gray-900">R$ {planPrice.toFixed(2).replace(".", ",")}</span>
@@ -775,16 +852,16 @@ const FinalizarAssinatura = () => {
                   {formData.coupon && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Cupom: {formData.coupon}</span>
-                      <span className="text-green-600">-R$ 0,00</span>
+                      <span className="text-[#10b981]">-R$ 0,00</span>
                     </div>
                   )}
                 </div>
 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between">
-                    <span className="font-bold text-gray-900">Total</span>
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex justify-between items-start">
+                    <span className="font-semibold text-gray-900">Total</span>
                     <div className="text-right">
-                      <p className="font-bold text-xl text-[#15a249]">
+                      <p className="font-bold text-xl text-gray-900">
                         R$ {planPrice.toFixed(2).replace(".", ",")}
                       </p>
                       {planType === "anual" && (
@@ -794,14 +871,10 @@ const FinalizarAssinatura = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-gray-500 pt-4 border-t">
+                <div className="flex items-center gap-2 text-xs text-gray-400 pt-4 border-t border-gray-100">
                   <Shield className="h-4 w-4" />
                   <span>Pagamento 100% seguro</span>
                 </div>
-
-                <p className="text-xs text-gray-400 text-center">
-                  Processado por Mercado Pago
-                </p>
               </CardContent>
             </Card>
           </div>
