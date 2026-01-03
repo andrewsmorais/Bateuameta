@@ -21,6 +21,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import logo from "@/assets/bateu-a-meta-logo.png";
+import cachorroImg from "@/assets/cachorro-praia.jpeg";
 
 type PlanType = "mensal" | "anual";
 
@@ -432,7 +433,7 @@ const FinalizarAssinatura = () => {
           <div className="flex items-center justify-between">
             {/* Left side - Product info */}
             <div className="flex items-center gap-5">
-              <img src={logo} alt="Bateu a Meta" className="w-20 h-20 object-contain rounded-xl shadow-lg bg-white p-2" />
+              <img src={cachorroImg} alt="Bateu a Meta" className="w-20 h-20 object-cover rounded-xl shadow-lg" />
               <div>
                 <h1 className="font-bold text-white text-2xl">Bateu a Meta - {planName}</h1>
                 <p className="text-base text-white/80 mt-1">Aplicativo de Gestão para Motoristas</p>
