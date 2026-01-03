@@ -349,11 +349,11 @@ const LandingPage = () => {
       </section>
 
       {/* App Demo Carousel Section */}
-      <section className="py-16 md:py-24 px-4 bg-black">
+      <section className="py-16 md:py-24 px-4 bg-white">
         <div className="container mx-auto max-w-5xl">
           <div className="text-center space-y-6 mb-12">
-            <h2 className="text-2xl md:text-4xl font-bold text-white">
-              Sua Jornada para o <span className="text-[#15a249] drop-shadow-[0_0_10px_rgba(21,162,73,0.5)]">Lucro Real</span> Começa Aqui.
+            <h2 className="text-2xl md:text-4xl font-bold text-black">
+              Sua Jornada para o <span className="text-[#15a249]">Lucro Real</span> Começa Aqui.
             </h2>
           </div>
 
@@ -371,7 +371,7 @@ const LandingPage = () => {
                 <CarouselItem key={index} className="basis-full md:basis-4/5">
                   <div className="px-2 md:px-4">
                     <div 
-                      className="bg-gray-900/80 rounded-2xl shadow-[0_0_30px_rgba(21,162,73,0.2)] p-3 md:p-4 border border-[#15a249]/30 cursor-pointer group relative"
+                      className="bg-white rounded-2xl shadow-lg p-3 md:p-4 border border-gray-200 cursor-pointer group relative"
                       onClick={() => setSelectedImage({ ...slide, index })}
                     >
                       <div className="relative overflow-hidden rounded-xl">
@@ -387,11 +387,11 @@ const LandingPage = () => {
                           </div>
                         </div>
                       </div>
-                      <p className="text-center mt-3 text-white font-medium text-sm md:text-base">
+                      <p className="text-center mt-3 text-black font-medium text-sm md:text-base">
                         {slide.caption}
                       </p>
                       {/* Mobile tap hint */}
-                      <p className="text-center text-white/50 text-xs mt-1 md:hidden">
+                      <p className="text-center text-gray-500 text-xs mt-1 md:hidden">
                         Toque para ampliar
                       </p>
                     </div>
@@ -399,8 +399,8 @@ const LandingPage = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-12 bg-gray-900 border-[#15a249]/50 text-white hover:bg-gray-800 hover:border-[#15a249] shadow-md" />
-            <CarouselNext className="hidden md:flex -right-12 bg-gray-900 border-[#15a249]/50 text-white hover:bg-gray-800 hover:border-[#15a249] shadow-md" />
+            <CarouselPrevious className="hidden md:flex -left-12 bg-white border-gray-300 text-black hover:bg-gray-100 hover:border-gray-400 shadow-md" />
+            <CarouselNext className="hidden md:flex -right-12 bg-white border-gray-300 text-black hover:bg-gray-100 hover:border-gray-400 shadow-md" />
           </Carousel>
 
           {/* Dynamic dots indicator */}
@@ -412,7 +412,7 @@ const LandingPage = () => {
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                   currentSlide === index 
                     ? 'bg-[#15a249] scale-125 shadow-[0_0_8px_rgba(21,162,73,0.6)]' 
-                    : 'bg-white/40 hover:bg-white/60'
+                    : 'bg-gray-300 hover:bg-gray-400'
                 }`}
                 aria-label={`Ir para slide ${index + 1}`}
               />
@@ -420,7 +420,7 @@ const LandingPage = () => {
           </div>
 
           {/* Swipe hint for mobile */}
-          <p className="text-center text-white/50 text-sm mt-3 md:hidden">
+          <p className="text-center text-gray-500 text-sm mt-3 md:hidden">
             ← Arraste para ver mais →
           </p>
 
