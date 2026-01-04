@@ -995,33 +995,10 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer CTA - #000000 */}
-      <section className="py-16 md:py-24 px-4 bg-black">
-        <div className="container mx-auto max-w-4xl text-center space-y-8">
-          <h2 className="text-2xl md:text-4xl font-bold text-white">
-            Pronto Para <span className="text-gradient-brand">Bater Sua Meta</span>?
-          </h2>
-          
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Junte-se a milhares de motoristas que já transformaram sua gestão financeira
-          </p>
-
-          <Button 
-            size="lg" 
-            onClick={scrollToPricing}
-            className="w-full md:w-auto text-base md:text-lg px-6 md:px-10 py-5 md:py-6 bg-[#25D366] hover:bg-[#1da851] text-white font-bold rounded-lg shadow-lg animate-soft-pulse mx-4 md:mx-0"
-          >
-            COMEÇAR AGORA
-          </Button>
-
-          <div className="pt-6">
-            <div className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-8 md:py-5 rounded-xl bg-green-600">
-              <ShieldCheck className="h-5 w-5 md:h-8 md:w-8 text-white flex-shrink-0" />
-              <span className="text-sm md:text-lg lg:text-xl font-bold text-white">7 dias de Garantia ou Seu Dinheiro de Volta</span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-6 pt-8 border-t border-zinc-800">
+      {/* Footer - #000000 */}
+      <section className="py-12 md:py-16 px-4 bg-black">
+        <div className="container mx-auto max-w-4xl text-center space-y-6">
+          <div className="flex flex-wrap justify-center gap-6">
             <a 
               href="https://www.instagram.com/bateu_meta/" 
               target="_blank" 
@@ -1029,9 +1006,9 @@ const LandingPage = () => {
               onClick={() => handleContactClick('Instagram')}
               className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity font-medium"
             >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="url(#instagram-gradient-footer)">
                 <defs>
-                  <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <linearGradient id="instagram-gradient-footer" x1="0%" y1="100%" x2="100%" y2="0%">
                     <stop offset="0%" stopColor="#FFDC80" />
                     <stop offset="25%" stopColor="#F77737" />
                     <stop offset="50%" stopColor="#E1306C" />
