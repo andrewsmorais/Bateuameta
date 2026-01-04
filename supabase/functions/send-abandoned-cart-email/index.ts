@@ -14,14 +14,16 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const PLANS = {
-  mensal: { original: 12.90, discounted: 11.61 },
-  anual: { original: 97.90, discounted: 88.11 },
+// Preços - Desconto apenas para o plano anual
+const PLAN_ANUAL = {
+  original: 97.90,
+  discounted: 88.11,
+  savings: 9.79,
 };
 
 function generateCouponCode(): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let code = "VOLTA10-";
+  let code = "ANUAL10-";
   for (let i = 0; i < 6; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -30,16 +32,14 @@ function generateCouponCode(): string {
 
 async function sendAbandonedCartEmail(
   email: string,
-  couponCode: string,
-  planType: string
+  couponCode: string
 ) {
   if (!BREVO_API_KEY) {
     console.error("[Abandoned Cart] BREVO_API_KEY not configured");
     return false;
   }
 
-  const prices = PLANS[planType as keyof typeof PLANS] || PLANS.mensal;
-  const checkoutUrl = `https://bateuameta.com/checkout?coupon=${couponCode}`;
+  const checkoutUrl = `https://bateuameta.com/checkout?plan=anual&coupon=${couponCode}`;
 
   // Extract name from email (before @)
   const userName = email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1);
@@ -50,14 +50,23 @@ async function sendAbandonedCartEmail(
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Ficou parado no semáforo? Garanta seu desconto!</title>
+      <title>Ficou parado no semáforo? Garanta seu desconto no Plano Anual!</title>
+      <style>
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.03); }
+        }
+        .cta-button {
+          animation: pulse 2s infinite;
+        }
+      </style>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f5f5f5;">
       <!-- Container Principal -->
       <div style="background: #ffffff; margin: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
         
         <!-- Header com Logo -->
-        <div style="background: #ffffff; padding: 30px; text-align: center; border-bottom: 3px solid #25D366;">
+        <div style="background: #ffffff; padding: 30px; text-align: center; border-top: 4px solid #25D366;">
           <h1 style="color: #25D366; margin: 0; font-size: 32px; font-weight: bold;">🚗 Bateu A Meta</h1>
         </div>
         
@@ -75,41 +84,50 @@ async function sendAbandonedCartEmail(
           </p>
           
           <p style="font-size: 16px; color: #333; line-height: 1.8; margin: 0 0 15px 0;">
-            Eu sei como é a correria no trecho — às vezes entra uma corrida boa ou o sinal cai, né?
+            Eu sei como é a correria no trecho — às vezes entra uma corrida boa ou o sinal cai bem na hora, né?
           </p>
           
           <p style="font-size: 16px; color: #333; line-height: 1.8; margin: 0 0 25px 0;">
-            Para te ajudar a começar a ver seu <strong>lucro real</strong>, gerei um cupom especial para você.
+            Para te ajudar a ter controle total do seu lucro o ano inteiro, gerei um cupom especial de <strong>10% de desconto</strong> exclusivo para o nosso <strong>PLANO ANUAL</strong>.
           </p>
           
           <!-- Bloco do Cupom com Borda Tracejada -->
           <div style="border: 3px dashed #25D366; padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center; background: #f8fff8;">
-            <p style="font-size: 16px; color: #333; margin: 0 0 10px 0;">🎁</p>
-            <h2 style="color: #333; margin: 0 0 10px 0; font-size: 22px; font-weight: bold;">
-              CUPOM: META10
+            <p style="font-size: 24px; color: #333; margin: 0 0 10px 0;">🎁</p>
+            <h2 style="color: #333; margin: 0 0 10px 0; font-size: 24px; font-weight: bold;">
+              CUPOM: ANUAL10
             </h2>
             <p style="color: #25D366; font-size: 20px; font-weight: bold; margin: 0 0 15px 0;">
               (10% de DESCONTO)
             </p>
+            <p style="color: #1976d2; margin: 0 0 10px 0; font-weight: bold; font-size: 14px;">
+              ✨ Válido apenas para o PLANO ANUAL
+            </p>
             <p style="color: #d32f2f; margin: 0; font-weight: bold; font-size: 14px;">
-              ⏰ Válido apenas pelas próximas 24 horas.
+              ⏰ Válido pelas próximas 24 horas!
             </p>
           </div>
           
-          <!-- Preços com Desconto -->
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 25px 0;">
-            <p style="font-size: 16px; margin: 8px 0; color: #333;">
-              • <strong>Plano Mensal:</strong> <span style="text-decoration: line-through; color: #999;">R$ ${PLANS.mensal.original.toFixed(2).replace('.', ',')}</span> por <span style="color: #25D366; font-weight: bold;">R$ ${PLANS.mensal.discounted.toFixed(2).replace('.', ',')}</span>
+          <!-- Preço com Desconto - APENAS ANUAL -->
+          <div style="background: linear-gradient(135deg, #f8fff8 0%, #e8f5e9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center; border: 2px solid #25D366;">
+            <p style="font-size: 18px; margin: 0 0 10px 0; color: #333; font-weight: bold;">
+              📅 Plano Anual
             </p>
-            <p style="font-size: 16px; margin: 8px 0; color: #333;">
-              • <strong>Plano Anual:</strong> <span style="text-decoration: line-through; color: #999;">R$ ${PLANS.anual.original.toFixed(2).replace('.', ',')}</span> por <span style="color: #25D366; font-weight: bold;">R$ ${PLANS.anual.discounted.toFixed(2).replace('.', ',')}</span>
+            <p style="font-size: 16px; margin: 0 0 5px 0; color: #999;">
+              <span style="text-decoration: line-through;">De R$ ${PLAN_ANUAL.original.toFixed(2).replace('.', ',')}</span>
+            </p>
+            <p style="font-size: 28px; margin: 0 0 10px 0; color: #25D366; font-weight: bold;">
+              por R$ ${PLAN_ANUAL.discounted.toFixed(2).replace('.', ',')}
+            </p>
+            <p style="font-size: 14px; margin: 0; color: #4caf50; font-weight: bold;">
+              💰 Economize R$ ${PLAN_ANUAL.savings.toFixed(2).replace('.', ',')}!
             </p>
           </div>
           
-          <!-- Botão CTA Verde -->
+          <!-- Botão CTA Verde com Efeito Pulsante -->
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${checkoutUrl}" style="display: inline-block; background: #25D366; color: white; padding: 18px 40px; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold; text-transform: uppercase;">
-              RESGATAR MEU DESCONTO AGORA
+            <a href="${checkoutUrl}" class="cta-button" style="display: inline-block; background: #25D366; color: white; padding: 20px 45px; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold; text-transform: uppercase; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);">
+              RESGATAR MEU DESCONTO ANUAL
             </a>
           </div>
           
@@ -170,7 +188,7 @@ async function sendAbandonedCartEmail(
           email: "suporte@bateuameta.com",
         },
         to: [{ email }],
-        subject: `🏁 Ficou parado no semáforo, ${email.split("@")[0]}? Garanta seu desconto!`,
+        subject: `🏁 Ficou parado no semáforo, ${userName}? Garanta seu desconto no Plano Anual!`,
         htmlContent: emailContent,
       }),
     });
@@ -255,12 +273,10 @@ serve(async (req) => {
           }
         }
 
-        // Generate unique coupon code
+        // Generate unique coupon code - SEMPRE para plano anual
         const couponCode = generateCouponCode();
-        const planType = checkout.plan_type || "mensal";
-        const prices = PLANS[planType as keyof typeof PLANS] || PLANS.mensal;
 
-        // Save coupon to database
+        // Save coupon to database - SEMPRE para plano anual
         const validUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
         
         const { error: couponError } = await supabaseAdmin
@@ -269,9 +285,9 @@ serve(async (req) => {
             code: couponCode,
             email: checkout.email,
             discount_percent: 10,
-            plan_type: planType,
-            original_price: prices.original,
-            discounted_price: prices.discounted,
+            plan_type: "anual", // SEMPRE anual
+            original_price: PLAN_ANUAL.original,
+            discounted_price: PLAN_ANUAL.discounted,
             valid_until: validUntil,
           });
 
@@ -281,8 +297,8 @@ serve(async (req) => {
           continue;
         }
 
-        // Send email
-        const emailSent = await sendAbandonedCartEmail(checkout.email, couponCode, planType);
+        // Send email focado no plano anual
+        const emailSent = await sendAbandonedCartEmail(checkout.email, couponCode);
 
         if (emailSent) {
           // Update checkout status
