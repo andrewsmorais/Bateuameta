@@ -407,10 +407,9 @@ const LandingPage = () => {
             <Button 
               size="lg" 
               onClick={scrollToPricing}
-              className="text-lg px-8 py-6 bg-[#15a249] hover:bg-[#128a3d] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+              className="w-full md:w-auto text-base md:text-lg px-6 md:px-10 py-5 md:py-6 bg-[#25D366] hover:bg-[#1da851] text-white font-bold rounded-lg shadow-lg animate-soft-pulse mx-4 md:mx-0"
             >
-              QUERO BATER MINHAS METAS AGORA
-              <ChevronDown className="ml-2 h-5 w-5 animate-bounce" />
+              COMEÇAR AGORA
             </Button>
           </div>
         </div>
@@ -560,11 +559,9 @@ const LandingPage = () => {
             <Button 
               size="lg" 
               onClick={scrollToPricing}
-              className="text-sm md:text-lg px-4 md:px-8 py-5 md:py-6 bg-[#15a249] hover:bg-[#128a3d] text-white font-bold shadow-[0_0_20px_rgba(21,162,73,0.4)] hover:shadow-[0_0_30px_rgba(21,162,73,0.6)] transition-all"
+              className="w-full md:w-auto text-base md:text-lg px-6 md:px-10 py-5 md:py-6 bg-[#25D366] hover:bg-[#1da851] text-white font-bold rounded-lg shadow-lg animate-soft-pulse mx-4 md:mx-0"
             >
-              <span className="md:hidden">QUERO COMEÇAR AGORA</span>
-              <span className="hidden md:inline">QUERO COMEÇAR MINHA JORNADA DE LUCRO</span>
-              <ChevronDown className="ml-2 h-5 w-5 animate-bounce" />
+              COMEÇAR AGORA
             </Button>
           </div>
         </div>
@@ -919,10 +916,10 @@ const LandingPage = () => {
                 </ul>
 
                 <Button 
-                  className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
+                  className="w-full py-5 md:py-6 text-base md:text-lg font-bold bg-[#25D366] hover:bg-[#1da851] text-white rounded-lg animate-soft-pulse"
                   onClick={() => handleSelectPlan("anual")}
                 >
-                  ASSINAR AGORA
+                  COMEÇAR AGORA
                 </Button>
               </CardContent>
             </Card>
@@ -956,10 +953,10 @@ const LandingPage = () => {
                 </ul>
 
                 <Button 
-                  className="w-full py-6 text-lg font-bold bg-[#c41313] hover:bg-[#a91010] text-white"
+                  className="w-full py-5 md:py-6 text-base md:text-lg font-bold bg-[#25D366] hover:bg-[#1da851] text-white rounded-lg animate-soft-pulse"
                   onClick={() => handleSelectPlan("mensal")}
                 >
-                  ASSINAR AGORA
+                  COMEÇAR AGORA
                 </Button>
               </CardContent>
             </Card>
@@ -1012,7 +1009,7 @@ const LandingPage = () => {
           <Button 
             size="lg" 
             onClick={scrollToPricing}
-            className="text-lg px-8 py-6 font-bold shadow-lg bg-gradient-to-r from-[#c41313] to-[#3c83f6] hover:from-[#a91010] hover:to-[#2a6ad9] text-white"
+            className="w-full md:w-auto text-base md:text-lg px-6 md:px-10 py-5 md:py-6 bg-[#25D366] hover:bg-[#1da851] text-white font-bold rounded-lg shadow-lg animate-soft-pulse mx-4 md:mx-0"
           >
             COMEÇAR AGORA
           </Button>
