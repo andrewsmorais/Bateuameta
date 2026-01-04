@@ -61,6 +61,11 @@ import whatsapp11 from "@/assets/testimonials/whatsapp-11.jpeg";
 import whatsapp12 from "@/assets/testimonials/whatsapp-12.jpeg";
 import whatsapp13 from "@/assets/testimonials/whatsapp-13.jpeg";
 
+// Driver testimonial images
+import motoristaCareca from "@/assets/testimonials/motorista-careca.png";
+import motoristaSenhor from "@/assets/testimonials/motorista-senhor.png";
+import motoristaCacheado from "@/assets/testimonials/motorista-cacheado.png";
+
 // Founder image
 import fundadorImg from "@/assets/fundador.png";
 
@@ -82,6 +87,36 @@ const resourcesSlides = [
   { img: featureRelatorios, caption: "Relatórios - Exporte seus dados" }
 ];
 
+// Driver testimonials slides
+const testimonialSlides = [
+  {
+    img: motoristaCareca,
+    name: "Ricardo",
+    testimonial: "Depois que comecei a usar o app, finalmente sei meu lucro líquido de verdade. Antes eu achava que estava ganhando bem, mas as despesas comiam tudo!"
+  },
+  {
+    img: motoristaSenhor,
+    name: "Carlos",
+    testimonial: "A organização que o app trouxe pra minha vida foi incrível. Agora tenho controle total dos meus gastos e sei exatamente quanto preciso rodar pra bater minha meta."
+  },
+  {
+    img: motoristaCacheado,
+    name: "Felipe",
+    testimonial: "O app mudou minha forma de trabalhar. Tenho lucro líquido claro todo dia e consigo planejar melhor minha semana. Recomendo demais!"
+  }
+];
+
+// Function to highlight keywords in testimonials
+const highlightKeywords = (text: string) => {
+  const keywords = ['lucro líquido', 'organização', 'controle'];
+  let result = text;
+  keywords.forEach(keyword => {
+    const regex = new RegExp(`(${keyword})`, 'gi');
+    result = result.replace(regex, '<span class="text-[#25D366] font-bold">$1</span>');
+  });
+  return result;
+};
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
@@ -98,6 +133,10 @@ const LandingPage = () => {
   const [resourcesCarouselApi, setResourcesCarouselApi] = useState<CarouselApi>();
   const [resourcesCurrentSlide, setResourcesCurrentSlide] = useState(0);
   const [selectedResourceImage, setSelectedResourceImage] = useState<{ img: string; caption: string; index: number } | null>(null);
+  
+  // Driver testimonials carousel state
+  const [testimonialCarouselApi, setTestimonialCarouselApi] = useState<CarouselApi>();
+  const [testimonialCurrentSlide, setTestimonialCurrentSlide] = useState(0);
   
   // Facebook Pixel - inicializa e dispara PageView automaticamente
   const { trackLead, trackInitiateCheckout, trackViewContent, trackContact } = useFacebookPixel();
@@ -138,7 +177,33 @@ const LandingPage = () => {
     };
   }, [resourcesCarouselApi]);
 
-  // Navigate lightbox
+  // Update driver testimonials carousel current slide
+  useEffect(() => {
+    if (!testimonialCarouselApi) return;
+
+    const onSelect = () => {
+      setTestimonialCurrentSlide(testimonialCarouselApi.selectedScrollSnap());
+    };
+
+    testimonialCarouselApi.on("select", onSelect);
+    onSelect();
+
+    return () => {
+      testimonialCarouselApi.off("select", onSelect);
+    };
+  }, [testimonialCarouselApi]);
+
+  // Auto-play for driver testimonials carousel (5 seconds)
+  useEffect(() => {
+    if (!testimonialCarouselApi) return;
+
+    const interval = setInterval(() => {
+      testimonialCarouselApi.scrollNext();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [testimonialCarouselApi]);
+
   const navigateLightbox = useCallback((direction: 'prev' | 'next') => {
     if (!selectedImage) return;
     const newIndex = direction === 'next' 
@@ -708,6 +773,69 @@ const LandingPage = () => {
             </h2>
           </div>
 
+          {/* Driver Testimonials Carousel */}
+          <div className="mb-16">
+            <Carousel
+              opts={{
+                align: "center",
+                loop: true,
+              }}
+              setApi={setTestimonialCarouselApi}
+              className="w-full max-w-4xl mx-auto"
+            >
+              <CarouselContent>
+                {testimonialSlides.map((slide, index) => (
+                  <CarouselItem key={index} className="basis-full">
+                    <Card className="bg-white shadow-lg border-0 mx-2">
+                      <CardContent className="p-6 md:p-8">
+                        <div className="flex flex-col md:flex-row md:gap-8 items-center">
+                          {/* Photo */}
+                          <div className="w-40 h-40 md:w-52 md:h-52 flex-shrink-0 mb-6 md:mb-0">
+                            <img 
+                              src={slide.img} 
+                              alt={`Depoimento de ${slide.name}`}
+                              className="w-full h-full object-cover rounded-2xl"
+                            />
+                          </div>
+                          
+                          {/* Text */}
+                          <div className="flex-1 text-center md:text-left">
+                            <p 
+                              className="text-base md:text-lg text-gray-700 italic leading-relaxed"
+                              dangerouslySetInnerHTML={{ __html: `"${highlightKeywords(slide.testimonial)}"` }}
+                            />
+                            <p className="mt-4 font-bold text-black text-lg">
+                              — {slide.name}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-12 bg-white border-gray-300 text-black hover:bg-gray-100" />
+              <CarouselNext className="hidden md:flex -right-12 bg-white border-gray-300 text-black hover:bg-gray-100" />
+            </Carousel>
+
+            {/* Dots indicators */}
+            <div className="flex justify-center gap-3 mt-6">
+              {testimonialSlides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => testimonialCarouselApi?.scrollTo(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    testimonialCurrentSlide === index 
+                      ? 'bg-[#25D366] scale-125' 
+                      : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Ir para depoimento ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* WhatsApp Screenshots Carousel */}
           <Carousel
             opts={{
               align: "start",
