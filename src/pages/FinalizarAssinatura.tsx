@@ -50,8 +50,29 @@ interface CardData {
   installments: number;
 }
 
-// Mercado Pago Public Key
-const MP_PUBLIC_KEY = "APP_USR-0eb91d31-0f75-4e5d-bb89-ce5ed15a93b7";
+// Mercado Pago Public Key - from environment
+const MP_PUBLIC_KEY = import.meta.env.VITE_MP_PUBLIC_KEY || "";
+
+// Build ID for debug tracking
+const BUILD_ID = `v${Date.now()}`;
+
+// Helper to send debug logs to edge function (fire and forget)
+const sendDebugLog = async (stage: string, payload?: Record<string, unknown>) => {
+  try {
+    await supabase.functions.invoke("checkout-debug-log", {
+      body: {
+        stage,
+        payload,
+        ts: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        buildId: BUILD_ID,
+      },
+    });
+  } catch (e) {
+    console.warn("[Debug] Failed to send log:", e);
+  }
+};
 
 // Card Brand Logos - Larger and more visible
 const VisaLogo = () => (
@@ -262,6 +283,13 @@ const FinalizarAssinatura = () => {
       return;
     }
 
+    // Check if MP_PUBLIC_KEY is configured
+    if (!MP_PUBLIC_KEY) {
+      toast.error("Chave pública do Mercado Pago não configurada");
+      sendDebugLog("error_no_public_key", { mpReady });
+      return;
+    }
+
     if (!mpReady) {
       toast.error("Sistema de pagamento ainda carregando. Aguarde...");
       return;
@@ -269,9 +297,18 @@ const FinalizarAssinatura = () => {
 
     setLoading(true);
 
+    // Send initial debug log
+    sendDebugLog("start", { 
+      planType, 
+      cardBrand, 
+      mpReady,
+      mpKeyPrefix: MP_PUBLIC_KEY.substring(0, 15),
+    });
+
     try {
       console.log("[Checkout] === INICIANDO PAGAMENTO COM CARTÃO ===");
-      console.log("[Checkout] MP_PUBLIC_KEY:", MP_PUBLIC_KEY);
+      console.log("[Checkout] Build ID:", BUILD_ID);
+      console.log("[Checkout] MP_PUBLIC_KEY prefix:", MP_PUBLIC_KEY.substring(0, 15));
       console.log("[Checkout] Card brand detected:", cardBrand);
       console.log("[Checkout] MP Ready:", mpReady);
       
@@ -279,6 +316,7 @@ const FinalizarAssinatura = () => {
       // @ts-expect-error MercadoPago is loaded from SDK
       const mp = new window.MercadoPago(MP_PUBLIC_KEY);
       console.log("[Checkout] MercadoPago SDK inicializado");
+      sendDebugLog("mp_initialized", { success: true });
       
       // Parse expiry date
       const [expMonth, expYear] = cardData.expiry.split("/");
@@ -295,15 +333,18 @@ const FinalizarAssinatura = () => {
         identificationNumber: formData.cpf.replace(/\D/g, ""),
       };
 
-      console.log("[Checkout] Card token data (parcial):", {
-        cardNumber: cardTokenData.cardNumber.slice(0, 6) + "******" + cardTokenData.cardNumber.slice(-4),
+      const sanitizedCardData = {
+        cardNumberPrefix: cardTokenData.cardNumber.slice(0, 6),
+        cardNumberSuffix: cardTokenData.cardNumber.slice(-4),
         cardholderName: cardTokenData.cardholderName,
         cardExpirationMonth: cardTokenData.cardExpirationMonth,
         cardExpirationYear: cardTokenData.cardExpirationYear,
-        securityCode: "***",
         identificationType: cardTokenData.identificationType,
-        identificationNumber: cardTokenData.identificationNumber.slice(0, 3) + "***" + cardTokenData.identificationNumber.slice(-2),
-      });
+        cpfPrefix: cardTokenData.identificationNumber.slice(0, 3),
+      };
+
+      console.log("[Checkout] Card token data (parcial):", sanitizedCardData);
+      sendDebugLog("before_token", sanitizedCardData);
 
       console.log("[Checkout] Criando card token via SDK...");
       
@@ -311,71 +352,137 @@ const FinalizarAssinatura = () => {
       try {
         tokenResponse = await mp.createCardToken(cardTokenData);
         console.log("[Checkout] Token response completo:", JSON.stringify(tokenResponse, null, 2));
+        
+        sendDebugLog("token_response", { 
+          hasId: !!tokenResponse?.id,
+          hasError: !!tokenResponse?.error,
+          tokenIdPrefix: tokenResponse?.id?.substring(0, 10),
+          error: tokenResponse?.error,
+          message: tokenResponse?.message,
+          cause: tokenResponse?.cause,
+        });
       } catch (tokenError) {
+        const errorMsg = tokenError instanceof Error ? tokenError.message : String(tokenError);
         console.error("[Checkout] ERRO ao criar token:", tokenError);
-        throw new Error(`Erro ao validar cartão: ${tokenError instanceof Error ? tokenError.message : String(tokenError)}`);
+        sendDebugLog("token_error_catch", { 
+          errorName: tokenError instanceof Error ? tokenError.name : "Unknown",
+          errorMessage: errorMsg,
+          errorStack: tokenError instanceof Error ? tokenError.stack?.substring(0, 200) : undefined,
+        });
+        throw new Error(`Falha ao validar cartão: ${errorMsg}`);
       }
       
       if (tokenResponse.error || !tokenResponse.id) {
         console.error("[Checkout] Token criado com erro:", tokenResponse);
-        throw new Error(tokenResponse.message || tokenResponse.error || "Dados do cartão inválidos. Verifique e tente novamente.");
+        const errorDetail = tokenResponse.cause?.[0]?.description || tokenResponse.message || tokenResponse.error || "Dados do cartão inválidos";
+        sendDebugLog("token_error_response", { 
+          error: tokenResponse.error,
+          message: tokenResponse.message,
+          cause: tokenResponse.cause,
+        });
+        throw new Error(`Falha ao validar cartão: ${errorDetail}`);
       }
 
       console.log("[Checkout] ✓ Card token criado com sucesso:", tokenResponse.id);
+      sendDebugLog("token_success", { tokenIdPrefix: tokenResponse.id.substring(0, 10) });
 
       // Split name for API
       const nameParts = formData.fullName.trim().split(" ");
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(" ") || firstName;
 
-      // Send to edge function
-      const { data, error } = await supabase.functions.invoke("create-mp-card-payment", {
-        body: {
-          planType,
-          token: tokenResponse.id,
-          payment_method_id: cardBrand || "visa",
-          installments: cardData.installments,
-          payer: {
-            email: formData.email,
-            first_name: firstName,
-            last_name: lastName,
-            identification: {
-              type: "CPF",
-              number: formData.cpf.replace(/\D/g, ""),
-            },
+      const paymentPayload = {
+        planType,
+        token: tokenResponse.id,
+        payment_method_id: cardBrand || "visa",
+        installments: cardData.installments,
+        payer: {
+          email: formData.email,
+          first_name: firstName,
+          last_name: lastName,
+          identification: {
+            type: "CPF",
+            number: formData.cpf.replace(/\D/g, ""),
           },
         },
+      };
+
+      console.log("[Checkout] Enviando para backend...");
+      sendDebugLog("invoke_backend", { 
+        planType, 
+        payment_method_id: cardBrand || "visa",
+        installments: cardData.installments,
+        email: formData.email,
       });
 
-      if (error) throw error;
+      // Send to edge function
+      const { data, error } = await supabase.functions.invoke("create-mp-card-payment", {
+        body: paymentPayload,
+      });
+
+      if (error) {
+        console.error("[Checkout] Edge function error:", error);
+        sendDebugLog("backend_error", { 
+          errorName: error.name,
+          errorMessage: error.message,
+        });
+        throw new Error(`Falha no pagamento (backend): ${error.message}`);
+      }
 
       console.log("[Checkout] Payment response:", data);
+      sendDebugLog("backend_response", { 
+        status: data?.status,
+        status_detail: data?.status_detail,
+        hasError: !!data?.error,
+        error: data?.error,
+      });
 
       if (data.status === "approved") {
+        sendDebugLog("payment_approved", { status: data.status });
         toast.success("Pagamento aprovado! Redirecionando...");
         navigate(`/auth?payment_success=true&plan=${planType}`);
       } else if (data.status === "in_process" || data.status === "pending") {
+        sendDebugLog("payment_pending", { status: data.status });
         toast.info("Pagamento em processamento. Aguarde a confirmação.");
         navigate(`/auth?payment_pending=true&plan=${planType}`);
       } else {
-        toast.error(data.error || "Pagamento não aprovado. Tente novamente.");
+        sendDebugLog("payment_rejected", { 
+          status: data.status,
+          status_detail: data.status_detail,
+          error: data.error,
+        });
+        toast.error(data.error || `Pagamento não aprovado: ${data.status_detail || data.status}`);
       }
     } catch (error: unknown) {
       console.error("[Checkout] === ERRO NO PAGAMENTO COM CARTÃO ===");
       console.error("[Checkout] Erro completo:", error);
       
       let errorMessage = "Erro ao processar pagamento";
+      let errorType = "unknown";
       
       if (error instanceof Error) {
         console.error("[Checkout] Mensagem do erro:", error.message);
-        if (error.message.includes("token") || error.message.includes("cartão") || error.message.includes("validar")) {
+        errorType = error.name;
+        
+        if (error.message.includes("Falha ao validar cartão")) {
           errorMessage = error.message;
+          errorType = "tokenization";
+        } else if (error.message.includes("Falha no pagamento (backend)")) {
+          errorMessage = error.message;
+          errorType = "backend";
         } else if (error.message.includes("network") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
           errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+          errorType = "network";
         } else {
           errorMessage = error.message;
         }
       }
+      
+      sendDebugLog("final_error", { 
+        errorType,
+        errorMessage,
+        errorName: error instanceof Error ? error.name : "Unknown",
+      });
       
       toast.error(errorMessage);
     } finally {
