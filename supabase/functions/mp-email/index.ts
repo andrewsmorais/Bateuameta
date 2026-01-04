@@ -19,18 +19,11 @@ const PLANS = {
   mensal: {
     name: "Plano Mensal",
     price: "R$ 12,90/mês",
-    discountedPrice: "R$ 11,61/mês",
     reason: "Bateu a Meta - Plano Mensal",
     auto_recurring: {
       frequency: 1,
       frequency_type: "months",
       transaction_amount: 12.90,
-      currency_id: "BRL",
-    },
-    discounted_auto_recurring: {
-      frequency: 1,
-      frequency_type: "months",
-      transaction_amount: 11.61,
       currency_id: "BRL",
     },
   },
@@ -64,7 +57,11 @@ function sanitizeOrigin(origin: string | null): string {
 // Gera o HTML do formulário de email diretamente
 function generateEmailFormHTML(planType: string, origin: string, error?: string, coupon?: string, hasDiscount?: boolean): string {
   const plan = PLANS[planType as keyof typeof PLANS] || PLANS.mensal;
-  const displayPrice = hasDiscount ? plan.discountedPrice : plan.price;
+  
+  // Desconto só aplica para plano anual
+  const canApplyDiscount = hasDiscount && planType === "anual";
+  const displayPrice = canApplyDiscount && "discountedPrice" in plan ? plan.discountedPrice : plan.price;
+  
   const errorHtml = error 
     ? `<div class="error-message show">${error}</div>` 
     : '<div class="error-message" id="errorMessage"></div>';
@@ -240,7 +237,7 @@ function generateEmailFormHTML(planType: string, origin: string, error?: string,
     
     <div class="plan-info">
       <div class="plan-name">${plan.name}</div>
-      ${hasDiscount ? `
+      ${canApplyDiscount ? `
         <div class="plan-price" style="text-decoration: line-through; opacity: 0.6; font-size: 12px;">${plan.price}</div>
         <div class="plan-price" style="color: #22c55e; font-weight: bold;">${displayPrice}</div>
         <div style="background: #22c55e; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; margin-top: 8px; display: inline-block;">🎉 CUPOM 10% OFF APLICADO!</div>
@@ -317,30 +314,33 @@ serve(async (req) => {
   
   // GET: Serve o HTML diretamente
   if (req.method === "GET") {
-    const planType = url.searchParams.get("planType") || "mensal";
+    const planType = url.searchParams.get("planType") || url.searchParams.get("plan") || "mensal";
     const origin = sanitizeOrigin(url.searchParams.get("origin"));
     const error = url.searchParams.get("error") || undefined;
     const coupon = url.searchParams.get("coupon") || undefined;
     
     console.log("[mp-email] GET - Serving HTML directly for planType:", planType, "origin:", origin, "coupon:", coupon);
     
-    // Check if coupon is valid
+    // Check if coupon is valid - SOMENTE para plano anual
     let hasDiscount = false;
-    if (coupon) {
+    if (coupon && planType === "anual") {
       const { data: couponData } = await supabaseAdmin
         .from("discount_coupons")
         .select("*")
         .eq("code", coupon)
+        .eq("plan_type", "anual") // Cupom deve ser para plano anual
         .is("used_at", null)
         .gt("valid_until", new Date().toISOString())
         .maybeSingle();
       
       if (couponData) {
         hasDiscount = true;
-        console.log("[mp-email] Valid coupon found:", coupon);
+        console.log("[mp-email] Valid annual coupon found:", coupon);
       } else {
-        console.log("[mp-email] Invalid or expired coupon:", coupon);
+        console.log("[mp-email] Invalid, expired, or non-annual coupon:", coupon);
       }
+    } else if (coupon && planType !== "anual") {
+      console.log("[mp-email] Coupon provided but planType is not anual, ignoring coupon");
     }
     
     const html = generateEmailFormHTML(planType, origin, error, coupon, hasDiscount);
@@ -396,32 +396,51 @@ serve(async (req) => {
       
       const plan = PLANS[planType as keyof typeof PLANS] || PLANS.mensal;
       
-      // Check if coupon is valid and apply discount
+      // Check if coupon is valid and apply discount - SOMENTE para plano anual
       let useDiscountedPrice = false;
-      if (coupon) {
+      if (coupon && planType === "anual") {
         const { data: couponData, error: couponError } = await supabaseAdmin
           .from("discount_coupons")
           .select("*")
           .eq("code", coupon)
+          .eq("plan_type", "anual") // Cupom deve ser para plano anual
           .is("used_at", null)
           .gt("valid_until", new Date().toISOString())
           .maybeSingle();
         
         if (couponData && !couponError) {
           useDiscountedPrice = true;
-          console.log("[mp-email] Applying coupon discount:", coupon);
+          console.log("[mp-email] Applying coupon discount for annual plan:", coupon);
         } else {
-          console.log("[mp-email] Invalid or expired coupon:", coupon);
+          console.log("[mp-email] Invalid or expired annual coupon:", coupon);
         }
+      } else if (coupon && planType !== "anual") {
+        // Cupom inválido para plano mensal - mostrar erro
+        console.log("[mp-email] Coupon is only valid for annual plan, rejecting for monthly");
+        const html = generateEmailFormHTML(planType, origin, "Este cupom é válido apenas para o Plano Anual.", coupon, false);
+        return new Response(html, {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        });
       }
       
       // Create PreApproval with or without discount
-      const preapprovalData = {
-        reason: useDiscountedPrice ? `${plan.reason} (10% OFF)` : plan.reason,
-        auto_recurring: useDiscountedPrice ? plan.discounted_auto_recurring : plan.auto_recurring,
-        back_url: `${origin}/auth?payment_success=true`,
-        payer_email: email,
-      };
+      let preapprovalData;
+      
+      if (useDiscountedPrice && planType === "anual" && "discounted_auto_recurring" in plan) {
+        preapprovalData = {
+          reason: `${plan.reason} (10% OFF)`,
+          auto_recurring: plan.discounted_auto_recurring,
+          back_url: `${origin}/auth?payment_success=true`,
+          payer_email: email,
+        };
+      } else {
+        preapprovalData = {
+          reason: plan.reason,
+          auto_recurring: plan.auto_recurring,
+          back_url: `${origin}/auth?payment_success=true`,
+          payer_email: email,
+        };
+      }
       
       console.log("[mp-email] Creating preapproval:", JSON.stringify(preapprovalData));
       
