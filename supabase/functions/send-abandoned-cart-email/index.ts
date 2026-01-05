@@ -39,7 +39,7 @@ async function sendAbandonedCartEmail(
     return false;
   }
 
-  const checkoutUrl = `https://bateuameta.com/checkout?plan=anual&coupon=${couponCode}`;
+  const checkoutUrl = `https://app.cakto.com.br/checkout-builder/669077?email=${encodeURIComponent(email)}`;
 
   // Extract name from email (before @)
   const userName = email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1);
@@ -225,7 +225,7 @@ serve(async (req) => {
     const { data: abandonedCheckouts, error: fetchError } = await supabaseAdmin
       .from("abandoned_checkouts")
       .select("*")
-      .eq("status", "pending")
+      .in("status", ["pending", "abandoned"]) // Aceita ambos status para compatibilidade
       .is("reminder_sent_at", null)
       .lt("created_at", oneHourAgo)
       .limit(50);
