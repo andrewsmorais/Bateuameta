@@ -1,4 +1,4 @@
-import { CheckCircle2, Mail, Smartphone, PlayCircle, MessageCircle, ExternalLink } from "lucide-react";
+import { Mail, Smartphone, PlayCircle, ExternalLink } from "lucide-react";
 import fundadorImage from "@/assets/fundador.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,11 +21,6 @@ const Obrigado = () => {
           
           {/* Success Header */}
           <div className="text-center space-y-3">
-            <div className="flex justify-center">
-              <div className="bg-success/20 rounded-full p-4">
-                <CheckCircle2 className="h-12 w-12 text-success" />
-              </div>
-            </div>
             <h1 className="text-2xl font-bold text-foreground">
               Pagamento Confirmado!
             </h1>
@@ -140,18 +135,6 @@ const Obrigado = () => {
             </Button>
           </a>
 
-          {/* Link WhatsApp */}
-          <div className="text-center pt-4">
-            <a
-              href="https://wa.me/5512981796135?text=Olá! Acabei de assinar o Bateu a Meta e preciso de ajuda."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-success text-base transition-colors"
-            >
-              <MessageCircle className="h-5 w-5" />
-              Precisa de ajuda? Fale comigo no WhatsApp
-            </a>
-          </div>
         </div>
       </main>
 
