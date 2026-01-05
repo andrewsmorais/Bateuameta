@@ -40,6 +40,37 @@ serve(async (req) => {
       _user_id: user.id,
     });
 
+    // Check if user profile exists and is not blocked
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("status")
+      .eq("id", user.id)
+      .single();
+
+    // If profile doesn't exist, user was deleted
+    if (!profile) {
+      console.log("Profile not found (user deleted):", user.id);
+      return new Response(JSON.stringify({ 
+        hasActiveSubscription: false, 
+        reason: "user_deleted" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // If user is blocked, deny access
+    if (profile.status === "blocked") {
+      console.log("User is blocked:", user.id);
+      return new Response(JSON.stringify({ 
+        hasActiveSubscription: false, 
+        reason: "user_blocked" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     if (isSuperAdmin) {
       console.log("User is super admin, granting access:", user.id);
       return new Response(JSON.stringify({ hasActiveSubscription: true, isSuperAdmin: true }), {

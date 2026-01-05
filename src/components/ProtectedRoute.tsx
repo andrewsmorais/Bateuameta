@@ -60,6 +60,15 @@ export const ProtectedRoute = ({ children, requireSubscription = true }: Protect
         console.error("Error checking subscription:", error);
         setHasSubscription(false);
       } else {
+        // If user was deleted or blocked, sign them out immediately
+        if (data?.reason === "user_deleted" || data?.reason === "user_blocked") {
+          console.log("User access revoked:", data.reason);
+          await supabase.auth.signOut();
+          setUser(null);
+          setSession(null);
+          setHasSubscription(false);
+          return;
+        }
         setHasSubscription(data?.hasActiveSubscription ?? false);
       }
     } catch (error) {
