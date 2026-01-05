@@ -56,8 +56,8 @@ const Obrigado = () => {
             <Card className="border-gray-100 shadow-md bg-white">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
-                  <div className="bg-primary/10 rounded-xl p-3">
-                    <Mail className="h-7 w-7 text-primary" />
+                  <div className="bg-blue-500 rounded-xl p-3 shadow-md">
+                    <Mail className="h-8 w-8 text-white" strokeWidth={2.5} />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 text-lg">Dados no seu E-mail</h3>
@@ -73,8 +73,8 @@ const Obrigado = () => {
             <Card className="border-gray-100 shadow-md bg-white">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
-                  <div className="bg-primary/10 rounded-xl p-3">
-                    <Smartphone className="h-7 w-7 text-primary" />
+                  <div className="bg-emerald-500 rounded-xl p-3 shadow-md">
+                    <Smartphone className="h-8 w-8 text-white" strokeWidth={2.5} />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 text-lg">Acesse o App</h3>
@@ -84,7 +84,7 @@ const Obrigado = () => {
                         href="https://bateuameta.com" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary font-semibold hover:underline"
+                        className="text-blue-600 font-semibold hover:underline"
                       >
                         bateuameta.com
                       </a>{" "}
@@ -99,8 +99,8 @@ const Obrigado = () => {
             <Card className="border-gray-100 shadow-md bg-white">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
-                  <div className="bg-destructive/10 rounded-xl p-3">
-                    <PlayCircle className="h-7 w-7 text-destructive" />
+                  <div className="bg-red-500 rounded-xl p-3 shadow-md">
+                    <PlayCircle className="h-8 w-8 text-white" strokeWidth={2.5} />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900 text-lg">Como Usar</h3>
@@ -111,7 +111,7 @@ const Obrigado = () => {
                       href="https://youtu.be/sbWG4v0Rm8I"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-base bg-destructive/10 text-destructive px-4 py-2 rounded-full font-semibold hover:bg-destructive/20 transition-colors"
+                      className="inline-flex items-center gap-2 text-base bg-red-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-red-600 transition-colors shadow-md"
                     >
                       <PlayCircle className="h-5 w-5" />
                       Assistir Tutorial
