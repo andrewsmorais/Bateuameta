@@ -304,10 +304,17 @@ serve(async (req) => {
   }
 
   try {
-    // Verificar secret do webhook (opcional mas recomendado)
+    // Verificar secret do webhook
     const authHeader = req.headers.get("x-webhook-secret") || req.headers.get("authorization");
-    if (CAKTO_WEBHOOK_SECRET && authHeader !== CAKTO_WEBHOOK_SECRET && authHeader !== `Bearer ${CAKTO_WEBHOOK_SECRET}`) {
-      console.log("[Cakto Webhook] Secret verificado ou não requerido");
+    if (CAKTO_WEBHOOK_SECRET) {
+      if (authHeader !== CAKTO_WEBHOOK_SECRET && authHeader !== `Bearer ${CAKTO_WEBHOOK_SECRET}`) {
+        console.error("[Cakto Webhook] Invalid webhook secret");
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      console.log("[Cakto Webhook] Secret verified");
     }
 
     const body = await req.text();
@@ -564,20 +571,44 @@ serve(async (req) => {
     } else if (event === "checkout_abandonment" || event === "cart_abandoned" || event === "CHECKOUT_ABANDONMENT") {
       console.log("[Cakto Webhook] Processing checkout abandonment for:", email);
 
-      // Salvar em abandoned_checkouts para remarketing
-      const { error: abandonError } = await supabaseAdmin
+      // Verificar se já existe registro de abandono para este email e plano
+      const { data: existingAbandonment } = await supabaseAdmin
         .from("abandoned_checkouts")
-        .upsert({
-          email: email,
-          plan_type: "anual",
-          status: "abandoned",
-          created_at: new Date().toISOString(),
-        }, { onConflict: "email" });
+        .select("id, status")
+        .eq("email", email)
+        .eq("plan_type", "anual")
+        .maybeSingle();
 
-      if (abandonError) {
-        console.error("[Cakto Webhook] Abandoned checkout error:", abandonError);
+      if (existingAbandonment) {
+        // Atualizar registro existente (reset para pending se não foi email_sent ainda)
+        if (existingAbandonment.status !== "email_sent" && existingAbandonment.status !== "converted") {
+          await supabaseAdmin
+            .from("abandoned_checkouts")
+            .update({
+              status: "pending",
+              created_at: new Date().toISOString(),
+              reminder_sent_at: null,
+            })
+            .eq("id", existingAbandonment.id);
+          console.log("[Cakto Webhook] Abandoned checkout updated for:", email);
+        } else {
+          console.log("[Cakto Webhook] Abandoned checkout already processed:", email, existingAbandonment.status);
+        }
       } else {
-        console.log("[Cakto Webhook] Abandoned checkout saved for:", email);
+        // Criar novo registro com status 'pending' (default do banco)
+        const { error: abandonError } = await supabaseAdmin
+          .from("abandoned_checkouts")
+          .insert({
+            email: email,
+            plan_type: "anual",
+            // status: "pending" é o default do banco
+          });
+
+        if (abandonError) {
+          console.error("[Cakto Webhook] Abandoned checkout error:", abandonError);
+        } else {
+          console.log("[Cakto Webhook] Abandoned checkout saved for:", email);
+        }
       }
 
     } else {
