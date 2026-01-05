@@ -1,40 +1,12 @@
-import { Link } from "react-router-dom";
-import { Mail, Download, LogIn, Play, MessageCircle } from "lucide-react";
-import mascoteImage from "@/assets/mascote-cachorro.png";
+import { CheckCircle2, Mail, LogIn, Play, MessageCircle, ExternalLink } from "lucide-react";
+import fundadorImage from "@/assets/fundador.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import logoImage from "@/assets/bateu-a-meta-logo.png";
 
 const Obrigado = () => {
-  const passos = [
-    {
-      numero: 1,
-      icone: Mail,
-      titulo: "Verifique seu Email",
-      descricao: "Enviamos suas credenciais de acesso para o email cadastrado na compra.",
-    },
-    {
-      numero: 2,
-      icone: Download,
-      titulo: "Instale o App",
-      descricao: "Acesse pelo navegador e instale como um aplicativo no seu celular.",
-    },
-    {
-      numero: 3,
-      icone: LogIn,
-      titulo: "Faça Login",
-      descricao: "Use o email e senha que recebeu para entrar no app.",
-    },
-    {
-      numero: 4,
-      icone: Play,
-      titulo: "Comece a Registrar",
-      descricao: "Configure seus dados e registre seu primeiro turno de trabalho.",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
       {/* Header */}
       <header className="py-6 px-4">
         <div className="max-w-lg mx-auto flex justify-center">
@@ -43,85 +15,137 @@ const Obrigado = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="max-w-lg w-full space-y-8">
-          {/* Success Message */}
-          <div className="text-center space-y-4">
+      <main className="flex-1 px-4 py-8">
+        <div className="max-w-lg mx-auto space-y-6">
+          
+          {/* Success Header */}
+          <div className="text-center space-y-3">
             <div className="flex justify-center">
-              <img 
-                src={mascoteImage} 
-                alt="Mascote Bateu a Meta" 
-                className="h-24 w-24 rounded-full object-cover shadow-lg"
-              />
+              <div className="bg-green-100 rounded-full p-3">
+                <CheckCircle2 className="h-10 w-10 text-green-600" />
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900">
               Pagamento Confirmado!
             </h1>
-            <p className="text-lg text-gray-600">
-              Obrigado por se juntar ao <strong>Bateu a Meta</strong>! 🎉
-            </p>
           </div>
 
-          {/* Próximos Passos */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 text-center">
-              Próximos Passos
-            </h2>
-            
-            <div className="space-y-3">
-              {passos.map((passo) => (
-                <Card key={passo.numero} className="border-none shadow-md bg-white">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="bg-blue-100 rounded-full h-10 w-10 flex items-center justify-center">
-                          <span className="text-blue-600 font-bold">{passo.numero}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <passo.icone className="h-4 w-4 text-blue-600" />
-                          <h3 className="font-semibold text-gray-900">{passo.titulo}</h3>
-                        </div>
-                        <p className="text-sm text-gray-600">{passo.descricao}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          {/* Card de Boas-vindas Humanizado */}
+          <Card className="border-none shadow-lg bg-white overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <img 
+                  src={fundadorImage} 
+                  alt="Andrews Morais" 
+                  className="h-20 w-20 rounded-full object-cover flex-shrink-0 border-2 border-blue-100"
+                />
+                <div>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    <strong className="text-gray-900">Fala, parceiro!</strong> Sou o Andrews Morais. 
+                    Também sou motorista de aplicativo e sei que o nosso tempo vale ouro. 
+                    Criei o <strong>Bateu a Meta</strong> para a gente ter controle real do lucro. 
+                    Parabéns pela decisão! Se precisar de ajuda, o suporte é direto comigo.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Action Buttons */}
+          {/* Cards de Instruções */}
           <div className="space-y-3">
-            <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 text-lg">
-              <Link to="/auth">
-                <LogIn className="mr-2 h-5 w-5" />
-                Acessar o App
-              </Link>
-            </Button>
-            
-            <Button asChild variant="outline" className="w-full h-12 text-lg border-blue-600 text-blue-700 hover:bg-blue-50">
-              <Link to="/instalar">
-                <Download className="mr-2 h-5 w-5" />
-                Como Instalar
-              </Link>
-            </Button>
+            {/* Card 1 - Email */}
+            <Card className="border-none shadow-md bg-white">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 rounded-full p-2">
+                    <Mail className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Dados no seu E-mail</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Enviamos agora seu e-mail e sua senha de acesso para a caixa de entrada (verifique também o spam).
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Card 2 - Login */}
+            <Card className="border-none shadow-md bg-white">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 rounded-full p-2">
+                    <LogIn className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Acesse o App</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Vá para o site oficial{" "}
+                      <a 
+                        href="https://bateuameta.com" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 font-medium hover:underline"
+                      >
+                        bateuameta.com
+                      </a>{" "}
+                      e use os dados que recebeu para entrar.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Card 3 - Tutorial */}
+            <Card className="border-none shadow-md bg-white">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 rounded-full p-2">
+                    <Play className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">Como Usar</h3>
+                    <p className="text-sm text-gray-600 mt-1 mb-3">
+                      Preparei um vídeo rápido para você aprender a configurar tudo em 2 minutos.
+                    </p>
+                    <a
+                      href="https://youtu.be/sbWG4v0Rm8I"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-medium hover:bg-red-100 transition-colors"
+                    >
+                      <Play className="h-4 w-4" />
+                      Assistir Tutorial
+                    </a>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Support */}
-          <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-2">
-              Precisa de ajuda?
-            </p>
+          {/* Botão Principal */}
+          <a
+            href="https://bateuameta.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg font-semibold shadow-lg">
+              <ExternalLink className="mr-2 h-5 w-5" />
+              Acessar o App Agora
+            </Button>
+          </a>
+
+          {/* Link WhatsApp */}
+          <div className="text-center pt-4">
             <a
-              href="https://wa.me/5511999999999?text=Olá! Acabei de assinar o Bateu a Meta e preciso de ajuda."
+              href="https://wa.me/5512981796135?text=Olá! Acabei de assinar o Bateu a Meta e preciso de ajuda."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 text-sm transition-colors"
             >
               <MessageCircle className="h-4 w-4" />
-              Falar no WhatsApp
+              Precisa de ajuda? Fale comigo no WhatsApp
             </a>
           </div>
         </div>
@@ -129,8 +153,8 @@ const Obrigado = () => {
 
       {/* Footer */}
       <footer className="py-4 px-4 text-center">
-        <p className="text-sm text-gray-500">
-          © {new Date().getFullYear()} Bateu a Meta. Todos os direitos reservados.
+        <p className="text-xs text-gray-400">
+          © {new Date().getFullYear()} Bateu a Meta
         </p>
       </footer>
     </div>
