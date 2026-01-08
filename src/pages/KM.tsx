@@ -337,7 +337,7 @@ const KM = () => {
               <CardTitle>Métricas do Turno</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                 <div>
                   <p className="text-sm font-bold text-foreground mb-1">KM Rodados</p>
                   <p className="text-xl font-bold text-[#15a249]">
@@ -354,6 +354,12 @@ const KM = () => {
                   <p className="text-sm font-bold text-foreground mb-1">Consumo</p>
                   <p className="text-xl font-bold text-[#15a249]">
                     {metricas.consumoMedio.toFixed(2)} km/L
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground mb-1">Total de Litros Gasto</p>
+                  <p className="text-xl font-bold text-[#15a249]">
+                    {(metricas.consumoMedio > 0 ? metricas.kmRodadosTotal / metricas.consumoMedio : 0).toFixed(1)} L
                   </p>
                 </div>
                 <div>
