@@ -602,7 +602,7 @@ const Relatorios = () => {
                 {/* Métricas Calculadas do Turno */}
                 <div className="mt-4 pt-4 border-t border-border">
                   <h4 className="text-lg font-semibold text-foreground mb-4">Métricas Calculadas</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
                     <div>
                       <p className="text-sm font-bold text-foreground">KM Rodados</p>
                       <p className="text-xl font-bold text-[#15a249]">{metricasTurno.kmRodados.toFixed(2)} km</p>
@@ -614,6 +614,10 @@ const Relatorios = () => {
                     <div>
                       <p className="text-sm font-bold text-foreground">Consumo</p>
                       <p className="text-xl font-bold text-[#15a249]">{resultado.consumo_combustivel?.toFixed(2) || 0} km/L</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">Total de Litros Gasto</p>
+                      <p className="text-xl font-bold text-[#15a249]">{(resultado.consumo_combustivel > 0 ? metricasTurno.kmRodados / resultado.consumo_combustivel : 0).toFixed(1)} L</p>
                     </div>
                     <div>
                       <p className="text-sm font-bold text-foreground">Preço Combustível/Litro</p>
@@ -1048,7 +1052,7 @@ const Relatorios = () => {
                   <CardTitle>Métricas Calculadas</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                     <div>
                       <p className="text-sm font-bold text-foreground mb-1">KM Rodados Total</p>
                       <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.kmRodadosTotal.toFixed(2)} km</p>
@@ -1060,6 +1064,10 @@ const Relatorios = () => {
                     <div>
                       <p className="text-sm font-bold text-foreground mb-1">Consumo Médio do Período</p>
                       <p className="text-xl font-bold text-[#15a249]">{metricasTurnos.consumoMedio.toFixed(2)} km/L</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground mb-1">Total de Litros Gasto</p>
+                      <p className="text-xl font-bold text-[#15a249]">{(metricasTurnos.consumoMedio > 0 ? metricasTurnos.kmRodadosTotal / metricasTurnos.consumoMedio : 0).toFixed(1)} L</p>
                     </div>
                     <div>
                       <p className="text-sm font-bold text-foreground mb-1">Preço Médio Combustível/Litro</p>
