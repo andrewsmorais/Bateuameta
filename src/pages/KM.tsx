@@ -62,7 +62,7 @@ const KM = () => {
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTurno, setEditingTurno] = useState<Turno | null>(null);
-  const [filtroData, setFiltroData] = useState<Date | undefined>(undefined);
+  const [filtroData, setFiltroData] = useState<Date | undefined>(new Date());
   const { toast } = useToast();
 
   const loadTurnos = async () => {
