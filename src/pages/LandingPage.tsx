@@ -414,7 +414,7 @@ const LandingPage = () => {
                     <h3 className="text-xl font-bold text-black mb-2">Plano Anual</h3>
                     
                     <div className="flex items-center justify-center gap-2 mb-1">
-                      <span className="text-red-500 line-through text-lg">de R$ 147</span>
+                      <span className="text-red-600 line-through text-lg">de R$ 147</span>
                       <span className="text-gray-600">por</span>
                     </div>
                     
