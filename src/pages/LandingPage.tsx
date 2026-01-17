@@ -90,25 +90,25 @@ const resourcesSlides = [
 // Driver testimonials slides
 const testimonialSlides = [
   {
-    img: motoristaCareca,
-    name: "Ricardo",
-    testimonial: "Depois que comecei a usar o app, finalmente sei meu lucro líquido de verdade. Antes eu achava que estava ganhando bem, mas as despesas comiam tudo!"
-  },
-  {
     img: motoristaSenhor,
     name: "Carlos",
-    testimonial: "A organização que o app trouxe pra minha vida foi incrível. Agora tenho controle total dos meus gastos e sei exatamente quanto preciso rodar pra bater minha meta."
+    testimonial: "Eu mesmo ja sendo de idade consegui apreder a usar o aplicativo algo que eu tive dificuldades de enteder em outros"
+  },
+  {
+    img: motoristaCareca,
+    name: "Ricardo",
+    testimonial: "Confesso que de início achei que era golpe, mas depois de ver o anúncio várias vezes no Instagram, resolvi arriscar. Que alívio quando o e-mail com o acesso chegou na mesma hora! Depois de já ter caído em umas ciladas na internet, foi uma surpresa muito boa ver que esse é real."
   },
   {
     img: motoristaCacheado,
     name: "Felipe",
-    testimonial: "O app mudou minha forma de trabalhar. Tenho lucro líquido claro todo dia e consigo planejar melhor minha semana. Recomendo demais!"
+    testimonial: "Minha organização no caderno era baseada na base da sorte: sorte de eu lembrar de levar e sorte de eu lembrar de anotar. Spoiler: quase nunca dava certo! kkk. Agora com o aplicativo no celular facilitou demais. Já que o motorista hoje em dia só não esquece a cabeça porque está grudada, ter tudo no celular tirou um peso enorme das minhas costas"
   }
 ];
 
 // Function to highlight keywords in testimonials
 const highlightKeywords = (text: string) => {
-  const keywords = ['lucro líquido', 'organização', 'controle'];
+  const keywords = ['golpe', 'real', 'organização', 'celular', 'aplicativo'];
   let result = text;
   keywords.forEach(keyword => {
     const regex = new RegExp(`(${keyword})`, 'gi');
@@ -834,7 +834,7 @@ const LandingPage = () => {
                       <CardContent className="p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:gap-8 items-center">
                           {/* Photo */}
-                          <div className="w-40 h-40 md:w-52 md:h-52 flex-shrink-0 mb-6 md:mb-0">
+                          <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 mb-6 md:mb-0">
                             <img 
                               src={slide.img} 
                               alt={`Depoimento de ${slide.name}`}
@@ -845,7 +845,7 @@ const LandingPage = () => {
                           {/* Text */}
                           <div className="flex-1 text-center md:text-left">
                             <p 
-                              className="text-base md:text-lg text-gray-700 italic leading-relaxed"
+                              className="text-lg md:text-xl text-gray-700 italic leading-relaxed"
                               dangerouslySetInnerHTML={{ __html: `"${highlightKeywords(slide.testimonial)}"` }}
                             />
                             <p className="mt-4 font-bold text-black text-lg">
