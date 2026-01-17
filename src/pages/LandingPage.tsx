@@ -354,13 +354,13 @@ const LandingPage = () => {
             </h2>
 
             {/* VSL Video - Thumbnail clicável que abre modal */}
-            <div className="w-full max-w-4xl mx-auto px-0 sm:px-4">
+            <div className="w-full max-w-xs md:max-w-4xl mx-auto px-0 sm:px-4">
               <button
                 onClick={() => {
                   trackViewContent('VSL Video', 'Video');
                   setVideoOpen(true);
                 }}
-                className="relative w-full aspect-video rounded-none sm:rounded-xl overflow-hidden shadow-2xl ring-2 ring-[#3c83f6]/40 group cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#3c83f6]/60"
+                className="relative w-full aspect-[9/16] md:aspect-video rounded-xl overflow-hidden shadow-2xl ring-2 ring-[#3c83f6]/40 group cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#3c83f6]/60"
               >
                 {/* Thumbnail do YouTube */}
                 <img
@@ -387,14 +387,14 @@ const LandingPage = () => {
 
             {/* Modal do Vídeo */}
             <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
-              <DialogContent className="max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw] w-full p-0 bg-black border-none">
+              <DialogContent className="max-w-[80vw] md:max-w-[90vw] lg:max-w-[85vw] w-full p-0 bg-black border-none">
                 <button
                   onClick={() => setVideoOpen(false)}
                   className="absolute top-3 right-3 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                 >
                   <X className="w-6 h-6 text-white" />
                 </button>
-                <div className="relative w-full aspect-video">
+                <div className="relative w-full aspect-[9/16] md:aspect-video">
                   <iframe
                     className="w-full h-full"
                     src="https://www.youtube.com/embed/sbWG4v0Rm8I?rel=0&modestbranding=1&autoplay=1"
