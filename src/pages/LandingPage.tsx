@@ -640,9 +640,9 @@ const LandingPage = () => {
           </div>
 
           {/* Resources Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 justify-items-center">
             {resourcesSlides.map((slide, index) => (
-              <div key={index} className="flex flex-col items-center">
+              <div key={index} className="flex flex-col items-center w-full max-w-[280px] md:max-w-none mx-auto">
                 <img 
                   src={slide.img} 
                   alt={slide.caption}
