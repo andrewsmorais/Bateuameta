@@ -487,7 +487,7 @@ const LandingPage = () => {
       {/* Vantagens e Diferenciais Section */}
       <section className="py-16 md:py-24 px-4 bg-black">
         <div className="container mx-auto max-w-5xl">
-          {/* Card container com bordas arredondadas */}
+          {/* Card container único com tudo junto */}
           <div className="bg-[#1a1a1a] rounded-3xl p-6 md:p-12 border border-gray-800">
             {/* Header */}
             <p className="text-[#c41313] font-bold text-sm mb-2 uppercase tracking-wide text-center">
@@ -502,7 +502,7 @@ const LandingPage = () => {
             </p>
             
             {/* Grid 2 colunas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10">
               {/* Card 1 - Domínio Financeiro (DESTAQUE) */}
               <div className="flex items-start gap-4 bg-gradient-to-r from-[#15a249]/10 to-transparent p-4 rounded-xl border border-[#15a249]/30">
                 <div className="border border-[#15a249] rounded-lg p-2 flex-shrink-0 bg-[#15a249]/10">
@@ -555,20 +555,20 @@ const LandingPage = () => {
                 </div>
               </div>
             </div>
-          </div>
-          
-          
-          {/* Footer com plataformas */}
-          <div className="bg-[#1a1a1a] py-8 px-6 rounded-b-3xl mt-0 border border-gray-800 border-t-0">
+            
+            {/* Separador sutil */}
+            <div className="border-t border-gray-700 my-8"></div>
+            
+            {/* Footer com plataformas - agora dentro do mesmo card */}
             <div className="flex flex-col items-center gap-6">
-              {/* Texto primeiro */}
+              {/* Texto */}
               <div className="bg-gradient-to-r from-yellow-400/10 via-yellow-400/20 to-yellow-400/10 border border-yellow-400/30 rounded-2xl p-6 max-w-2xl">
                 <p className="text-white text-lg md:text-xl text-center font-medium leading-relaxed">
                   O <strong className="text-yellow-400 font-bold">Bateu a Meta</strong> é totalmente compatível com sistemas <strong className="text-yellow-400 font-bold">iOS (iPhone)</strong>, <strong className="text-yellow-400 font-bold">Android</strong>, tablets e computadores. Após a conclusão do pagamento, basta retornar ao nosso site oficial, clicar no botão <strong className="text-yellow-400 font-bold">'Já sou Cliente'</strong> e entrar com suas credenciais para começar a usar o aplicativo imediatamente.
                 </p>
               </div>
               
-              {/* Logos maiores embaixo */}
+              {/* Logos das plataformas */}
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 {/* 99 */}
                 <div className="w-16 h-16 md:w-20 md:h-20 bg-yellow-400 rounded-xl flex items-center justify-center">
