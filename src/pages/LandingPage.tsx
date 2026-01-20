@@ -573,22 +573,46 @@ const LandingPage = () => {
           
           {/* Footer com plataformas */}
           <div className="bg-[#1a1a1a] py-8 px-6 rounded-b-3xl mt-0 border border-gray-800 border-t-0">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              {/* Logos das Plataformas */}
-              <div className="flex items-center justify-center">
-                <img 
-                  src={platformLogos} 
-                  alt="Plataformas: 99, Uber, iFood, InDriver" 
-                  className="h-12 md:h-14 object-contain"
-                />
-              </div>
-              
-              {/* Texto */}
-              <p className="text-gray-300 text-sm md:text-base text-center md:text-right max-w-md">
+            <div className="flex flex-col items-center gap-6">
+              {/* Texto primeiro */}
+              <p className="text-gray-300 text-sm md:text-base text-center max-w-lg">
                 O aplicativo está disponível para <strong className="text-white">sistemas iOS e Android</strong>. 
                 E vale ressaltar que o link para instalação e ativação do aplicativo 
                 <em className="text-yellow-400"> é disponibilizado após a conclusão do pagamento</em>.
               </p>
+              
+              {/* Logos maiores embaixo */}
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                {/* 99 */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-yellow-400 rounded-xl flex items-center justify-center">
+                  <span className="text-black font-bold text-2xl md:text-3xl">99</span>
+                </div>
+                
+                {/* Uber */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-black border-2 border-white rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-lg md:text-xl">Uber</span>
+                </div>
+                
+                {/* iFood */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-red-500 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-lg md:text-xl">iFood</span>
+                </div>
+                
+                {/* InDriver */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-green-500 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xs md:text-sm">InDriver</span>
+                </div>
+                
+                {/* BlaBlaCar */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-[#00AAFF] rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xs md:text-sm text-center leading-tight">Bla<br/>BlaCar</span>
+                </div>
+                
+                {/* Keepa */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-purple-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-lg md:text-xl">Keepa</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
