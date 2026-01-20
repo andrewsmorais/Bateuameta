@@ -562,14 +562,6 @@ const LandingPage = () => {
             </div>
           </div>
           
-          {/* Marquee Importante */}
-          <div className="bg-yellow-400 py-2 mt-8 overflow-hidden rounded-lg">
-            <div className="animate-marquee whitespace-nowrap flex">
-              {[...Array(10)].map((_, i) => (
-                <span key={i} className="text-black font-bold text-sm mx-4">IMPORTANTE •</span>
-              ))}
-            </div>
-          </div>
           
           {/* Footer com plataformas */}
           <div className="bg-[#1a1a1a] py-8 px-6 rounded-b-3xl mt-0 border border-gray-800 border-t-0">
