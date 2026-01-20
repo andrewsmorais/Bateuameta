@@ -525,8 +525,8 @@ const LandingPage = () => {
                 <div className="border border-gray-600 rounded-lg p-2 flex-shrink-0">
                   <ChevronRight className="w-5 h-5 text-gray-400" />
                 </div>
-                <p className="text-gray-300 text-base md:text-lg">
-                  Quer ter o <strong className="text-white">controle total dos gastos preventivos</strong> e evitar surpresas mecânicas que pesam no bolso.
+              <p className="text-gray-300 text-base md:text-lg">
+                  Gerencie suas <strong className="text-white">trocas de óleo, pneus e revisões</strong> em um só lugar. O segredo para o lucro real é um <strong className="text-white">carro que nunca te deixa na mão</strong>.
                 </p>
               </div>
 
@@ -545,8 +545,8 @@ const LandingPage = () => {
                 <div className="border border-gray-600 rounded-lg p-2 flex-shrink-0">
                   <ChevronRight className="w-5 h-5 text-gray-400" />
                 </div>
-                <p className="text-gray-300 text-base md:text-lg">
-                  Deseja entender seu <strong className="text-[#3c83f6]">ganho real por hora</strong> para decidir os <strong className="text-white">melhores horários</strong> para rodar.
+              <p className="text-gray-300 text-base md:text-lg">
+                  <strong className="text-[#3c83f6]">Meta Diária e Mensal:</strong> Configure quanto você precisa ganhar para <strong className="text-white">cobrir suas contas</strong> e quanto quer lucrar para <strong className="text-white">realizar seus sonhos</strong>.
                 </p>
               </div>
 
