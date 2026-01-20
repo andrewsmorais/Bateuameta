@@ -664,51 +664,19 @@ const LandingPage = () => {
             setApi={setResourcesCarouselApi}
             className="w-full max-w-5xl mx-auto -mx-4 md:mx-auto"
           >
-            <CarouselContent className="-ml-0 md:-ml-4">
+            <CarouselContent className="-ml-0">
               {resourcesSlides.map((slide, index) => (
-                <CarouselItem key={index} className="pl-0 md:pl-4 basis-[100%] md:basis-4/5">
-                  <div className="px-0">
-                    <div 
-                      className="cursor-pointer group relative"
-                      onClick={() => setSelectedResourceImage({ ...slide, index })}
-                    >
-                      <div className="relative overflow-hidden">
-                        <img 
-                          src={slide.img} 
-                          alt={slide.caption}
-                          className="w-full h-auto min-h-[85vh] max-h-[90vh] object-contain md:max-h-[80vh] md:min-h-0 transition-transform duration-300 group-hover:scale-105"
-                        />
-                        {/* Hover overlay with expand icon */}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                            <Expand className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <CarouselItem key={index} className="pl-0 basis-[100%]">
+                  <img 
+                    src={slide.img} 
+                    alt={slide.caption}
+                    className="w-full h-auto min-h-[85vh] max-h-[90vh] object-contain md:max-h-[80vh] md:min-h-0 cursor-pointer"
+                    onClick={() => setSelectedResourceImage({ ...slide, index })}
+                  />
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-12 bg-white border-gray-300 text-black hover:bg-gray-100 hover:border-gray-400 shadow-md" />
-            <CarouselNext className="hidden md:flex -right-12 bg-white border-gray-300 text-black hover:bg-gray-100 hover:border-gray-400 shadow-md" />
           </Carousel>
-
-          {/* Dynamic dots indicator */}
-          <div className="flex justify-center gap-3 mt-6">
-            {resourcesSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => resourcesCarouselApi?.scrollTo(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  resourcesCurrentSlide === index 
-                    ? 'bg-[#15a249] scale-125 shadow-[0_0_8px_rgba(21,162,73,0.6)]' 
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                aria-label={`Ir para slide ${index + 1}`}
-              />
-            ))}
-          </div>
 
           {/* Swipe hint for mobile */}
           <p className="text-center text-gray-500 text-sm mt-3 md:hidden">
