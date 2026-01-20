@@ -662,35 +662,35 @@ const LandingPage = () => {
               loop: true,
             }}
             setApi={setResourcesCarouselApi}
-            className="w-full max-w-4xl mx-auto"
+            className="w-full max-w-5xl mx-auto -mx-4 md:mx-auto"
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-0 md:-ml-4">
               {resourcesSlides.map((slide, index) => (
-                <CarouselItem key={index} className="basis-[100%] md:basis-4/5">
+                <CarouselItem key={index} className="pl-0 md:pl-4 basis-[100%] md:basis-4/5">
                   <div className="px-0 md:px-4">
                     <div 
                       className="bg-transparent md:bg-white md:rounded-2xl md:shadow-lg p-0 md:p-4 md:border md:border-gray-200 cursor-pointer group relative"
                       onClick={() => setSelectedResourceImage({ ...slide, index })}
                     >
-                      <div className="relative overflow-hidden rounded-lg md:rounded-xl">
+                      <div className="relative overflow-hidden md:rounded-xl">
                         <img 
                           src={slide.img} 
                           alt={slide.caption}
-                          className="w-full h-auto max-h-[80vh] object-contain rounded-lg md:rounded-xl transition-transform duration-300 group-hover:scale-105"
+                          className="w-full h-auto min-h-[85vh] max-h-[90vh] object-contain md:max-h-[80vh] md:min-h-0 transition-transform duration-300 group-hover:scale-105"
                         />
                         {/* Hover overlay with expand icon */}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg md:rounded-xl">
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center md:rounded-xl">
                           <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
                             <Expand className="w-6 h-6 md:w-8 md:h-8 text-white" />
                           </div>
                         </div>
                       </div>
-                      <p className="text-center mt-2 md:mt-3 text-black font-bold text-lg md:text-xl">
+                      <p className="text-center mt-2 md:mt-3 text-black font-bold text-xl md:text-xl">
                         {slide.caption}
                       </p>
                       {/* Mobile tap hint */}
                       <p className="text-center text-gray-500 text-sm mt-1 md:hidden">
-                        Toque para ampliar
+                        Deslize para ver mais
                       </p>
                     </div>
                   </div>
