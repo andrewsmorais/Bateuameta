@@ -490,14 +490,14 @@ const LandingPage = () => {
           {/* Card container com bordas arredondadas */}
           <div className="bg-[#1a1a1a] rounded-3xl p-6 md:p-12 border border-gray-800">
             {/* Header */}
-            <p className="text-[#c41313] font-bold text-sm mb-2 uppercase tracking-wide">
+            <p className="text-[#c41313] font-bold text-sm mb-2 uppercase tracking-wide text-center">
               Vantagens e Diferenciais
             </p>
-            <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 text-center">
               Tudo o que você precisa para ter<br />
               <span className="text-[#15a249]">controle total</span> das suas finanças
             </h2>
-            <p className="text-gray-400 mb-10 text-base">
+            <p className="text-gray-400 mb-10 text-base text-center">
               Ferramentas práticas pensadas para o dia a dia do motorista
             </p>
             
