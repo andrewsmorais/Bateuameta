@@ -78,7 +78,7 @@ const Planos = () => {
         </div>
 
         {/* Plano Anual Exclusive */}
-        <Card className="relative border-2 border-[#3c83f6] shadow-lg">
+        <Card className="relative border-2 border-[#3c83f6] shadow-lg bg-black text-white">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <Badge className="bg-[#25D366] text-white px-4 py-1 font-bold">
               Economize R$ 49,10 agora!
