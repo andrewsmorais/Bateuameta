@@ -639,31 +639,22 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Resources Carousel */}
-          <Carousel
-            opts={{
-              align: "center",
-              loop: true,
-            }}
-            setApi={setResourcesCarouselApi}
-            className="w-full mx-auto relative"
-          >
-            <CarouselContent className="-ml-0">
-              {resourcesSlides.map((slide, index) => (
-                <CarouselItem key={index} className="pl-0 basis-[100%] flex items-center justify-center">
-                  <img 
-                    src={slide.img} 
-                    alt={slide.caption}
-                    className="h-[80vh] w-auto max-w-full object-contain cursor-pointer"
-                    onClick={() => setSelectedResourceImage({ ...slide, index })}
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {/* Navigation arrows */}
-            <CarouselPrevious className="left-2 bg-black/60 border-0 text-white hover:bg-black/80 h-12 w-12" />
-            <CarouselNext className="right-2 bg-black/60 border-0 text-white hover:bg-black/80 h-12 w-12" />
-          </Carousel>
+          {/* Resources Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {resourcesSlides.map((slide, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <img 
+                  src={slide.img} 
+                  alt={slide.caption}
+                  className="w-full h-auto object-contain cursor-pointer rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
+                  onClick={() => setSelectedResourceImage({ ...slide, index })}
+                />
+                <p className="text-center text-sm md:text-base text-gray-700 mt-3 font-medium">
+                  {slide.caption}
+                </p>
+              </div>
+            ))}
+          </div>
 
           {/* Resources Image Lightbox Dialog */}
           <Dialog open={!!selectedResourceImage} onOpenChange={() => setSelectedResourceImage(null)}>
