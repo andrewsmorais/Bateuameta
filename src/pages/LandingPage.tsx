@@ -685,13 +685,6 @@ const LandingPage = () => {
                           </div>
                         </div>
                       </div>
-                      <p className="text-center mt-2 md:mt-3 text-black font-bold text-xl md:text-xl">
-                        {slide.caption}
-                      </p>
-                      {/* Mobile tap hint */}
-                      <p className="text-center text-gray-500 text-sm mt-1 md:hidden">
-                        Deslize para ver mais
-                      </p>
                     </div>
                   </div>
                 </CarouselItem>
