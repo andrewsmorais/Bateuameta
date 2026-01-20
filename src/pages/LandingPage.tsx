@@ -378,7 +378,6 @@ const LandingPage = () => {
                   <div className="w-14 h-14 md:w-24 md:h-24 bg-[#c41313] rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
                     <Play className="w-7 h-7 md:w-12 md:h-12 text-white ml-1" fill="white" />
                   </div>
-                  </div>
                 </div>
                 {/* Texto indicativo */}
                 <div className="absolute bottom-4 left-0 right-0 text-center">
