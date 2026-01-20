@@ -662,7 +662,7 @@ const LandingPage = () => {
               loop: true,
             }}
             setApi={setResourcesCarouselApi}
-            className="w-full max-w-5xl mx-auto -mx-4 md:mx-auto"
+            className="w-full mx-auto relative"
           >
             <CarouselContent className="-ml-0">
               {resourcesSlides.map((slide, index) => (
@@ -670,18 +670,16 @@ const LandingPage = () => {
                   <img 
                     src={slide.img} 
                     alt={slide.caption}
-                    className="w-full h-auto min-h-[85vh] max-h-[90vh] object-contain md:max-h-[80vh] md:min-h-0 cursor-pointer"
+                    className="w-full h-[95vh] object-contain cursor-pointer"
                     onClick={() => setSelectedResourceImage({ ...slide, index })}
                   />
                 </CarouselItem>
               ))}
             </CarouselContent>
+            {/* Navigation arrows */}
+            <CarouselPrevious className="left-2 md:left-4 bg-black/50 border-0 text-white hover:bg-black/70 h-12 w-12" />
+            <CarouselNext className="right-2 md:right-4 bg-black/50 border-0 text-white hover:bg-black/70 h-12 w-12" />
           </Carousel>
-
-          {/* Swipe hint for mobile */}
-          <p className="text-center text-gray-500 text-sm mt-3 md:hidden">
-            ← Arraste para ver mais →
-          </p>
 
           {/* Resources Image Lightbox Dialog */}
           <Dialog open={!!selectedResourceImage} onOpenChange={() => setSelectedResourceImage(null)}>
