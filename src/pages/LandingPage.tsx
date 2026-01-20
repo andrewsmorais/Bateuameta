@@ -517,12 +517,12 @@ const LandingPage = () => {
               </div>
 
               {/* Card 2 - Menu Manutenções */}
-              <div className="flex items-start gap-4 p-4">
-                <div className="border border-gray-600 rounded-lg p-2 flex-shrink-0">
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="flex items-start gap-4 bg-gradient-to-r from-[#15a249]/10 to-transparent p-4 rounded-xl border border-[#15a249]/30">
+                <div className="border border-[#15a249] rounded-lg p-2 flex-shrink-0 bg-[#15a249]/10">
+                  <ChevronRight className="w-5 h-5 text-[#15a249]" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm mb-2 uppercase tracking-wide">Menu Manutenções</p>
+                  <p className="text-[#15a249] font-bold text-sm mb-2 uppercase tracking-wide">Menu Manutenções</p>
                   <p className="text-gray-300 text-base md:text-lg">
                     Registre o <strong className="text-white">nome da oficina</strong>, <strong className="text-white">peças trocadas</strong>, <strong className="text-white">KM da manutenção</strong>, data, motivo da troca e garantia, com a facilidade de <strong className="text-white">anexar suas notas fiscais</strong>.
                   </p>
@@ -530,12 +530,12 @@ const LandingPage = () => {
               </div>
 
               {/* Card 3 - Gestão Prática */}
-              <div className="flex items-start gap-4 p-4">
-                <div className="border border-gray-600 rounded-lg p-2 flex-shrink-0">
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="flex items-start gap-4 bg-gradient-to-r from-[#15a249]/10 to-transparent p-4 rounded-xl border border-[#15a249]/30">
+                <div className="border border-[#15a249] rounded-lg p-2 flex-shrink-0 bg-[#15a249]/10">
+                  <ChevronRight className="w-5 h-5 text-[#15a249]" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm mb-2 uppercase tracking-wide">Gestão Prática</p>
+                  <p className="text-[#15a249] font-bold text-sm mb-2 uppercase tracking-wide">Gestão Prática</p>
                   <p className="text-gray-300 text-base md:text-lg">
                     Muito mais prático que papel ou planilhas: Com o <strong className="text-[#15a249]">Bateu a Meta</strong>, você registra tudo na hora pelo celular, <strong className="text-white">evita esquecimentos</strong> e deixa que o aplicativo faça os <strong className="text-white">cálculos automáticos</strong> para você.
                   </p>
@@ -543,12 +543,12 @@ const LandingPage = () => {
               </div>
 
               {/* Card 4 - Estratégia de Metas */}
-              <div className="flex items-start gap-4 p-4">
-                <div className="border border-gray-600 rounded-lg p-2 flex-shrink-0">
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="flex items-start gap-4 bg-gradient-to-r from-[#15a249]/10 to-transparent p-4 rounded-xl border border-[#15a249]/30">
+                <div className="border border-[#15a249] rounded-lg p-2 flex-shrink-0 bg-[#15a249]/10">
+                  <ChevronRight className="w-5 h-5 text-[#15a249]" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm mb-2 uppercase tracking-wide">Estratégia de Metas</p>
+                  <p className="text-[#15a249] font-bold text-sm mb-2 uppercase tracking-wide">Estratégia de Metas</p>
                   <p className="text-gray-300 text-base md:text-lg">
                     Pare de rodar na sorte: <strong className="text-[#c41313]">Quem não controla os números, não vê o dinheiro crescer.</strong> Com o Bateu a Meta, você registra cada turno com <strong className="text-white">clareza total</strong>, garantindo o seu <strong className="text-[#15a249]">resultado no final do mês</strong>.
                   </p>
