@@ -31,7 +31,8 @@ import {
   X,
   Expand,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Check
 } from "lucide-react";
 import logo from "@/assets/bateu-a-meta-logo.png";
 import platformLogos from "@/assets/platform-logos.png";
@@ -431,22 +432,42 @@ const LandingPage = () => {
                       </p>
                     </div>
 
-                    <ul className="text-left space-y-2">
-                      <li className="flex items-center gap-2">
-                        <span className="text-green-500 text-3xl font-bold">✓</span>
-                        <span className="text-black text-lg font-bold">Ganhos Por Hora</span>
+                    <ul className="text-left space-y-3">
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-black text-base">Descubra qual é o seu Custo e o seu Lucro real em cada viagem</span>
                       </li>
-                      <li className="flex items-center gap-2">
-                        <span className="text-green-500 text-3xl font-bold">✓</span>
-                        <span className="text-black text-lg font-bold">Ganhos Por Km</span>
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-black text-base">Entenda de forma simples quanto é o seu Custo e o seu Lucro por cada KM que você roda</span>
                       </li>
-                      <li className="flex items-center gap-2">
-                        <span className="text-green-500 text-3xl font-bold">✓</span>
-                        <span className="text-black text-lg font-bold">Despesas Por Km</span>
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-black text-base">Tenha total controle de quanto você lucra e de quanto você gasta por hora</span>
                       </li>
-                      <li className="flex items-center gap-2">
-                        <span className="text-green-500 text-3xl font-bold">✓</span>
-                        <span className="text-black text-lg font-bold">Horas Trabalhadas</span>
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-black text-base">Defina uma meta para os seus ganhos e para os gastos</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-black text-base">Acompanhe o seu faturamento por hora e por KM</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-black text-base">Funciona em aparelhos IOS (iPhone) e em aparelhos Android</span>
                       </li>
                     </ul>
 
@@ -904,22 +925,42 @@ const LandingPage = () => {
                   </p>
                 </div>
 
-                <ul className="text-left space-y-2">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 text-3xl font-bold">✓</span>
-                    <span className="text-black text-lg font-bold">Ganhos Por Hora</span>
+                <ul className="text-left space-y-3">
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black text-base">Descubra qual é o seu Custo e o seu Lucro real em cada viagem</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 text-3xl font-bold">✓</span>
-                    <span className="text-black text-lg font-bold">Ganhos Por Km</span>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black text-base">Entenda de forma simples quanto é o seu Custo e o seu Lucro por cada KM que você roda</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 text-3xl font-bold">✓</span>
-                    <span className="text-black text-lg font-bold">Despesas Por Km</span>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black text-base">Tenha total controle de quanto você lucra e de quanto você gasta por hora</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 text-3xl font-bold">✓</span>
-                    <span className="text-black text-lg font-bold">Horas Trabalhadas</span>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black text-base">Defina uma meta para os seus ganhos e para os gastos</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black text-base">Acompanhe o seu faturamento por hora e por KM</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black text-base">Funciona em aparelhos IOS (iPhone) e em aparelhos Android</span>
                   </li>
                 </ul>
 
