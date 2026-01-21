@@ -194,7 +194,8 @@ export const UsersManagement = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      toast.success(`Usuário criado! Senha provisória: 1234`);
+      const senha = data?.password || "Verifique o e-mail";
+      toast.success(`Usuário criado! Senha: ${senha}. E-mail enviado.`);
       setIsAddOpen(false);
       setAddForm({
         email: "",
@@ -490,8 +491,8 @@ export const UsersManagement = () => {
                         <SelectValue placeholder="Selecione um plano" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="free">Free (Sem cobrança)</SelectItem>
-                        <SelectItem value="anual">Anual R$ 97,90</SelectItem>
+                        <SelectItem value="7ce2d64b-e97a-429e-9448-3af009895d70">Free (Sem cobrança)</SelectItem>
+                        <SelectItem value="08033a83-5a65-4248-ae25-89e8bc35fe04">Anual R$ 97,90</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

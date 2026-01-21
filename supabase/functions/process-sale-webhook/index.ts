@@ -6,6 +6,110 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Generate random 6-digit password
+function generateRandomPassword(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Send welcome email via Brevo
+async function sendWelcomeEmail(email: string, name: string, password: string): Promise<void> {
+  const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
+  
+  if (!BREVO_API_KEY) {
+    console.error("[Process Sale] BREVO_API_KEY not configured");
+    return;
+  }
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: "Bateu A Meta", email: "suporte@bateuameta.com" },
+        to: [{ email: email, name: name || "Usuário" }],
+        subject: "Bem-vindo ao Bateu A Meta! 🎉",
+        htmlContent: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+              .credentials-box { background: #fff; border: 2px solid #10b981; padding: 20px; margin: 20px 0; border-radius: 8px; }
+              .password { font-size: 28px; font-weight: bold; color: #10b981; letter-spacing: 6px; text-align: center; margin: 10px 0; }
+              .button { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+              .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+              .feature { display: flex; align-items: center; margin: 10px 0; }
+              .feature-icon { margin-right: 10px; color: #10b981; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>🚗 Bem-vindo ao Bateu A Meta!</h1>
+                <p>Sua conta foi criada com sucesso</p>
+              </div>
+              <div class="content">
+                <h2>Olá, ${name || "Motorista"}!</h2>
+                <p>Parabéns! Sua conta no Bateu A Meta foi criada. Agora você pode começar a controlar seus ganhos e alcançar suas metas!</p>
+                
+                <div class="credentials-box">
+                  <p style="margin: 0 0 10px 0;"><strong>📧 Seu email:</strong> ${email}</p>
+                  <p style="margin: 0;"><strong>🔐 Sua senha:</strong></p>
+                  <p class="password">${password}</p>
+                </div>
+                
+                <h3>O que você pode fazer:</h3>
+                <div class="feature">
+                  <span class="feature-icon">✅</span>
+                  <span>Registrar seus turnos e ganhos diários</span>
+                </div>
+                <div class="feature">
+                  <span class="feature-icon">✅</span>
+                  <span>Definir metas diárias, semanais e mensais</span>
+                </div>
+                <div class="feature">
+                  <span class="feature-icon">✅</span>
+                  <span>Acompanhar relatórios detalhados</span>
+                </div>
+                <div class="feature">
+                  <span class="feature-icon">✅</span>
+                  <span>Controlar despesas com combustível e manutenção</span>
+                </div>
+                
+                <center>
+                  <a href="https://appdriver-track.lovable.app/auth" class="button">Acessar Minha Conta</a>
+                </center>
+                
+                <div class="footer">
+                  <p>Dúvidas? Responda este e-mail ou entre em contato pelo suporte.</p>
+                  <p>© ${new Date().getFullYear()} Bateu A Meta - Todos os direitos reservados</p>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Process Sale] Brevo API error:", errorText);
+    } else {
+      console.log("[Process Sale] Welcome email sent successfully to:", email);
+    }
+  } catch (error) {
+    console.error("[Process Sale] Error sending welcome email:", error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,11 +138,12 @@ serve(async (req) => {
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     let user = existingUsers?.users?.find(u => u.email === email);
 
-    const provisionalPassword = "1234";
+    // Generate random 6-digit password
+    const provisionalPassword = generateRandomPassword();
     let isNewUser = false;
 
     if (!user) {
-      // Create new user with provisional password
+      // Create new user with random 6-digit password
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: email,
         password: provisionalPassword,
@@ -145,14 +250,10 @@ serve(async (req) => {
       }
     }
 
-    // Initialize default goals for new users
+    // Send welcome email to new users
     if (isNewUser) {
-      try {
-        // The trigger should handle this, but we can also call it manually if needed
-        console.log("[Process Sale] New user goals will be initialized by trigger");
-      } catch (goalError) {
-        console.error("[Process Sale] Error initializing goals:", goalError);
-      }
+      await sendWelcomeEmail(email, nome || "Usuário", provisionalPassword);
+      console.log("[Process Sale] Welcome email triggered for new user");
     }
 
     return new Response(
@@ -162,8 +263,9 @@ serve(async (req) => {
         email: email,
         role: role,
         is_new_user: isNewUser,
+        password: isNewUser ? provisionalPassword : undefined,
         message: isNewUser 
-          ? `Usuário criado com sucesso. Senha provisória: ${provisionalPassword}` 
+          ? `Usuário criado com sucesso. Senha: ${provisionalPassword}. E-mail enviado.` 
           : "Usuário atualizado com sucesso",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
