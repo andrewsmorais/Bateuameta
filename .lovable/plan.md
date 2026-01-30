@@ -1,59 +1,51 @@
 
-# Plano: Adicionar Videos do YouTube Shorts na Seção de Depoimentos
+
+# Plano: Empilhar Vídeos do YouTube Shorts Verticalmente
 
 ## Objetivo
-Adicionar 4 vídeos do YouTube Shorts (proporção 9:16) abaixo do título "Veja Quem Já Bateu A Meta!" na seção de depoimentos da Landing Page.
+Alterar o layout dos 4 vídeos do YouTube Shorts para que fiquem empilhados um debaixo do outro (verticalmente), removendo o formato de carrossel.
 
-## Vídeos a Adicionar
-1. https://youtube.com/shorts/bOkwngfR0-8
-2. https://youtube.com/shorts/9e7MrKaUW5c
-3. https://youtube.com/shorts/RTqU92TMKfU
-4. https://youtube.com/shorts/rR8iYDF_8YY
-
-## Layout Proposto
+## Layout Atual vs. Proposto
 
 ```text
-+------------------------------------------+
-|     Título da Seção (existente)          |
-+------------------------------------------+
-|                                          |
-|  +------+  +------+  +------+  +------+  |
-|  | Video|  | Video|  | Video|  | Video|  |
-|  | 9:16 |  | 9:16 |  | 9:16 |  | 9:16 |  |
-|  +------+  +------+  +------+  +------+  |
-|                                          |
-|  (Mobile: Carrossel horizontal)          |
-|                                          |
-+------------------------------------------+
-|     Carrossel de Depoimentos (existente) |
-+------------------------------------------+
+ATUAL:                              PROPOSTO:
++------+ +------+ +------+ +------+        +------+
+|Video1| |Video2| |Video3| |Video4|        |Video1|
++------+ +------+ +------+ +------+        +------+
+   (Grid horizontal no desktop)              |
+                                           +------+
+   [< ] [Video] [ >]                       |Video2|
+   (Carrossel no mobile)                   +------+
+                                             |
+                                           +------+
+                                           |Video3|
+                                           +------+
+                                             |
+                                           +------+
+                                           |Video4|
+                                           +------+
+                                      (Empilhados verticalmente)
 ```
 
-## Implementação Técnica
+## Implementação
 
 ### Arquivo: `src/pages/LandingPage.tsx`
 
-1. **Criar array com os IDs dos vídeos Shorts**
-   - Extrair os IDs: `bOkwngfR0-8`, `9e7MrKaUW5c`, `RTqU92TMKfU`, `rR8iYDF_8YY`
+**Alteração:** Substituir o código atual (linhas 757-802) por uma estrutura simples de flex vertical:
 
-2. **Adicionar novo componente de carrossel de vídeos**
-   - Posicionar entre o título (linha 755) e o carrossel de depoimentos (linha 758)
-   - Usar componente `Carousel` já existente para consistência
+1. **Remover** o grid de 4 colunas do desktop
+2. **Remover** o componente Carousel do mobile
+3. **Adicionar** layout flex vertical com espaçamento entre vídeos
+4. **Centralizar** cada vídeo com largura máxima apropriada para formato 9:16
 
-3. **Layout Responsivo**
-   - **Mobile**: Carrossel horizontal com 1 vídeo por vez
-   - **Desktop**: Grid com 4 vídeos lado a lado
-
-4. **Estilo dos Vídeos**
-   - Usar `aspect-[9/16]` para manter proporção vertical
-   - Embed do YouTube com parâmetros otimizados
-   - Bordas arredondadas e sombra para consistência visual
-
-### Código do Embed
-Cada vídeo será um iframe com:
-- Proporção 9:16 (vertical, formato Shorts)
-- Parâmetros: `rel=0`, `modestbranding=1`
-- Responsivo com tamanho adequado para mobile e desktop
+### Detalhes Técnicos
+- Usar `flex flex-col` para empilhar verticalmente
+- Usar `gap-6` para espaçamento entre vídeos
+- Usar `max-w-xs` (320px) para tamanho adequado no mobile
+- Usar `md:max-w-sm` (384px) para tamanho maior no desktop
+- Manter `aspect-[9/16]` para proporção vertical
+- Manter bordas arredondadas e sombra
 
 ## Resultado Esperado
-Os 4 vídeos aparecerão em formato vertical (9:16) logo abaixo do título da seção de depoimentos, antes dos cards de depoimentos existentes. No mobile, serão exibidos em carrossel deslizante. No desktop, em linha horizontal.
+Os 4 vídeos aparecerão empilhados verticalmente (um abaixo do outro), centralizados na página, com tamanho apropriado para o formato Shorts, tanto no mobile quanto no desktop.
+
