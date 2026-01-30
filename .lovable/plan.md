@@ -1,57 +1,51 @@
 
 
-# Plano: Layout Responsivo para Vídeos Shorts
+# Plano: Aumentar Tamanho das Imagens de Recursos no Desktop
 
 ## Objetivo
-Alterar o layout dos 4 vídeos do YouTube Shorts para que:
-- **Desktop**: Fiquem lado a lado (4 colunas)
-- **Mobile**: Fiquem empilhados (1 coluna)
+Aumentar o tamanho das 4 imagens de funcionalidades do app (Dashboard, Metas, Ganhos & Despesas, Relatórios) quando visualizadas no computador.
 
-## Layout Proposto
+## Situação Atual
+- Container: `max-w-5xl` (1024px)
+- Grid: 4 colunas no desktop (`md:grid-cols-4`)
+- Resultado: cada imagem fica com ~230px de largura
 
-```text
-DESKTOP (md e acima):
-+------+ +------+ +------+ +------+
-|Video1| |Video2| |Video3| |Video4|
-+------+ +------+ +------+ +------+
-
-MOBILE (abaixo de md):
-+------+
-|Video1|
-+------+
-   |
-+------+
-|Video2|
-+------+
-   |
-+------+
-|Video3|
-+------+
-   |
-+------+
-|Video4|
-+------+
-```
-
-## Implementação
+## Solução Proposta
 
 ### Arquivo: `src/pages/LandingPage.tsx`
 
-**Alteração nas linhas 759-771:**
+**Alterações:**
 
-Mudar de `flex flex-col` para um layout de grid responsivo:
+1. **Expandir o container** de `max-w-5xl` para `max-w-7xl` (1280px)
+   - Isso dará mais espaço horizontal para as 4 imagens
 
-- **Mobile**: `grid-cols-1` (empilhados)
-- **Desktop**: `md:grid-cols-4` (lado a lado)
+2. **Aumentar a largura mínima das imagens no desktop**
+   - Adicionar `md:min-w-[250px]` ou definir largura fixa maior
 
-### Detalhes Técnicos
-- Usar `grid` ao invés de `flex`
-- Usar `grid-cols-1 md:grid-cols-4` para responsividade
-- Usar `gap-4` para espaçamento uniforme
-- Manter `aspect-[9/16]` para proporção vertical
-- Ajustar largura máxima para desktop (`max-w-4xl` no container)
-- Remover `max-w-xs` e `max-w-sm` individuais para permitir que o grid controle o tamanho
+3. **Alternativa: Usar 2 linhas de 2 imagens**
+   - Mudar para `md:grid-cols-2` permitiria imagens bem maiores
+   - As imagens ficariam com ~500px cada
+
+### Recomendação
+A opção de manter 4 colunas com container maior (`max-w-7xl`) é a mais equilibrada, aumentando as imagens em ~25% sem alterar o layout.
+
+```text
+ATUAL (max-w-5xl = 1024px):
++-----+ +-----+ +-----+ +-----+
+|~230px|~230px|~230px|~230px|
++-----+ +-----+ +-----+ +-----+
+
+PROPOSTO (max-w-7xl = 1280px):
++-------+ +-------+ +-------+ +-------+
+|~295px | |~295px | |~295px | |~295px |
++-------+ +-------+ +-------+ +-------+
+```
+
+## Detalhes Técnicos
+- **Linha 632**: Mudar `max-w-5xl` para `max-w-7xl`
+- Manter gap-6 para espaçamento adequado
+- Manter proporções responsivas no mobile
 
 ## Resultado Esperado
-No celular, os vídeos aparecem um abaixo do outro. No computador, os 4 vídeos ficam lado a lado em uma única linha.
+As imagens dos recursos ficarão significativamente maiores no desktop, proporcionando melhor visualização das funcionalidades do app.
 
