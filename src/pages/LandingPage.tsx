@@ -629,7 +629,7 @@ const LandingPage = () => {
 
       {/* Resources Carousel Section - White Background */}
       <section className="py-10 md:py-24 px-4 bg-white">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto max-w-7xl">
           <div className="text-center space-y-2 md:space-y-4 mb-8 md:mb-12">
             <h2 className="text-xl md:text-4xl font-bold text-black">
               Veja os <span className="text-[#3c83f6]">Recursos</span> na Prática
