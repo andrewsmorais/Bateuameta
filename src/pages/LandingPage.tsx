@@ -754,11 +754,11 @@ const LandingPage = () => {
             </h2>
           </div>
 
-          {/* YouTube Shorts Videos - Stacked Vertically */}
+          {/* YouTube Shorts Videos - Responsive Grid */}
           <div className="mb-10 md:mb-16">
-            <div className="flex flex-col items-center gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {['bOkwngfR0-8', '9e7MrKaUW5c', 'RTqU92TMKfU', 'rR8iYDF_8YY'].map((videoId, index) => (
-                <div key={videoId} className="w-full max-w-xs md:max-w-sm aspect-[9/16] rounded-xl overflow-hidden shadow-lg">
+                <div key={videoId} className="aspect-[9/16] rounded-xl overflow-hidden shadow-lg mx-auto w-full max-w-xs md:max-w-none">
                   <iframe
                     src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
                     title={`Depoimento em vídeo ${index + 1}`}
