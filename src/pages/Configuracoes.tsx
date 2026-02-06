@@ -41,7 +41,17 @@ const Configuracoes = () => {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showContact, setShowContact] = useState(false);
+  const [showInstallDialog, setShowInstallDialog] = useState(false);
   const { toast } = useToast();
+  const { install, isInstallable } = usePWAInstall();
+
+  const handleInstallClick = async () => {
+    if (isInstallable) {
+      const installed = await install();
+      if (installed) return;
+    }
+    setShowInstallDialog(true);
+  };
 
   useEffect(() => {
     loadProfile();
