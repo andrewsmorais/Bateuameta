@@ -7,10 +7,12 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Car, Info, Instagram, Phone, PlayCircle } from "lucide-react";
+import { Camera, Car, Download, Info, Instagram, Phone, PlayCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AvatarEditor } from "@/components/AvatarEditor";
 import { Link } from "react-router-dom";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { PWAInstallDialog } from "@/components/PWAInstallDialog";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -39,7 +41,17 @@ const Configuracoes = () => {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showContact, setShowContact] = useState(false);
+  const [showInstallDialog, setShowInstallDialog] = useState(false);
   const { toast } = useToast();
+  const { install, isInstallable } = usePWAInstall();
+
+  const handleInstallClick = async () => {
+    if (isInstallable) {
+      const installed = await install();
+      if (installed) return;
+    }
+    setShowInstallDialog(true);
+  };
 
   useEffect(() => {
     loadProfile();
@@ -205,6 +217,20 @@ const Configuracoes = () => {
         </CardContent>
       </Card>
 
+      {/* Instalar App */}
+      <Card>
+        <CardContent className="pt-6">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-base"
+            onClick={handleInstallClick}
+          >
+            <Download className="mr-2 h-5 w-5" />
+            Instalar App
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Como Usar */}
       <Card>
         <CardContent className="pt-6">
@@ -347,6 +373,9 @@ const Configuracoes = () => {
           <Button onClick={() => setShowContact(false)}>Fechar</Button>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* PWA Install Dialog */}
+      <PWAInstallDialog open={showInstallDialog} onOpenChange={setShowInstallDialog} />
     </div>
   );
 };

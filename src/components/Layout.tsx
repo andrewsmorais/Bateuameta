@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Navigation, TrendingUp, Wrench, Target, FileText, Menu, X, LogOut, User, Car, Settings, DollarSign, Route, Shield, Download } from "lucide-react";
+import { LayoutDashboard, Navigation, TrendingUp, Wrench, Target, FileText, Menu, X, LogOut, User, Car, Settings, DollarSign, Route, Shield } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
@@ -9,8 +9,6 @@ import { useIOSPWA } from "@/hooks/useIOSPWA";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ThemeToggle } from "./ThemeToggle";
-import { PWAFloatingButton } from "./PWAFloatingButton";
-import { PWAInstallDialog } from "./PWAInstallDialog";
 import { OfflineIndicator } from "./OfflineIndicator";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -52,8 +50,6 @@ export const Layout = ({
 }: LayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
-  const [installDialogOpen, setInstallDialogOpen] = useState(false);
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -75,13 +71,6 @@ export const Layout = ({
     };
   }, [isIOSPWA]);
 
-  const handleInstallApp = () => {
-    setShowFloatingButton(true);
-  };
-
-  const handleCloseFloatingButton = () => {
-    setShowFloatingButton(false);
-  };
   useEffect(() => {
     loadProfile();
   }, [user]);
@@ -172,18 +161,6 @@ export const Layout = ({
               </Link>;
         })}
         
-        {/* Install App Button - Always visible */}
-        <button
-          onClick={handleInstallApp}
-          className={cn(
-            "flex items-center px-4 py-3 rounded-lg transition-colors w-full text-left",
-            "text-sidebar-foreground hover:bg-sidebar-accent/50"
-          )}
-        >
-          <Download className="w-5 h-5 mr-3" />
-          <span className="font-medium">Instalar App</span>
-        </button>
-
         {isSuperAdmin && (
           <Link
             to="/super-admin"
@@ -229,21 +206,6 @@ export const Layout = ({
               </Link>;
         })}
         
-        {/* Install App Button - Mobile - Always visible */}
-        <button
-          onClick={() => {
-            handleInstallApp();
-            setSidebarOpen(false);
-          }}
-          className={cn(
-            "flex items-center px-4 py-3 rounded-lg transition-colors w-full text-left",
-            "text-sidebar-foreground hover:bg-sidebar-accent/50"
-          )}
-        >
-          <Download className="w-5 h-5 mr-3" />
-          <span className="font-medium">Instalar App</span>
-        </button>
-
         {isSuperAdmin && (
           <Link
             to="/super-admin"
@@ -309,12 +271,6 @@ export const Layout = ({
         <main className={cn("p-6", isIOSPWA && "ios-pwa-content")}>{children}</main>
       </div>
 
-      {/* PWA Install Dialog */}
-      <PWAInstallDialog open={installDialogOpen} onOpenChange={setInstallDialogOpen} />
-      
-      {/* PWA Floating Button - Appears after clicking "Instalar App" */}
-      <PWAFloatingButton visible={showFloatingButton} onClose={handleCloseFloatingButton} />
-      
       {/* Offline Indicator */}
       <OfflineIndicator />
     </div>;
