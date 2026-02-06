@@ -1,55 +1,71 @@
 
-# Plano: Adicionar Opção "Como Usar" no Menu Configurações
+# Plano: Mover "Instalar App" para Configurações
 
 ## Objetivo
-Adicionar um botão "Como Usar" no menu de Configurações, abaixo da opção "Adicionar Veículo", que abre o vídeo tutorial do YouTube em uma nova aba.
+Remover a opção "Instalar App" do menu lateral (sidebar) e adicioná-la dentro da página de Configurações, entre os cards "Adicionar Veículo" e "Como Usar", como um card separado.
 
-## Alteração
+## Alterações
 
-**Arquivo:** `src/pages/Configuracoes.tsx`
+### 1. Arquivo: `src/pages/Configuracoes.tsx`
 
-### O que será feito:
+**Importações a adicionar:**
+- `Download` do lucide-react
+- `usePWAInstall` do hook existente
+- `PWAInstallDialog` do componente existente
 
-1. **Importar o ícone PlayCircle** do lucide-react (linha 10)
-   - Adicionar `PlayCircle` aos imports existentes
+**Estado a adicionar:**
+- `showInstallDialog` para controlar o modal de instalação PWA
 
-2. **Adicionar novo botão no Card de Veículos** (após linha 204)
-   - Criar um link externo para o vídeo tutorial
-   - Usar o mesmo estilo dos outros botões: `variant="outline"` com `w-full justify-start text-base`
-   - Incluir ícone PlayCircle com `mr-2 h-5 w-5`
-   - Texto: "Como Usar"
-   - Link: `https://youtu.be/u2kpNJZX5Y8`
-   - Abrir em nova aba com `target="_blank"` e `rel="noopener noreferrer"`
-
-### Código a ser adicionado:
-
-```tsx
-<a 
-  href="https://youtu.be/u2kpNJZX5Y8" 
-  target="_blank" 
-  rel="noopener noreferrer"
->
-  <Button variant="outline" className="w-full justify-start text-base">
-    <PlayCircle className="mr-2 h-5 w-5" />
-    Como Usar
-  </Button>
-</a>
-```
-
-## Resultado Visual
+**Novo Card a inserir entre "Adicionar Veículo" e "Como Usar":**
 
 ```text
 ┌─────────────────────────────────────┐
-│  🚗  Adicionar Veículo              │
-├─────────────────────────────────────┤
-│  ▶️  Como Usar                       │  ← NOVO
+│  🚗  Adicionar Veículo              │  ← Card existente
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│  ⬇️  Instalar App                   │  ← NOVO Card
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│  ▶️  Como Usar                       │  ← Card existente
 └─────────────────────────────────────┘
 ```
 
-## O que NÃO será alterado
-- Estilo do Card
-- Outros botões existentes
-- Qualquer outra seção do menu Configurações
+**Lógica do botão:**
+- Usar o hook `usePWAInstall` para verificar se a instalação direta é possível
+- Se `isInstallable` for verdadeiro, chamar `install()` diretamente
+- Caso contrário, abrir o `PWAInstallDialog` com instruções específicas para cada dispositivo
 
-## Resultado Esperado
-O usuário verá a opção "Como Usar" logo abaixo de "Adicionar Veículo", com o mesmo visual padrão dos outros botões. Ao clicar, o vídeo tutorial abrirá em uma nova aba do navegador.
+### 2. Arquivo: `src/components/Layout.tsx`
+
+**Remover do menu lateral (Desktop e Mobile):**
+- Botão "Instalar App" com ícone `Download` (linhas 175-185 - Desktop)
+- Botão "Instalar App" com ícone `Download` (linhas 232-245 - Mobile)
+
+**Estado e função a remover (caso não sejam mais usados):**
+- `showFloatingButton` state
+- `handleInstallApp` function
+- `handleCloseFloatingButton` function
+- Componente `PWAFloatingButton`
+
+**Importações a remover:**
+- `PWAFloatingButton`
+- `PWAInstallDialog` (se não for mais usado)
+
+## Resultado Visual em Configurações
+
+A página de Configurações terá a seguinte ordem de cards:
+
+1. Foto de Perfil
+2. Meus Dados
+3. **Adicionar Veículo** (card separado)
+4. **Instalar App** (NOVO - card separado)
+5. **Como Usar** (card separado)
+6. Políticas e Informações
+
+## O que NÃO será alterado
+- Funcionalidade de instalação PWA (mesmo comportamento)
+- Visual do dialog de instalação
+- Instruções específicas por dispositivo (iOS, Android, Desktop)
+- Outros itens do menu lateral
