@@ -11,6 +11,8 @@ import { Camera, Car, Download, Info, Instagram, Phone, PlayCircle } from "lucid
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AvatarEditor } from "@/components/AvatarEditor";
 import { Link } from "react-router-dom";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { PWAInstallDialog } from "@/components/PWAInstallDialog";
 import {
   AlertDialog,
   AlertDialogContent,
