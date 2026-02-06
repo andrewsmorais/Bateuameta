@@ -1,34 +1,28 @@
 
-# Plano: Substituir Vídeo do VSL
+# Plano: Substituir Link do Vídeo Tutorial
 
 ## Objetivo
-Substituir o vídeo do YouTube que aparece abaixo do texto "Conquiste Seus Objetivos Financeiros Com O Poder Da Organização E Planejamento Inteligente." pelo novo vídeo.
+Substituir o link do vídeo tutorial na página "Obrigado" no card "Como Usar".
 
 ## Alteração
 
-**Arquivo:** `src/pages/LandingPage.tsx`
+**Arquivo:** `src/pages/Obrigado.tsx`
 
-**Vídeo atual:** `TlnrQnk4M_E`
-**Novo vídeo:** `8n4ex3L5G8E`
+**Link atual:** `https://youtu.be/sbWG4v0Rm8I`
+**Novo link:** `https://youtu.be/u2kpNJZX5Y8`
 
-### Locais a serem alterados:
+### Local a ser alterado:
 
-1. **Linha 370** - Thumbnail da imagem:
-   - De: `https://img.youtube.com/vi/TlnrQnk4M_E/maxresdefault.jpg`
-   - Para: `https://img.youtube.com/vi/8n4ex3L5G8E/maxresdefault.jpg`
-
-2. **Linha 403** - URL do embed no modal:
-   - De: `https://www.youtube.com/embed/TlnrQnk4M_E?rel=0&modestbranding=1&autoplay=1`
-   - Para: `https://www.youtube.com/embed/8n4ex3L5G8E?rel=0&modestbranding=1&autoplay=1`
+**Linha 111** - URL do botão "Assistir Tutorial":
+- De: `https://youtu.be/sbWG4v0Rm8I`
+- Para: `https://youtu.be/u2kpNJZX5Y8`
 
 ## O que NÃO será alterado
-- Tamanho do vídeo (mobile e desktop)
-- Proporção do vídeo (9:16 no mobile, 16:9 no desktop)
-- Botão de play vermelho
-- Texto "Clique para assistir"
-- Modal com botão de fechar
-- Parâmetros do YouTube (autoplay, modestbranding, rel)
-- Qualquer outra configuração existente
+- Texto do título "Como Usar"
+- Texto descritivo "Preparei um vídeo rápido para você aprender a configurar tudo em 2 minutos."
+- Estilo do botão "Assistir Tutorial" (vermelho com ícone de play)
+- Comportamento de abrir em nova aba
+- Qualquer outro elemento da página
 
 ## Resultado
-O novo vídeo será exibido mantendo exatamente a mesma aparência e comportamento em todos os dispositivos.
+O botão "Assistir Tutorial" abrirá o novo vídeo ao ser clicado.
