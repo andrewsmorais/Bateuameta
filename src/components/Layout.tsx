@@ -71,13 +71,6 @@ export const Layout = ({
     };
   }, [isIOSPWA]);
 
-  const handleInstallApp = () => {
-    setShowFloatingButton(true);
-  };
-
-  const handleCloseFloatingButton = () => {
-    setShowFloatingButton(false);
-  };
   useEffect(() => {
     loadProfile();
   }, [user]);
