@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Car, Info, Instagram, Phone } from "lucide-react";
+import { Camera, Car, Info, Instagram, Phone, PlayCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AvatarEditor } from "@/components/AvatarEditor";
 import { Link } from "react-router-dom";
@@ -202,6 +202,16 @@ const Configuracoes = () => {
               Adicionar Veículo
             </Button>
           </Link>
+          <a 
+            href="https://youtu.be/u2kpNJZX5Y8" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" className="w-full justify-start text-base">
+              <PlayCircle className="mr-2 h-5 w-5" />
+              Como Usar
+            </Button>
+          </a>
         </CardContent>
       </Card>
 
