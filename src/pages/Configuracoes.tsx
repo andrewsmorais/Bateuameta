@@ -195,13 +195,19 @@ const Configuracoes = () => {
 
       {/* Veículos */}
       <Card>
-        <CardContent className="space-y-3 pt-6">
+        <CardContent className="pt-6">
           <Link to="/veiculos">
             <Button variant="outline" className="w-full justify-start text-base">
               <Car className="mr-2 h-5 w-5" />
               Adicionar Veículo
             </Button>
           </Link>
+        </CardContent>
+      </Card>
+
+      {/* Como Usar */}
+      <Card>
+        <CardContent className="pt-6">
           <a 
             href="https://youtu.be/u2kpNJZX5Y8" 
             target="_blank" 
@@ -219,7 +225,7 @@ const Configuracoes = () => {
       <Card>
         <CardContent className="space-y-3 pt-6">
           <Button 
-            variant="outline" 
+            variant="outline"
             className="w-full justify-start text-base"
             onClick={() => setShowRefundPolicy(true)}
           >
