@@ -202,6 +202,16 @@ const Configuracoes = () => {
               Adicionar Veículo
             </Button>
           </Link>
+          <a 
+            href="https://youtu.be/u2kpNJZX5Y8" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" className="w-full justify-start text-base">
+              <PlayCircle className="mr-2 h-5 w-5" />
+              Como Usar
+            </Button>
+          </a>
         </CardContent>
       </Card>
 
