@@ -50,8 +50,6 @@ export const Layout = ({
 }: LayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
-  const [installDialogOpen, setInstallDialogOpen] = useState(false);
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const {
