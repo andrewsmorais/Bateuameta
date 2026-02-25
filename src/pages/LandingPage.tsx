@@ -351,14 +351,13 @@ const LandingPage = () => {
               <span className="text-brand-blue">Bateu A Meta :</span>{" "}
               <span className="text-black">Controle e Planejamento Inteligente</span>
             </h1>
-            <p className="text-base md:text-xl lg:text-2xl font-medium leading-relaxed max-w-3xl text-center text-black">
+            <p className="text-base md:text-xl lg:text-2xl font-medium leading-relaxed max-w-3xl text-left md:text-center text-black mt-4 md:mt-6">
               <span className="text-brand-red">Aposente o caderninho e as planilhas complicadas!</span>{" "}
-              Chegou o <span className="text-brand-blue">Bateu a Meta</span>: o App para Celular, Tablet ou PC. Domine seus{" "}
-              <span className="text-brand-blue">Ganhos e Despesas</span> por Hora e por KM rodado com um clique.
+              Chegou o <span className="text-brand-blue">Bateu a Meta</span>: o App para Celular, Tablet ou PC. Domine seus Ganhos e Despesas por Hora e por KM rodado com um clique.
             </p>
 
             {/* VSL Video - Thumbnail clicável que abre modal */}
-            <div className="w-full max-w-xs md:max-w-4xl mx-auto px-0 sm:px-4">
+            <div className="w-full max-w-xs md:max-w-4xl mx-auto px-0 sm:px-4 mt-6 md:mt-10">
               <button
                 onClick={() => {
                   trackViewContent('VSL Video', 'Video');
