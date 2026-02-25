@@ -1,36 +1,27 @@
 
 
-# Plano: Atualizar Texto do Hero na Landing Page
+## Problema
+O vídeo do YouTube Shorts com ID `rR8iYDF_8YY` está dando erro ("Something went wrong") na seção de depoimentos da Landing Page. Isso pode acontecer porque o vídeo foi removido, tornado privado, ou está com restrição de embed.
 
-## Objetivo
-Substituir o título e subtítulo atuais do Hero Section pelo novo texto, aplicando cores de destaque (vermelho e azul) nas palavras indicadas.
+## Diagnóstico
+O vídeo está embedado na seção "Veja Quem Já Bateu A Meta!" junto com outros 4 vídeos Shorts. O embed usa a URL padrão `https://www.youtube.com/embed/rR8iYDF_8YY`.
 
-## Texto Atual (a ser removido)
-- H1: "Bateu A Meta: Transforme Sua Gestão Financeira Pessoal em Resultados Reais!"
-- H2: "Conquiste Seus Objetivos Financeiros Com O Poder Da Organização E Planejamento Inteligente."
+## Solução
+Remover o vídeo `rR8iYDF_8YY` da lista de depoimentos, já que ele não está mais disponível no YouTube.
 
-## Novo Texto (com cores)
-- <span class="text-brand-red">Aposente o caderninho e as planilhas complicadas!</span> Chegou o <span class="text-brand-blue">Bateu a Meta</span>: o App para Celular, Tablet ou PC. Domine seus <span class="text-brand-blue">Ganhos e Despesas</span> por Hora e por KM rodado com um clique.
+### Arquivo: `src/pages/LandingPage.tsx` (linha 760)
 
-## Alteração
-
-### Arquivo: `src/pages/LandingPage.tsx` (linhas 350-357)
-
-**Remover** o H1 e H2 atuais e **substituir** por um único H1 com o novo texto e as cores aplicadas:
-
-```tsx
-<h1 className="text-xl md:text-5xl lg:text-6xl font-bold leading-tight max-w-4xl text-black">
-  <span className="text-brand-red">Aposente o caderninho e as planilhas complicadas!</span>{" "}
-  Chegou o <span className="text-brand-blue">Bateu a Meta</span>: o App para Celular, Tablet ou PC. Domine seus{" "}
-  <span className="text-brand-blue">Ganhos e Despesas</span> por Hora e por KM rodado com um clique.
-</h1>
+**Antes:**
+```js
+{['bOkwngfR0-8', '9e7MrKaUW5c', 'RTqU92TMKfU', 'rR8iYDF_8YY', 'T85VaIC987M'].map(...)
 ```
 
-## Cores Utilizadas
-- **Vermelho** (`text-brand-red` = #c41313): "Aposente o caderninho e as planilhas complicadas!"
-- **Azul** (`text-brand-blue` = #3c83f6): "Bateu a Meta" e "Ganhos e Despesas"
-- **Preto** (`text-black`): restante do texto
+**Depois:**
+```js
+{['bOkwngfR0-8', '9e7MrKaUW5c', 'RTqU92TMKfU', 'T85VaIC987M'].map(...)
+```
 
-## O que será removido
-- O H2 com "Conquiste Seus Objetivos Financeiros..." (linha 355-357) — o novo texto já é completo e substitui ambos os elementos.
+Isso reduz de 5 para 4 vídeos, que se encaixam perfeitamente no grid de 4 colunas do desktop sem precisar ajustar o layout.
+
+> **Nota:** Se você tiver outro vídeo de depoimento para substituir o removido, me avise o link e eu coloco no lugar.
 
