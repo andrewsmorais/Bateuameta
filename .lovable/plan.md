@@ -1,27 +1,30 @@
 
 
-## Problema
-O vídeo do YouTube Shorts com ID `rR8iYDF_8YY` está dando erro ("Something went wrong") na seção de depoimentos da Landing Page. Isso pode acontecer porque o vídeo foi removido, tornado privado, ou está com restrição de embed.
+## Adicionar Tag do Google Ads
 
-## Diagnóstico
-O vídeo está embedado na seção "Veja Quem Já Bateu A Meta!" junto com outros 4 vídeos Shorts. O embed usa a URL padrão `https://www.youtube.com/embed/rR8iYDF_8YY`.
+### Como funciona
+Assim como o Facebook Pixel que já está no projeto (`src/hooks/useFacebookPixel.tsx`), podemos adicionar o script do Google Ads (gtag.js) para rastrear conversões e remarketing.
 
-## Solução
-Remover o vídeo `rR8iYDF_8YY` da lista de depoimentos, já que ele não está mais disponível no YouTube.
+### O que preciso de você
+Para implementar, preciso do seu **ID de conversão do Google Ads** (formato: `AW-XXXXXXXXXX`). Você encontra isso no painel do Google Ads em **Ferramentas > Conversões**.
 
-### Arquivo: `src/pages/LandingPage.tsx` (linha 760)
+### Plano de implementação
 
-**Antes:**
-```js
-{['bOkwngfR0-8', '9e7MrKaUW5c', 'RTqU92TMKfU', 'rR8iYDF_8YY', 'T85VaIC987M'].map(...)
-```
+1. **Criar hook `useGoogleAds.tsx`** — Similar ao `useFacebookPixel.tsx`, com funções para:
+   - Carregar o script `gtag.js`
+   - Rastrear PageView
+   - Rastrear conversões (compra, lead, etc.)
 
-**Depois:**
-```js
-{['bOkwngfR0-8', '9e7MrKaUW5c', 'RTqU92TMKfU', 'T85VaIC987M'].map(...)
-```
+2. **Adicionar no `index.html`** — Inserir o script global do gtag.js no `<head>`
 
-Isso reduz de 5 para 4 vídeos, que se encaixam perfeitamente no grid de 4 colunas do desktop sem precisar ajustar o layout.
+3. **Integrar na Landing Page e páginas de conversão** — Disparar eventos nos mesmos pontos onde o Facebook Pixel já dispara (checkout, registro, etc.)
 
-> **Nota:** Se você tiver outro vídeo de depoimento para substituir o removido, me avise o link e eu coloco no lugar.
+### Arquivos envolvidos
+- `index.html` — Script global do gtag.js
+- `src/hooks/useGoogleAds.tsx` — Novo hook (seguindo o padrão do Facebook Pixel)
+- `src/pages/LandingPage.tsx` — Integração dos eventos
+- `src/pages/PagamentoSucesso.tsx` — Evento de conversão de compra
+
+### Próximo passo
+Me envie seu **ID de conversão do Google Ads** (`AW-XXXXXXXXXX`) e, se tiver, os **IDs das ações de conversão** específicas, que eu implemento tudo.
 
