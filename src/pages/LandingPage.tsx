@@ -1004,11 +1004,11 @@ const LandingPage = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <a href="#" className="text-[#3c83f6] hover:text-[#c41313] transition-colors">Política de Privacidade</a>
+            <Link to="/politica-privacidade" className="text-[#3c83f6] hover:text-[#c41313] transition-colors">Política de Privacidade</Link>
             <span className="text-gray-600">•</span>
-            <a href="#" className="text-[#3c83f6] hover:text-[#c41313] transition-colors">Termos de Uso</a>
+            <Link to="/termos-de-uso" className="text-[#3c83f6] hover:text-[#c41313] transition-colors">Termos de Uso</Link>
             <span className="text-gray-600">•</span>
-            <a href="#" className="text-[#3c83f6] hover:text-[#c41313] transition-colors">Política de Reembolso</a>
+            <Link to="/termos-de-uso#reembolso" className="text-[#3c83f6] hover:text-[#c41313] transition-colors">Política de Reembolso</Link>
           </div>
 
           <p className="text-sm text-gray-400 pt-4">

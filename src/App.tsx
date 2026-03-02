@@ -145,6 +145,8 @@ const AppContent = () => {
         />
         <Route path="/instalar" element={<Instalar />} />
         <Route path="/obrigado" element={<Obrigado />} />
+        <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+        <Route path="/termos-de-uso" element={<TermosDeUso />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
