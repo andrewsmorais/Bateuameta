@@ -21,6 +21,8 @@ import Planos from "./pages/Planos";
 import PagamentoSucesso from "./pages/PagamentoSucesso";
 import LandingPage from "./pages/LandingPage";
 import Obrigado from "./pages/Obrigado";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import TermosDeUso from "./pages/TermosDeUso";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { OfflineProvider } from "./contexts/OfflineContext";
 import { usePWAUpdate } from "./hooks/usePWAUpdate";
