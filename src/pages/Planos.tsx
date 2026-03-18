@@ -84,20 +84,20 @@ const Planos = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Plano Mensal */}
-          <Card className="relative border border-border shadow-sm">
+          <Card className="relative border-2 border-[hsl(217,90%,60%)] shadow-lg bg-black text-white">
             <CardHeader className="text-center pb-2 pt-6">
-              <div className="mx-auto mb-2 p-3 rounded-full bg-muted w-fit">
-                <Zap className="h-8 w-8 text-muted-foreground" />
+              <div className="mx-auto mb-2 p-3 rounded-full bg-[hsl(217,90%,60%)]/10 w-fit">
+                <Zap className="h-8 w-8 text-[hsl(217,90%,60%)]" />
               </div>
-              <CardTitle className="text-2xl text-foreground">PLANO MENSAL</CardTitle>
+              <CardTitle className="text-2xl text-[hsl(217,90%,60%)]">PLANO MENSAL</CardTitle>
               <CardDescription>Acesso completo mês a mês</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <ul className="space-y-3 mb-6 text-left">
                 {features.map((f, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <div className="bg-muted-foreground/20 rounded-full p-1 mt-0.5 flex-shrink-0">
-                      <Check className="h-3 w-3 text-foreground" />
+                    <div className="bg-[hsl(24,95%,53%)] rounded-full p-1 mt-0.5 flex-shrink-0">
+                      <Check className="h-3 w-3 text-white" />
                     </div>
                     <span className="text-sm">
                       <strong>{f.label}</strong>{f.desc ? ` ${f.desc}` : ""}
@@ -107,8 +107,8 @@ const Planos = () => {
               </ul>
 
               <div className="mb-4">
-                <span className="text-4xl font-bold text-foreground">R$ 12,90</span>
-                <p className="text-muted-foreground text-sm">/mês</p>
+                <span className="text-4xl font-bold text-white">R$ 12,90</span>
+                <p className="text-gray-400 text-sm">/mês</p>
               </div>
 
               <Button 
