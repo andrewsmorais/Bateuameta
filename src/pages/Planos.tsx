@@ -7,7 +7,7 @@ import { Check, Crown, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logoImage from "@/assets/bateu-a-meta-logo.png";
 
-const CAKTO_CHECKOUT_MENSAL = "https://app.cakto.com.br/checkout-builder/810036";
+const CAKTO_CHECKOUT_MENSAL = "https://pay.cakto.com.br/hrg5kq9";
 const CAKTO_CHECKOUT_ANUAL = "https://pay.cakto.com.br/pxje8kx_669077";
 
 const features = [
