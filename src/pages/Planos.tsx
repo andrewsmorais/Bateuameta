@@ -10,10 +10,12 @@ import logoImage from "@/assets/bateu-a-meta-logo.png";
 const CAKTO_CHECKOUT_URL = "https://pay.cakto.com.br/pxje8kx_669077";
 
 const features = [
-  { label: "Ganhos Brutos, Ganhos Líquidos e Despesas:", desc: "Tenha a clareza total do seu saldo em cada turno." },
-  { label: "Ganhos por Hora, Ganho por KM e Despesas por KM:", desc: "Entenda sua performance real no trecho." },
-  { label: "Custo por Combustível:", desc: "Controle exato do seu maior gasto diário." },
-  { label: "Funciona em aparelhos IOS (iPhone) e em aparelhos Android", desc: "" },
+  "Descubra qual é o seu Custo e o seu Lucro real em cada viagem",
+  "Entenda de forma simples quanto é o seu Custo e o seu Lucro por cada KM que você roda",
+  "Tenha total controle de quanto você lucra e de quanto você gasta por hora",
+  "Defina uma meta para os seus ganhos e para os gastos",
+  "Acompanhe o seu faturamento por hora e por KM",
+  "Funciona em aparelhos IOS (iPhone) e em aparelhos Android",
 ];
 
 const Planos = () => {
