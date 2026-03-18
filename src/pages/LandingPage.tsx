@@ -73,8 +73,9 @@ import motoristaCacheado from "@/assets/testimonials/motorista-cacheado.png";
 // Founder image
 import fundadorImg from "@/assets/andrews-morais.jpeg";
 
-// Cakto checkout URL
-const CAKTO_CHECKOUT_URL = "https://pay.cakto.com.br/pxje8kx_669077";
+// Cakto checkout URLs
+const CAKTO_CHECKOUT_MENSAL = "https://app.cakto.com.br/checkout-builder/810036";
+const CAKTO_CHECKOUT_ANUAL = "https://pay.cakto.com.br/pxje8kx_669077";
 
 // Slides data for carousel
 const carouselSlides = [
