@@ -1,28 +1,21 @@
 
 
-## Correção: Tag do Google Ads nao detectada pelo Tag Assistant
+## Adicionar Plano Mensal na página de Planos
 
-### Problema
-O `index.html` (linha 34) carrega o `gtag.js` com `async`, mas **nao inclui o script inline de inicializacao** com `window.dataLayer` e `gtag('config')`. O Google Tag Assistant verifica o HTML bruto antes do JavaScript do React executar, por isso mostra "Nenhuma tag do Google foi encontrada".
+### Situação
+O checkout da Cakto já tem ambas as ofertas (Anual R$ 97,90 e Mensal R$ 12,90) no mesmo link. A página `/planos` só mostra o card do plano anual.
 
-### Solucao
-Adicionar o script inline de inicializacao logo apos o script async no `index.html`, exatamente como o snippet original fornecido pelo Google:
+### Plano
 
-```html
-<!-- Google Ads (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17945487409"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'AW-17945487409');
-</script>
-```
+#### Arquivo: `src/pages/Planos.tsx`
 
-### Arquivo afetado
-| Arquivo | Acao |
-|---------|------|
-| `index.html` | Adicionar script inline de inicializacao (linhas 34-35) |
+1. **Expandir layout** de `max-w-lg` para `max-w-3xl` com grid de 2 colunas (`md:grid-cols-2`)
+2. **Manter card do Plano Anual** como está, com badge "Mais Popular" ou "Melhor Custo-Benefício"
+3. **Adicionar card do Plano Mensal** (R$ 12,90/mês) com:
+   - Mesma lista de features (ambos têm acesso completo)
+   - Preço: R$ 12,90/mês
+   - Estilo mais discreto (sem borda azul highlight) para destacar o anual como melhor opção
+4. **Ambos os botões** redirecionam para o mesmo `CAKTO_CHECKOUT_URL` — o cliente escolhe a oferta dentro do checkout da Cakto
 
-O hook `useGoogleAds.tsx` e as integracoes nas paginas continuam funcionando normalmente, pois o hook ja verifica se `window.gtag` existe antes de re-inicializar.
+Nenhum outro arquivo precisa ser alterado.
 
