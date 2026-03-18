@@ -44,13 +44,14 @@ const Planos = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleSelectPlan = async () => {
+  const handleSelectPlan = async (plan: 'mensal' | 'anual' = 'anual') => {
     const { data: { session } } = await supabase.auth.getSession();
     const email = session?.user?.email || "";
 
+    const baseUrl = plan === 'mensal' ? CAKTO_CHECKOUT_MENSAL : CAKTO_CHECKOUT_ANUAL;
     const checkoutUrl = email 
-      ? `${CAKTO_CHECKOUT_URL}?email=${encodeURIComponent(email)}`
-      : CAKTO_CHECKOUT_URL;
+      ? `${baseUrl}?email=${encodeURIComponent(email)}`
+      : baseUrl;
     
     window.location.href = checkoutUrl;
   };

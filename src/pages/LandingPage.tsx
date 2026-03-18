@@ -235,18 +235,17 @@ const LandingPage = () => {
     document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSelectPlan = async () => {
+  const handleSelectPlan = async (plan: 'mensal' | 'anual' = 'anual') => {
     // Facebook Pixel - InitiateCheckout
-    trackInitiateCheckout("Anual", 97.90);
+    trackInitiateCheckout(plan === 'anual' ? "Anual" : "Mensal", plan === 'anual' ? 97.90 : 12.90);
 
-    // Verificar se já tem email (usuário logado)
     const { data: { session } } = await supabase.auth.getSession();
     const email = session?.user?.email || "";
 
-    // Redirecionar para checkout da Cakto
+    const baseUrl = plan === 'mensal' ? CAKTO_CHECKOUT_MENSAL : CAKTO_CHECKOUT_ANUAL;
     const checkoutUrl = email 
-      ? `${CAKTO_CHECKOUT_URL}?email=${encodeURIComponent(email)}`
-      : CAKTO_CHECKOUT_URL;
+      ? `${baseUrl}?email=${encodeURIComponent(email)}`
+      : baseUrl;
     
     window.location.href = checkoutUrl;
   };
