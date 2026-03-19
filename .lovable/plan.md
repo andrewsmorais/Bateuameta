@@ -1,20 +1,28 @@
 
 
-## Atualizar Facebook Pixel ID e Token
+## Correção: Tag do Google Ads nao detectada pelo Tag Assistant
 
-### O que será feito
+### Problema
+O `index.html` (linha 34) carrega o `gtag.js` com `async`, mas **nao inclui o script inline de inicializacao** com `window.dataLayer` e `gtag('config')`. O Google Tag Assistant verifica o HTML bruto antes do JavaScript do React executar, por isso mostra "Nenhuma tag do Google foi encontrada".
 
-Substituir o Pixel ID antigo (`1290319795205025`) pelo novo (`1163164178906906`) em 2 arquivos, e atualizar o token de acesso do Facebook. O Google Ads não será alterado.
+### Solucao
+Adicionar o script inline de inicializacao logo apos o script async no `index.html`, exatamente como o snippet original fornecido pelo Google:
 
-### Alterações
+```html
+<!-- Google Ads (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17945487409"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-17945487409');
+</script>
+```
 
-1. **`src/hooks/useFacebookPixel.tsx`** (linha 6) — Trocar o Pixel ID para `1163164178906906`
+### Arquivo afetado
+| Arquivo | Acao |
+|---------|------|
+| `index.html` | Adicionar script inline de inicializacao (linhas 34-35) |
 
-2. **`supabase/functions/cakto-webhook/index.ts`** (linha 12) — Trocar o Pixel ID para `1163164178906906`
-
-3. **Secret `FB_ACCESS_TOKEN`** — Atualizar o token do Facebook Conversions API com o novo valor fornecido
-
-### Observação
-- O token é uma chave privada e será armazenado como secret seguro (acessível apenas nas edge functions)
-- Google Ads permanece inalterado
+O hook `useGoogleAds.tsx` e as integracoes nas paginas continuam funcionando normalmente, pois o hook ja verifica se `window.gtag` existe antes de re-inicializar.
 

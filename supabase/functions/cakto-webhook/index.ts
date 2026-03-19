@@ -9,7 +9,7 @@ const corsHeaders = {
 const CAKTO_WEBHOOK_SECRET = Deno.env.get("CAKTO_WEBHOOK_SECRET");
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
 const FB_ACCESS_TOKEN = Deno.env.get("FB_ACCESS_TOKEN");
-const FB_PIXEL_ID = "1290319795205025";
+const FB_PIXEL_ID = "1163164178906906";
 
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL") ?? "",
