@@ -231,7 +231,7 @@ async function sendWelcomeEmail(email: string, password: string, nome: string) {
   }
 }
 
-async function sendRenewalEmail(email: string, nome: string, expiresAt: string) {
+async function sendRenewalEmail(email: string, nome: string, expiresAt: string, planLabel: string = "Anual (R$ 97,90)") {
   if (!BREVO_API_KEY) {
     console.error("[Cakto Webhook] BREVO_API_KEY não configurada");
     return;
