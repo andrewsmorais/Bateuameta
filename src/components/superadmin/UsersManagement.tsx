@@ -359,7 +359,7 @@ export const UsersManagement = () => {
       user.email || "",
       user.telefone || "",
       user.cpf || "",
-      user.planPrice === 97.9 ? "Anual R$ 97,90" : "Free",
+      user.planPrice >= 90 ? "Anual R$ 97,90" : user.planPrice > 0 ? "Mensal R$ 12,90" : "Free",
       user.daysRemaining !== null && user.daysRemaining !== undefined ? String(user.daysRemaining) : "",
       user.status === "active" ? "Ativo" : "Bloqueado",
       user.admin_notes || ""
@@ -494,6 +494,7 @@ export const UsersManagement = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="7ce2d64b-e97a-429e-9448-3af009895d70">Free (Sem cobrança)</SelectItem>
+                        <SelectItem value="49a734d8-af86-4a0b-accf-755d947cc1d8">Mensal R$ 12,90</SelectItem>
                         <SelectItem value="08033a83-5a65-4248-ae25-89e8bc35fe04">Anual R$ 97,90</SelectItem>
                       </SelectContent>
                     </Select>
@@ -572,7 +573,7 @@ export const UsersManagement = () => {
                       <TableCell>{user.cpf || "-"}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={user.planPrice > 0 ? "bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30" : ""}>
-                          {user.planPrice === 97.9 ? "Anual" : "Free"}
+                          {user.planPrice >= 90 ? "Anual" : user.planPrice > 0 ? "Mensal" : "Free"}
                         </Badge>
                       </TableCell>
                       <TableCell>
