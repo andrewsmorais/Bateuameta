@@ -524,15 +524,21 @@ serve(async (req) => {
       console.log("[Cakto Webhook] Completed for:", email, "New user:", isNewUser);
 
     } else if (event === "subscription_renewed" || event === "subscription.renewed" || event === "SUBSCRIPTION_RENEWED") {
-      console.log("[Cakto Webhook] Processing subscription renewal for:", email);
+      const planType = detectPlanType(data);
+      const plan = PLAN_CONFIG[planType];
+      console.log("[Cakto Webhook] Processing subscription renewal for:", email, "Plan:", planType);
 
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
       const user = existingUsers?.users?.find(u => u.email === email);
 
       if (user) {
-        // Calcular nova data de expiração
         const now = new Date();
-        const expiresAt = new Date(now.setFullYear(now.getFullYear() + 1)).toISOString();
+        if (planType === "mensal") {
+          now.setMonth(now.getMonth() + 1);
+        } else {
+          now.setFullYear(now.getFullYear() + 1);
+        }
+        const expiresAt = now.toISOString();
 
         await supabaseAdmin
           .from("subscriptions")
@@ -542,8 +548,8 @@ serve(async (req) => {
           })
           .eq("user_id", user.id);
 
-        await sendRenewalEmail(email, nome, expiresAt);
-        await sendFacebookConversionEvent("Purchase", email, 97.90, "BRL");
+        await sendRenewalEmail(email, nome, expiresAt, plan.label);
+        await sendFacebookConversionEvent("Purchase", email, plan.price, "BRL");
 
         console.log("[Cakto Webhook] Subscription renewed for:", user.id);
       }
