@@ -26,6 +26,28 @@ async function hashSHA256(str: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Configuração dos planos
+const PLAN_CONFIG = {
+  mensal: { name: "mensal", price: 12.90, label: "Mensal (R$ 12,90)" },
+  anual: { name: "anual", price: 97.90, label: "Anual (R$ 97,90)" },
+};
+
+// Detectar tipo de plano baseado no payload
+function detectPlanType(data: any): "mensal" | "anual" {
+  const eventData = data.data || data;
+  const sale = eventData.sale || eventData.purchase || eventData;
+  const product = sale?.product || sale?.offer || eventData.product || eventData.offer || {};
+  
+  const productName = (product.name || product.title || sale?.product_name || sale?.offer_name || "").toLowerCase();
+  if (productName.includes("mensal")) return "mensal";
+  if (productName.includes("anual")) return "anual";
+  
+  const price = parseFloat(sale?.price || sale?.amount || product.price || eventData.price || "0");
+  if (price > 0 && price <= 15) return "mensal";
+  
+  return "anual";
+}
+
 // Gerar senha aleatória de 7 dígitos
 function generatePassword(): string {
   return Math.floor(1000000 + Math.random() * 9000000).toString();
