@@ -573,7 +573,7 @@ export const UsersManagement = () => {
                       <TableCell>{user.cpf || "-"}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={user.planPrice > 0 ? "bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30" : ""}>
-                          {user.planPrice === 97.9 ? "Anual" : "Free"}
+                          {user.planPrice >= 90 ? "Anual" : user.planPrice > 0 ? "Mensal" : "Free"}
                         </Badge>
                       </TableCell>
                       <TableCell>
