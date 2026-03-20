@@ -26,6 +26,28 @@ async function hashSHA256(str: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Configuração dos planos
+const PLAN_CONFIG = {
+  mensal: { name: "mensal", price: 12.90, label: "Mensal (R$ 12,90)" },
+  anual: { name: "anual", price: 97.90, label: "Anual (R$ 97,90)" },
+};
+
+// Detectar tipo de plano baseado no payload
+function detectPlanType(data: any): "mensal" | "anual" {
+  const eventData = data.data || data;
+  const sale = eventData.sale || eventData.purchase || eventData;
+  const product = sale?.product || sale?.offer || eventData.product || eventData.offer || {};
+  
+  const productName = (product.name || product.title || sale?.product_name || sale?.offer_name || "").toLowerCase();
+  if (productName.includes("mensal")) return "mensal";
+  if (productName.includes("anual")) return "anual";
+  
+  const price = parseFloat(sale?.price || sale?.amount || product.price || eventData.price || "0");
+  if (price > 0 && price <= 15) return "mensal";
+  
+  return "anual";
+}
+
 // Gerar senha aleatória de 7 dígitos
 function generatePassword(): string {
   return Math.floor(1000000 + Math.random() * 9000000).toString();
@@ -209,7 +231,7 @@ async function sendWelcomeEmail(email: string, password: string, nome: string) {
   }
 }
 
-async function sendRenewalEmail(email: string, nome: string, expiresAt: string) {
+async function sendRenewalEmail(email: string, nome: string, expiresAt: string, planLabel: string = "Anual (R$ 97,90)") {
   if (!BREVO_API_KEY) {
     console.error("[Cakto Webhook] BREVO_API_KEY não configurada");
     return;
@@ -235,7 +257,7 @@ async function sendRenewalEmail(email: string, nome: string, expiresAt: string) 
       <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #15a249;">
         <h2 style="color: #333; margin-bottom: 15px; font-size: 18px;">📋 DETALHES DA RENOVAÇÃO:</h2>
         <p style="font-size: 16px; margin: 10px 0; color: #333;">
-          <strong>Plano:</strong> Anual (R$ 97,90)
+          <strong>Plano:</strong> ${planLabel}
         </p>
         <p style="font-size: 16px; margin: 10px 0; color: #333;">
           <strong>Válido até:</strong> ${expirationDate}
@@ -355,7 +377,10 @@ serve(async (req) => {
 
     // Processar baseado no evento
     if (event === "purchase_approved" || event === "sale_approved" || event === "purchase.approved" || event === "SALE_APPROVED") {
-      console.log("[Cakto Webhook] Processing approved purchase for:", email);
+      // Detectar tipo de plano
+      const planType = detectPlanType(data);
+      const plan = PLAN_CONFIG[planType];
+      console.log("[Cakto Webhook] Processing approved purchase for:", email, "Plan:", planType);
 
       // Verificar se usuário já existe
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
@@ -365,14 +390,11 @@ serve(async (req) => {
       let isNewUser = false;
 
       if (!user) {
-        // Criar novo usuário
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
           email: email,
           password: password,
           email_confirm: true,
-          user_metadata: {
-            full_name: nome,
-          },
+          user_metadata: { full_name: nome },
         });
 
         if (createError) {
@@ -384,7 +406,6 @@ serve(async (req) => {
         isNewUser = true;
         console.log("[Cakto Webhook] New user created:", user.id);
 
-        // Enviar email de boas-vindas
         await sendWelcomeEmail(email, password, nome);
       } else {
         console.log("[Cakto Webhook] User already exists:", user.id);
@@ -405,12 +426,12 @@ serve(async (req) => {
         console.error("[Cakto Webhook] Profile error:", profileError);
       }
 
-      // Encontrar ou criar plano anual
+      // Encontrar ou criar plano
       let planId: string;
       const { data: existingPlan } = await supabaseAdmin
         .from("plans")
         .select("id")
-        .eq("name", "anual")
+        .eq("name", plan.name)
         .maybeSingle();
 
       if (existingPlan) {
@@ -419,8 +440,8 @@ serve(async (req) => {
         const { data: newPlan, error: planError } = await supabaseAdmin
           .from("plans")
           .insert({
-            name: "anual",
-            price: 97.90,
+            name: plan.name,
+            price: plan.price,
             features: { premium: true },
           })
           .select("id")
@@ -433,9 +454,14 @@ serve(async (req) => {
         planId = newPlan.id;
       }
 
-      // Calcular data de expiração (1 ano)
+      // Calcular data de expiração
       const now = new Date();
-      const expiresAt = new Date(now.setFullYear(now.getFullYear() + 1)).toISOString();
+      if (planType === "mensal") {
+        now.setMonth(now.getMonth() + 1);
+      } else {
+        now.setFullYear(now.getFullYear() + 1);
+      }
+      const expiresAt = now.toISOString();
 
       // Criar ou atualizar subscription
       const { data: newSubscription, error: subError } = await supabaseAdmin
@@ -453,7 +479,6 @@ serve(async (req) => {
       if (subError) {
         console.error("[Cakto Webhook] Subscription error:", subError);
       } else {
-        // Atualizar profile com subscription_id
         await supabaseAdmin
           .from("profiles")
           .update({ subscription_id: newSubscription.id })
@@ -474,11 +499,11 @@ serve(async (req) => {
 
       // Enviar email de renovação para usuários existentes
       if (!isNewUser) {
-        await sendRenewalEmail(email, nome, expiresAt);
+        await sendRenewalEmail(email, nome, expiresAt, plan.label);
       }
 
       // Enviar evento Purchase para Facebook
-      await sendFacebookConversionEvent("Purchase", email, 97.90, "BRL");
+      await sendFacebookConversionEvent("Purchase", email, plan.price, "BRL");
 
       // Marcar abandoned checkout como convertido
       await supabaseAdmin
@@ -499,15 +524,21 @@ serve(async (req) => {
       console.log("[Cakto Webhook] Completed for:", email, "New user:", isNewUser);
 
     } else if (event === "subscription_renewed" || event === "subscription.renewed" || event === "SUBSCRIPTION_RENEWED") {
-      console.log("[Cakto Webhook] Processing subscription renewal for:", email);
+      const planType = detectPlanType(data);
+      const plan = PLAN_CONFIG[planType];
+      console.log("[Cakto Webhook] Processing subscription renewal for:", email, "Plan:", planType);
 
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
       const user = existingUsers?.users?.find(u => u.email === email);
 
       if (user) {
-        // Calcular nova data de expiração
         const now = new Date();
-        const expiresAt = new Date(now.setFullYear(now.getFullYear() + 1)).toISOString();
+        if (planType === "mensal") {
+          now.setMonth(now.getMonth() + 1);
+        } else {
+          now.setFullYear(now.getFullYear() + 1);
+        }
+        const expiresAt = now.toISOString();
 
         await supabaseAdmin
           .from("subscriptions")
@@ -517,8 +548,8 @@ serve(async (req) => {
           })
           .eq("user_id", user.id);
 
-        await sendRenewalEmail(email, nome, expiresAt);
-        await sendFacebookConversionEvent("Purchase", email, 97.90, "BRL");
+        await sendRenewalEmail(email, nome, expiresAt, plan.label);
+        await sendFacebookConversionEvent("Purchase", email, plan.price, "BRL");
 
         console.log("[Cakto Webhook] Subscription renewed for:", user.id);
       }
@@ -568,14 +599,15 @@ serve(async (req) => {
       }
 
     } else if (event === "checkout_abandonment" || event === "cart_abandoned" || event === "CHECKOUT_ABANDONMENT") {
-      console.log("[Cakto Webhook] Processing checkout abandonment for:", email);
+      const planType = detectPlanType(data);
+      console.log("[Cakto Webhook] Processing checkout abandonment for:", email, "Plan:", planType);
 
       // Verificar se já existe registro de abandono para este email e plano
       const { data: existingAbandonment } = await supabaseAdmin
         .from("abandoned_checkouts")
         .select("id, status")
         .eq("email", email)
-        .eq("plan_type", "anual")
+        .eq("plan_type", planType)
         .maybeSingle();
 
       if (existingAbandonment) {
@@ -599,7 +631,7 @@ serve(async (req) => {
           .from("abandoned_checkouts")
           .insert({
             email: email,
-            plan_type: "anual",
+            plan_type: planType,
             // status: "pending" é o default do banco
           });
 
