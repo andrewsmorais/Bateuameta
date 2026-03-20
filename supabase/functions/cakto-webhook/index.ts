@@ -631,7 +631,7 @@ serve(async (req) => {
           .from("abandoned_checkouts")
           .insert({
             email: email,
-            plan_type: "anual",
+            plan_type: planType,
             // status: "pending" é o default do banco
           });
 
