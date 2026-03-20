@@ -377,7 +377,10 @@ serve(async (req) => {
 
     // Processar baseado no evento
     if (event === "purchase_approved" || event === "sale_approved" || event === "purchase.approved" || event === "SALE_APPROVED") {
-      console.log("[Cakto Webhook] Processing approved purchase for:", email);
+      // Detectar tipo de plano
+      const planType = detectPlanType(data);
+      const plan = PLAN_CONFIG[planType];
+      console.log("[Cakto Webhook] Processing approved purchase for:", email, "Plan:", planType);
 
       // Verificar se usuário já existe
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
@@ -387,14 +390,11 @@ serve(async (req) => {
       let isNewUser = false;
 
       if (!user) {
-        // Criar novo usuário
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
           email: email,
           password: password,
           email_confirm: true,
-          user_metadata: {
-            full_name: nome,
-          },
+          user_metadata: { full_name: nome },
         });
 
         if (createError) {
@@ -406,7 +406,6 @@ serve(async (req) => {
         isNewUser = true;
         console.log("[Cakto Webhook] New user created:", user.id);
 
-        // Enviar email de boas-vindas
         await sendWelcomeEmail(email, password, nome);
       } else {
         console.log("[Cakto Webhook] User already exists:", user.id);
@@ -427,12 +426,12 @@ serve(async (req) => {
         console.error("[Cakto Webhook] Profile error:", profileError);
       }
 
-      // Encontrar ou criar plano anual
+      // Encontrar ou criar plano
       let planId: string;
       const { data: existingPlan } = await supabaseAdmin
         .from("plans")
         .select("id")
-        .eq("name", "anual")
+        .eq("name", plan.name)
         .maybeSingle();
 
       if (existingPlan) {
@@ -441,8 +440,8 @@ serve(async (req) => {
         const { data: newPlan, error: planError } = await supabaseAdmin
           .from("plans")
           .insert({
-            name: "anual",
-            price: 97.90,
+            name: plan.name,
+            price: plan.price,
             features: { premium: true },
           })
           .select("id")
@@ -455,9 +454,14 @@ serve(async (req) => {
         planId = newPlan.id;
       }
 
-      // Calcular data de expiração (1 ano)
+      // Calcular data de expiração
       const now = new Date();
-      const expiresAt = new Date(now.setFullYear(now.getFullYear() + 1)).toISOString();
+      if (planType === "mensal") {
+        now.setMonth(now.getMonth() + 1);
+      } else {
+        now.setFullYear(now.getFullYear() + 1);
+      }
+      const expiresAt = now.toISOString();
 
       // Criar ou atualizar subscription
       const { data: newSubscription, error: subError } = await supabaseAdmin
@@ -475,7 +479,6 @@ serve(async (req) => {
       if (subError) {
         console.error("[Cakto Webhook] Subscription error:", subError);
       } else {
-        // Atualizar profile com subscription_id
         await supabaseAdmin
           .from("profiles")
           .update({ subscription_id: newSubscription.id })
@@ -496,11 +499,11 @@ serve(async (req) => {
 
       // Enviar email de renovação para usuários existentes
       if (!isNewUser) {
-        await sendRenewalEmail(email, nome, expiresAt);
+        await sendRenewalEmail(email, nome, expiresAt, plan.label);
       }
 
       // Enviar evento Purchase para Facebook
-      await sendFacebookConversionEvent("Purchase", email, 97.90, "BRL");
+      await sendFacebookConversionEvent("Purchase", email, plan.price, "BRL");
 
       // Marcar abandoned checkout como convertido
       await supabaseAdmin
