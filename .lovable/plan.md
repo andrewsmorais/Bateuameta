@@ -1,46 +1,32 @@
 
 
-## Configurar Webhook Cakto para Plano Mensal
+## Adicionar Plano Mensal ao Gerenciamento de Usuários
 
-### Problema Atual
+### Situação Atual
 
-O webhook `cakto-webhook` está configurado apenas para o plano **anual**. Tudo é tratado como anual: plano "anual", preço R$97,90, expiração de 1 ano, e evento do Facebook com valor 97.90. Quando uma venda mensal acontece, o sistema cria o usuário com dados errados.
-
-### O que será feito
-
-Atualizar o `cakto-webhook` para identificar se a venda é **mensal** ou **anual** e processar corretamente cada caso:
-
-| | Mensal | Anual |
-|---|---|---|
-| Plano | "mensal" | "anual" |
-| Preço | R$ 12,90 | R$ 97,90 |
-| Expiração | +1 mês | +1 ano |
-| FB Pixel valor | 12.90 | 97.90 |
-
-### Como identificar o plano
-
-A Cakto envia no payload dados do produto/oferta. O webhook vai verificar campos como `product_id`, `offer_id`, `product_name`, ou `price` para determinar se é mensal ou anual. A lógica será:
-
-1. Se o preço for <= 15 ou o nome do produto contiver "mensal" → plano mensal
-2. Caso contrário → plano anual (comportamento atual preservado)
+- A tabela `plans` tem um plano "mensal" (ID: `49a734d8-af86-4a0b-accf-755d947cc1d8`) mas com preço R$ 19,90 (deveria ser R$ 12,90)
+- O painel Super Admin só mostra "Anual" ou "Free" nos selects e na tabela de usuários
+- O cliente Luiz Carlos comprou mensal mas foi registrado como anual
 
 ### Alterações
 
-**`supabase/functions/cakto-webhook/index.ts`**:
+1. **Atualizar preço do plano mensal** na tabela `plans`: de R$ 19,90 para R$ 12,90
 
-1. Adicionar função `detectPlanType()` que analisa o payload e retorna `"mensal"` ou `"anual"`
-2. No bloco de `purchase_approved`:
-   - Usar o plano detectado para buscar/criar o plano correto na tabela `plans`
-   - Ajustar preço (12.90 vs 97.90)
-   - Ajustar expiração (1 mês vs 1 ano)
-   - Ajustar valor do evento Facebook
-3. No email de renovação, mostrar o plano correto
-4. Nos eventos de abandono, usar o plano detectado
+2. **Corrigir assinatura do Luiz Carlos** (`luis.1948caca@gmail.com`): trocar para o plano mensal com expiração de 1 mês
+
+3. **`src/components/superadmin/UsersManagement.tsx`** — 4 pontos de alteração:
+
+   - **Select "Adicionar Usuário"** (linha ~496): adicionar opção "Mensal R$ 12,90" com o UUID do plano mensal
+   
+   - **Badge da coluna Plano na tabela** (linha ~574): atualizar lógica para mostrar "Anual", "Mensal" ou "Free" (atualmente só compara `planPrice === 97.9`)
+   
+   - **CSV export** (linha ~362): atualizar label do plano para incluir "Mensal R$ 12,90"
 
 ### Detalhes Técnicos
 
-- A detecção é feita por múltiplos campos do payload para máxima compatibilidade
-- O plano mensal terá `expires_at` calculado com `setMonth(getMonth() + 1)`
-- O email de boas-vindas permanece igual (já é genérico)
-- O email de renovação será atualizado para mostrar o plano/preço correto
+- UUID do plano mensal: `49a734d8-af86-4a0b-accf-755d947cc1d8`
+- UUID do plano anual: `08033a83-5a65-4248-ae25-89e8bc35fe04`
+- UUID do plano free: `7ce2d64b-e97a-429e-9448-3af009895d70`
+- O select de "Editar Usuário" já usa dados dinâmicos da tabela `plans` (linhas 718-722), então não precisa de alteração
+- A lógica do badge será: preço >= 90 → "Anual", preço > 0 → "Mensal", senão → "Free"
 
