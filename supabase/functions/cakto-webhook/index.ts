@@ -257,7 +257,7 @@ async function sendRenewalEmail(email: string, nome: string, expiresAt: string, 
       <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #15a249;">
         <h2 style="color: #333; margin-bottom: 15px; font-size: 18px;">📋 DETALHES DA RENOVAÇÃO:</h2>
         <p style="font-size: 16px; margin: 10px 0; color: #333;">
-          <strong>Plano:</strong> Anual (R$ 97,90)
+          <strong>Plano:</strong> ${planLabel}
         </p>
         <p style="font-size: 16px; margin: 10px 0; color: #333;">
           <strong>Válido até:</strong> ${expirationDate}
