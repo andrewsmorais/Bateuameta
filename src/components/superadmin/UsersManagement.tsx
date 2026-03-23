@@ -664,6 +664,9 @@ export const UsersManagement = () => {
                           </a>
                         ) : "-"}
                       </TableCell>
+                      <TableCell className="text-sm">
+                        {user.started_at ? format(new Date(user.started_at), "dd/MM/yyyy") : "-"}
+                      </TableCell>
                       <TableCell>{user.cpf || "-"}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={user.planPrice > 0 ? "bg-[hsl(142,76%,36%)]/10 text-[hsl(142,76%,36%)] border-[hsl(142,76%,36%)]/30" : ""}>
