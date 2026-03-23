@@ -627,6 +627,7 @@ export const UsersManagement = () => {
                   <TableHead>Nome</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
+                  <TableHead>Data do Plano</TableHead>
                   <TableHead>CPF</TableHead>
                   <TableHead>Plano</TableHead>
                   <TableHead>Dias Restantes</TableHead>
