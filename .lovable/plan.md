@@ -1,52 +1,28 @@
 
 
-## Análise do Brevo — Resultado
+## Adicionar filtros avançados ao Gerenciamento de Usuários
 
-### O que está configurado corretamente
+### O que será feito
 
-1. **BREVO_API_KEY** — O secret existe no Supabase
-2. **Código de envio** — O `cakto-webhook` chama `https://api.brevo.com/v3/smtp/email` corretamente com:
-   - Sender: `suporte@bateuameta.com` (nome "Bateu A Meta")
-   - Headers corretos (`api-key`, `Content-Type`, `Accept`)
-   - Template HTML completo com link de cadastro
-3. **Email de boas-vindas** — Envia para novos compradores com link para `/pagamento-sucesso?session_id=...`
-4. **Email de renovação** — Envia para clientes existentes que renovam
+Adicionar uma barra de filtros abaixo da busca existente com:
 
-### O que NÃO é possível verificar daqui
+1. **Filtro por Data de Cadastro** — Campos "De" e "Até" para filtrar por `created_at`
+2. **Filtro por Plano** — Select com opções: Todos, Free, Mensal, Anual
+3. **Ordenação** — Select com opções: Mais recente, Mais antigo, Nome A-Z, Nome Z-A
 
-1. **Se a API key do Brevo é válida e ativa** — Não há como testar sem enviar um email real. Você precisa verificar no painel do Brevo:
-   - Acesse [https://app.brevo.com](https://app.brevo.com)
-   - Vá em **Transactional → Logs** para ver os emails enviados recentemente
-   - Verifique se aparecem envios para os compradores recentes (Carlos Roberto, Eusder, Luiz Carlos)
+### Detalhes técnicos
 
-2. **Domínio verificado** — O sender é `suporte@bateuameta.com`. No Brevo, o domínio `bateuameta.com` precisa estar verificado. Verifique em:
-   - **Settings → Senders, Domains & Dedicated IPs → Domains**
-   - O domínio deve mostrar SPF, DKIM e DMARC como verificados (verde)
+**Arquivo modificado:** `src/components/superadmin/UsersManagement.tsx`
 
-3. **Limite de envio** — Contas gratuitas do Brevo têm limite de 300 emails/dia. Verifique se não atingiu o limite
+- Adicionar states: `planFilter`, `sortOrder`, `dateFrom`, `dateTo`
+- O `UserData` já possui `created_at` (vindo do edge function `get-admin-users`) — será adicionado à interface se necessário
+- A lógica de `filteredUsers` (linha 298) será expandida para aplicar os filtros de plano e data, e depois ordenar conforme selecionado
+- Os filtros ficarão em uma row flexbox abaixo do campo de busca existente, usando os componentes `Select` e `Input type="date"` já existentes no projeto
+- O edge function `get-admin-users` já retorna `created_at` nos dados do usuário
 
-### Dados encontrados
-
-- **3 clientes criados recentemente** (19-21 Mar), todos com plano mensal ativo
-- **`pending_registrations` está vazia** — Isso é esperado se esses clientes já completaram o cadastro (os registros são consumidos pelo `complete-registration`)
-- **Nenhum log recente do cakto-webhook** — Os logs podem ter expirado, ou o webhook não recebeu chamadas recentes
-
-### Checklist para validar no Brevo
-
-| Item | Onde verificar |
-|------|---------------|
-| API Key ativa | Brevo → Settings → API Keys |
-| Domínio `bateuameta.com` verificado | Brevo → Settings → Domains |
-| Emails recentes enviados | Brevo → Transactional → Logs |
-| Limite diário não atingido | Brevo → Dashboard → Usage |
-| Sender `suporte@bateuameta.com` autorizado | Brevo → Settings → Senders |
-
-### Conclusão
-
-O código está correto e integrado. Para confirmar que o Brevo está funcionando, é necessário verificar no painel do Brevo se:
-- Os emails estão aparecendo nos logs de transacional
-- O domínio está verificado
-- O sender está autorizado
-
-Se quiser, posso fazer um teste real enviando um email de teste via a Edge Function `resend-welcome-email` para um email seu, e assim confirmar se o Brevo responde corretamente.
+**Layout dos filtros:**
+```text
+[🔍 Buscar por nome, email...              ]
+[Plano: Todos ▼] [Ordenar: Mais recente ▼] [De: __/__/____] [Até: __/__/____]
+```
 
