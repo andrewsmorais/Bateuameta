@@ -299,12 +299,42 @@ export const UsersManagement = () => {
     },
   });
 
-  const filteredUsers = users?.filter((user: UserData) =>
-    user.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.cpf?.includes(searchTerm) ||
-    user.telefone?.includes(searchTerm) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users
+    ?.filter((user: UserData) =>
+      user.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.cpf?.includes(searchTerm) ||
+      user.telefone?.includes(searchTerm) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    ?.filter((user: UserData) => {
+      if (planFilter === "all") return true;
+      if (planFilter === "free") return user.planPrice === 0;
+      if (planFilter === "mensal") return user.planPrice > 0 && user.planPrice < 90;
+      if (planFilter === "anual") return user.planPrice >= 90;
+      return true;
+    })
+    ?.filter((user: UserData) => {
+      if (!dateFrom && !dateTo) return true;
+      const created = (user as any).created_at ? new Date((user as any).created_at) : null;
+      if (!created) return true;
+      if (dateFrom && created < new Date(dateFrom)) return false;
+      if (dateTo && created > new Date(dateTo + "T23:59:59")) return false;
+      return true;
+    })
+    ?.sort((a: UserData, b: UserData) => {
+      switch (sortOrder) {
+        case "newest":
+          return new Date((b as any).created_at || 0).getTime() - new Date((a as any).created_at || 0).getTime();
+        case "oldest":
+          return new Date((a as any).created_at || 0).getTime() - new Date((b as any).created_at || 0).getTime();
+        case "name_az":
+          return (a.nome_completo || "").localeCompare(b.nome_completo || "");
+        case "name_za":
+          return (b.nome_completo || "").localeCompare(a.nome_completo || "");
+        default:
+          return 0;
+      }
+    });
 
   const handleEditClick = (user: UserData) => {
     setSelectedUser(user);
