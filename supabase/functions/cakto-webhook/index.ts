@@ -594,6 +594,65 @@ serve(async (req) => {
       await sendFacebookConversionEvent("Purchase", email, plan.price, "BRL");
       await finalizeCheckoutArtifacts(email);
       console.log("[Cakto Webhook] Completed approved purchase for:", email);
+    } else if (event === "subscription_created" || event === "subscription.created" || event === "SUBSCRIPTION_CREATED") {
+      const planType = detectPlanType(data);
+      const plan = PLAN_CONFIG[planType];
+      const sessionId = extractSessionId(data);
+      console.log("[Cakto Webhook] Processing subscription created for:", email, "Plan:", planType, "Session:", sessionId);
+
+      const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+      const user = existingUsers?.users?.find((u) => u.email === email);
+
+      if (!user) {
+        const registrationLink = buildRegistrationLink(sessionId);
+        await createOrUpdatePendingRegistration(email, planType, sessionId);
+        await sendWelcomeEmail(email, nome, registrationLink, plan.label);
+        console.log("[Cakto Webhook] Pending registration created (subscription_created) for:", email);
+      } else {
+        console.log("[Cakto Webhook] User already exists (subscription_created):", user.id);
+
+        const { error: profileError } = await supabaseAdmin
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            nome_completo: nome,
+            telefone: phone || null,
+            status: "active",
+            updated_at: new Date().toISOString(),
+          }, { onConflict: "id" });
+
+        if (profileError) {
+          console.error("[Cakto Webhook] Profile error:", profileError);
+        }
+
+        const planId = await resolvePlanId(planType);
+        const subscription = await createOrUpdateSubscription(user.id, planId, planType);
+
+        await supabaseAdmin
+          .from("profiles")
+          .update({ subscription_id: subscription.id })
+          .eq("id", user.id);
+
+        const { error: roleError } = await supabaseAdmin
+          .from("user_roles")
+          .upsert({ user_id: user.id, role: "premium" }, { onConflict: "user_id,role" });
+
+        if (roleError) {
+          console.error("[Cakto Webhook] Role error:", roleError);
+        }
+
+        await supabaseAdmin
+          .from("pending_registrations")
+          .update({ status: "completed", completed_at: new Date().toISOString() })
+          .eq("email", email)
+          .eq("status", "pending");
+
+        await sendRenewalEmail(email, nome, subscription.expiresAt, plan.label);
+      }
+
+      await sendFacebookConversionEvent("Purchase", email, plan.price, "BRL");
+      await finalizeCheckoutArtifacts(email);
+      console.log("[Cakto Webhook] Completed subscription_created for:", email);
     } else if (event === "subscription_renewed" || event === "subscription.renewed" || event === "SUBSCRIPTION_RENEWED") {
       const planType = detectPlanType(data);
       const plan = PLAN_CONFIG[planType];
