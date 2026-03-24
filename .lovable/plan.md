@@ -1,37 +1,33 @@
 
 
-## Atualizar preço mensal de R$ 12,90 para R$ 19,90 e economia anual de R$ 49,10 para R$ 56,90
+## Unificar e-mail de boas-vindas com credenciais
 
-### Arquivos a modificar
+### Problema atual
 
-**1. `src/pages/Planos.tsx`**
-- Linha 96: `R$ 12,90` → `R$ 19,90`
-- Linha 144: `R$ 49,10` → `R$ 56,90`
+Existem dois e-mails diferentes sendo enviados:
+1. **`process-sale-webhook`** — e-mail genérico com layout simples e URL errada (`appdriver-track.lovable.app`)
+2. **`resend-welcome-email`** — e-mail profissional com mensagem do Andrews, YouTube, WhatsApp, etc.
 
-**2. `src/pages/LandingPage.tsx`**
-- Linha 240: `12.90` → `19.90` (Facebook Pixel)
-- Linha 428: `R$ 12,90` → `R$ 19,90`
-- Linha 502: `R$ 49,10` → `R$ 56,90`
-- Linha 897: `R$ 12,90` → `R$ 19,90`
-- Linha 971: `R$ 49,10` → `R$ 56,90`
+O usuário quer que exista **apenas um e-mail**, usando o template profissional do `resend-welcome-email` com senha de 6 digitos.
 
-**3. `public/checkout-email.html`**
-- Linha 172: `R$ 12,90/mês` → `R$ 19,90/mês`
-- Linha 229: `R$ 12,90/mês` → `R$ 19,90/mês`
+### O que sera feito
 
-**4. `src/components/superadmin/UsersManagement.tsx`**
-- Linha 397: `Mensal R$ 12,90` → `Mensal R$ 19,90`
-- Linha 532: `Mensal R$ 12,90` → `Mensal R$ 19,90`
+**Arquivo: `supabase/functions/process-sale-webhook/index.ts`**
 
-**5. `src/components/superadmin/StatsCards.tsx`**
-- Linha 90: `12.90` → `19.90`
-- Linha 184: `R$ 12,90/mês` → `R$ 19,90/mês`
+1. Substituir todo o HTML do e-mail (linhas 34-98) pelo template profissional do `resend-welcome-email`, que inclui:
+   - Header verde com "🚗 Bateu A Meta"
+   - Mensagem pessoal do Andrews Morais
+   - Caixa de credenciais (email + senha de 6 digitos)
+   - Link para video manual no YouTube
+   - Botao "ENTRAR NO APLICATIVO AGORA" apontando para `bateuameta.com/auth`
+   - Links uteis (site, WhatsApp, Instagram)
+   - Assinatura "Tamo junto no trecho! 🚗"
 
-**6. `supabase/functions/cakto-webhook/index.ts`**
-- Linha 22: `price: 12.9` → `price: 19.9`, label `R$ 12,90` → `R$ 19,90`
+2. Atualizar o assunto do e-mail para: `"Bem-vindo ao Bateu a Meta, [nome]! 🎉 Seus dados de acesso estão aqui"`
 
-**7. `supabase/functions/complete-registration/index.ts`**
-- Linha 140: `12.90` → `19.90`
+**Arquivo: `supabase/functions/resend-welcome-email/index.ts`**
 
-**Nota:** Os e-mails de boas-vindas do Brevo (resend-welcome-email e process-sale-webhook) não contêm o preço R$ 12,90, então não precisam de alteração.
+3. Alterar a geração de senha de `crypto.randomUUID().slice(0, 12)` para senha numérica de 6 digitos (mesmo padrão do `process-sale-webhook`), e salvar no campo `provisional_password` do perfil
+
+Ambas as Edge Functions serao reimplantadas apos as alterações.
 
