@@ -179,7 +179,7 @@ serve(async (req) => {
     const name = profile?.nome_completo || "Motorista";
 
     // Generate a new temporary password
-    const tempPassword = crypto.randomUUID().slice(0, 12);
+    const tempPassword = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Update user password
     const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
