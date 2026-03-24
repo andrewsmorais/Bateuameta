@@ -21,6 +21,97 @@ async function sendWelcomeEmail(email: string, name: string, password: string): 
   }
 
   try {
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Bem-vindo ao Bateu A Meta!</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f5f5f5;">
+        <!-- Header Verde -->
+        <div style="background: linear-gradient(135deg, #15a249 0%, #0d7a35 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">🚗 Bateu A Meta</h1>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div style="background: #ffffff; padding: 30px;">
+          <!-- Saudação -->
+          <h2 style="color: #333; margin-top: 0; font-size: 24px;">Olá, ${name}! 🎉</h2>
+          
+          <!-- Mensagem do Andrews -->
+          <p style="font-size: 16px; color: #333; line-height: 1.8;">
+            Aqui é o <strong>Andrews Morais</strong>. Fico feliz em ter você conosco! A partir de agora, você não vai mais "bater lata" sem saber o seu lucro. Você tem em mãos a ferramenta certa para dominar suas finanças e bater suas metas com inteligência.
+          </p>
+          
+          <!-- Box de Dados de Acesso -->
+          <div style="background: #ffffff; padding: 25px; border-radius: 10px; margin: 25px 0; border-left: 4px solid #15a249; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px;">🔑 SEUS DADOS DE ACESSO:</h3>
+            <p style="font-size: 16px; margin: 8px 0; color: #333;">
+              <strong>Usuário:</strong> ${email}
+            </p>
+            <p style="font-size: 16px; margin: 8px 0; color: #333;">
+              <strong>Senha:</strong> ${password}
+            </p>
+            <p style="font-size: 14px; color: #666; margin: 15px 0 0 0; font-style: italic;">
+              (Dica: Guarde este e-mail ou tire um print para consultas futuras)
+            </p>
+          </div>
+          
+          <!-- Seção Manual do App -->
+          <div style="margin: 25px 0;">
+            <h3 style="color: #333; margin: 0 0 10px 0; font-size: 18px;">📺 PASSO A PASSO (MANUAL DO APP):</h3>
+            <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+              Antes de começar, assista ao vídeo rápido que preparei explicando como funciona cada detalhe do aplicativo:
+            </p>
+            <div style="text-align: center;">
+              <a href="https://www.youtube.com/watch?v=8mqtvi0tvsU" style="display: inline-block; background-color: #FF0000; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold;">
+                ▶️ Assistir ao Manual no YouTube
+              </a>
+            </div>
+          </div>
+          
+          <!-- Botão Principal -->
+          <div style="margin: 30px 0;">
+            <h3 style="color: #333; margin: 0 0 10px 0; font-size: 18px;">🚀 COMECE AGORA:</h3>
+            <p style="font-size: 16px; color: #333; margin: 0 0 15px 0;">
+              Clique no botão abaixo para acessar a área de login e cadastrar seu primeiro turno:
+            </p>
+            <div style="text-align: center;">
+              <a href="https://bateuameta.com/auth?payment_success=true" style="display: inline-block; background-color: #25D366; color: white; padding: 18px 40px; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;">
+                👉 ENTRAR NO APLICATIVO AGORA
+              </a>
+            </div>
+          </div>
+          
+          <!-- Links Úteis -->
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 25px 0;">
+            <h3 style="color: #333; margin: 0 0 15px 0; font-size: 16px;">📌 LINKS ÚTEIS:</h3>
+            <p style="font-size: 15px; margin: 8px 0; color: #333;">
+              • Nosso Site: <a href="https://bateuameta.com" style="color: #15a249; text-decoration: none;">bateuameta.com</a>
+            </p>
+            <p style="font-size: 15px; margin: 8px 0; color: #333;">
+              • Dúvidas ou Suporte: <a href="https://wa.me/5512981796135" style="color: #25D366; text-decoration: none;">Chamar no WhatsApp</a>
+            </p>
+            <p style="font-size: 15px; margin: 8px 0; color: #333;">
+              • Instagram: <a href="https://www.instagram.com/bateu_meta/" style="color: #E1306C; text-decoration: none;">@bateu_meta</a>
+            </p>
+          </div>
+          
+          <!-- Assinatura -->
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="font-size: 16px; color: #333; margin: 0; font-weight: bold;">
+              Tamo junto no trecho! 🚗
+            </p>
+            <p style="font-size: 16px; color: #666; margin: 5px 0 0 0;">
+              Andrews Morais & Equipe Bateu a Meta
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -30,72 +121,8 @@ async function sendWelcomeEmail(email: string, name: string, password: string): 
       body: JSON.stringify({
         sender: { name: "Bateu A Meta", email: "suporte@bateuameta.com" },
         to: [{ email: email, name: name || "Usuário" }],
-        subject: "Bem-vindo ao Bateu A Meta! 🎉",
-        htmlContent: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-              .credentials-box { background: #fff; border: 2px solid #10b981; padding: 20px; margin: 20px 0; border-radius: 8px; }
-              .password { font-size: 28px; font-weight: bold; color: #10b981; letter-spacing: 6px; text-align: center; margin: 10px 0; }
-              .button { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
-              .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
-              .feature { display: flex; align-items: center; margin: 10px 0; }
-              .feature-icon { margin-right: 10px; color: #10b981; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>🚗 Bem-vindo ao Bateu A Meta!</h1>
-                <p>Sua conta foi criada com sucesso</p>
-              </div>
-              <div class="content">
-                <h2>Olá, ${name || "Motorista"}!</h2>
-                <p>Parabéns! Sua conta no Bateu A Meta foi criada. Agora você pode começar a controlar seus ganhos e alcançar suas metas!</p>
-                
-                <div class="credentials-box">
-                  <p style="margin: 0 0 10px 0;"><strong>📧 Seu email:</strong> ${email}</p>
-                  <p style="margin: 0;"><strong>🔐 Sua senha:</strong></p>
-                  <p class="password">${password}</p>
-                </div>
-                
-                <h3>O que você pode fazer:</h3>
-                <div class="feature">
-                  <span class="feature-icon">✅</span>
-                  <span>Registrar seus turnos e ganhos diários</span>
-                </div>
-                <div class="feature">
-                  <span class="feature-icon">✅</span>
-                  <span>Definir metas diárias, semanais e mensais</span>
-                </div>
-                <div class="feature">
-                  <span class="feature-icon">✅</span>
-                  <span>Acompanhar relatórios detalhados</span>
-                </div>
-                <div class="feature">
-                  <span class="feature-icon">✅</span>
-                  <span>Controlar despesas com combustível e manutenção</span>
-                </div>
-                
-                <center>
-                  <a href="https://appdriver-track.lovable.app/auth" class="button">Acessar Minha Conta</a>
-                </center>
-                
-                <div class="footer">
-                  <p>Dúvidas? Responda este e-mail ou entre em contato pelo suporte.</p>
-                  <p>© ${new Date().getFullYear()} Bateu A Meta - Todos os direitos reservados</p>
-                </div>
-              </div>
-            </div>
-          </body>
-          </html>
-        `,
+        subject: "Bem-vindo ao Bateu a Meta, " + (name || "Motorista") + "! 🎉 Seus dados de acesso estão aqui",
+        htmlContent: emailHtml,
       }),
     });
 

@@ -179,7 +179,7 @@ serve(async (req) => {
     const name = profile?.nome_completo || "Motorista";
 
     // Generate a new temporary password
-    const tempPassword = crypto.randomUUID().slice(0, 12);
+    const tempPassword = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Update user password
     const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
@@ -191,7 +191,11 @@ serve(async (req) => {
       throw new Error("Failed to update password");
     }
 
-    // Send welcome email
+    // Save provisional password to profile
+    await supabase
+      .from("profiles")
+      .update({ provisional_password: tempPassword })
+      .eq("id", user.id);
     await sendWelcomeEmail(email, name, tempPassword);
 
     return new Response(
