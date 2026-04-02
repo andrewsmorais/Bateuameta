@@ -241,7 +241,7 @@ const KM = () => {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <h2 className="text-xl font-bold text-foreground">
               Histórico de Turnos {filtroData ? `(${format(filtroData, "dd/MM/yyyy", { locale: ptBR })})` : ""}
             </h2>
