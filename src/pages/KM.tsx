@@ -254,8 +254,6 @@ const KM = () => {
                   <div className="flex justify-between items-start">
                     <div className="flex flex-wrap items-center gap-3">
                       <CardTitle className="text-lg">Métricas do Turno</CardTitle>
-                      <span className="text-sm text-muted-foreground">{format(parseISO(turno.data), "dd/MM/yyyy", { locale: ptBR })}</span>
-                      <span className="text-sm text-muted-foreground">Horário: {turno.hora_inicio} - {turno.hora_fim}</span>
                     </div>
                     <div className="flex gap-2">
                       <Button 
