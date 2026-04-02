@@ -1,19 +1,27 @@
 
 
-## Adicionar Shopee/Mercado Livre e trocar label para "Quantidade de Entregas"
+## Reorganizar Fontes de Ganho dentro de Métricas do Turno
 
 ### O que sera feito
 
-**Arquivos: `AddTurnoDialog.tsx` e `EditTurnoDialog.tsx`**
+No arquivo `src/pages/KM.tsx`:
 
-1. Adicionar "Shopee" e "Mercado Livre" na lista `fontesGanho` (antes de "Outros")
+1. **Remover a seção separada "Fontes de Ganho"** (linhas 300-320)
 
-2. Trocar dinamicamente o label "Quantidade de Corridas" para "Quantidade de Entregas" quando a fonte selecionada for: `ifood`, `keeta`, `shopee` ou `mercado_livre`
+2. **Dentro de "Métricas do Turno"**, logo após o título h4, adicionar as fontes de ganho com o veículo ao lado — sem bordas/linhas separadoras, sem o valor R$
 
-### Detalhes tecnicos
+3. **Remover o `border-t border-border`** da div de métricas para não ter linha separando das fontes
 
-- Novas entradas: `{ value: "shopee", label: "Shopee" }` e `{ value: "mercado_livre", label: "Mercado Livre" }`
-- Criar constante `fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"]`
-- No label do campo quantidade, usar: `fontesEntrega.includes(fonte.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas"`
-- Aplicar a mesma logica nos dois dialogs (Add e Edit)
+### Layout
+
+Para cada fonte: `Fonte: Uber  19 corridas   Veículo: Palio (FFF-3C96)` — tudo na mesma linha, sem pipes `|`, sem bordas, sem valor monetário
+
+### Detalhes técnicos
+
+- Remover bloco linhas 300-320 (seção "Fontes de Ganho" separada)
+- Na div de "Métricas do Turno" (linha 323), remover `border-t border-border` e `pt-4`
+- Após o h4 "Métricas do Turno", inserir bloco com cada fonte mostrando:
+  - `Fonte: {nome}` + `{quantidade} corridas/entregas` (usando lógica fontesEntrega) + `Veículo: {modelo} ({placa})`
+- Layout flex-row com gap, sem border-l, sem separadores visuais
+- Manter o grid de métricas (KM Rodados, etc.) logo abaixo
 
