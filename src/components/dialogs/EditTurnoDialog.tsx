@@ -31,8 +31,12 @@ const fontesGanho = [
   { value: "indriver", label: "Indriver" },
   { value: "lalamove", label: "Lalamove" },
   { value: "blabacar", label: "Blabacar" },
+  { value: "shopee", label: "Shopee" },
+  { value: "mercado_livre", label: "Mercado Livre" },
   { value: "outros", label: "Outros" },
 ];
+
+const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
 
 const tiposCombustivel = [
   { value: "gasolina", label: "Gasolina" },
@@ -454,7 +458,7 @@ export const EditTurnoDialog = ({ turno, open, onOpenChange, onSuccess }: EditTu
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor={`quantidade_corridas_${index}`}>Quantidade de Corridas</Label>
+                    <Label htmlFor={`quantidade_corridas_${index}`}>{fontesEntrega.includes(fonte.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas"}</Label>
                     <Input
                       id={`quantidade_corridas_${index}`}
                       type="number"
