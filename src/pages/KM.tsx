@@ -252,13 +252,9 @@ const KM = () => {
               <Card key={turno.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">
-                        {format(parseISO(turno.data), "dd/MM/yyyy", { locale: ptBR })} - {turno.veiculos.modelo} ({turno.veiculos.placa})
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Horário: {turno.hora_inicio} - {turno.hora_fim}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <CardTitle className="text-lg">Métricas do Turno</CardTitle>
+                      <span className="text-sm text-muted-foreground">Horário: {turno.hora_inicio} - {turno.hora_fim}</span>
                     </div>
                     <div className="flex gap-2">
                       <Button 
@@ -297,9 +293,7 @@ const KM = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Métricas do Turno */}
                   <div>
-                    <h4 className="text-sm font-bold text-foreground mb-3">Métricas do Turno</h4>
                     
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {/* Fonte, Quantidade, Veículo - primeira linha */}
