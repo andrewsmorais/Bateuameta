@@ -320,10 +320,10 @@ const KM = () => {
                           const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
                           const labelQtd = fontesEntrega.includes(turno.fonte_ganho) ? "entregas" : "corridas";
                           return (
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                              <span className="text-sm font-bold text-primary capitalize">Fonte: {turno.fonte_ganho}</span>
-                              <span className="text-sm font-bold text-muted-foreground">{turno.quantidade_corridas} {labelQtd}</span>
-                              <span className="text-sm font-bold text-foreground">Veículo: {turno.veiculos.modelo} ({turno.veiculos.placa})</span>
+                            <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+                              <span className="text-base font-bold text-[#15a249] capitalize">Fonte: {turno.fonte_ganho}</span>
+                              <span className="text-base font-bold text-[#15a249]">{turno.quantidade_corridas} {labelQtd}</span>
+                              <span className="text-base font-bold text-foreground">Veículo: {turno.veiculos.modelo} ({turno.veiculos.placa})</span>
                             </div>
                           );
                         })()
