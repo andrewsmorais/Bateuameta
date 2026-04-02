@@ -297,31 +297,39 @@ const KM = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Fontes de Ganho */}
+                  {/* Métricas do Turno */}
                   <div>
-                    <p className="text-sm font-bold text-foreground mb-2">Fontes de Ganho</p>
-                    <div className="space-y-2">
+                    <h4 className="text-sm font-bold text-foreground mb-3">Métricas do Turno</h4>
+                    
+                    {/* Fontes de Ganho + Veículo */}
+                    <div className="space-y-1 mb-4">
                       {turno.turno_fontes_ganho && turno.turno_fontes_ganho.length > 0 ? (
-                        turno.turno_fontes_ganho.map((fonte) => (
-                          <div key={fonte.id} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-1 border-l-2 border-primary/30 pl-3">
-                            <span className="text-lg font-bold text-primary capitalize">{fonte.fonte_ganho}</span>
-                            <span className="text-lg font-bold text-muted-foreground">{fonte.quantidade_corridas} corridas</span>
-                            <span className="text-lg font-bold text-[#15a249]">R$ {fonte.valor_ganho.toFixed(2)}</span>
-                          </div>
-                        ))
+                        turno.turno_fontes_ganho.map((fonte) => {
+                          const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
+                          const labelQtd = fontesEntrega.includes(fonte.fonte_ganho) ? "entregas" : "corridas";
+                          return (
+                            <div key={fonte.id} className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                              <span className="text-sm font-bold text-primary capitalize">Fonte: {fonte.fonte_ganho}</span>
+                              <span className="text-sm font-bold text-muted-foreground">{fonte.quantidade_corridas} {labelQtd}</span>
+                              <span className="text-sm font-bold text-foreground">Veículo: {turno.veiculos.modelo} ({turno.veiculos.placa})</span>
+                            </div>
+                          );
+                        })
                       ) : (
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-1 border-l-2 border-primary/30 pl-3">
-                          <span className="text-lg font-bold text-primary capitalize">{turno.fonte_ganho}</span>
-                          <span className="text-lg font-bold text-muted-foreground">{turno.quantidade_corridas} corridas</span>
-                          <span className="text-lg font-bold text-[#15a249]">R$ {turno.valor_ganho.toFixed(2)}</span>
-                        </div>
+                        (() => {
+                          const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
+                          const labelQtd = fontesEntrega.includes(turno.fonte_ganho) ? "entregas" : "corridas";
+                          return (
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                              <span className="text-sm font-bold text-primary capitalize">Fonte: {turno.fonte_ganho}</span>
+                              <span className="text-sm font-bold text-muted-foreground">{turno.quantidade_corridas} {labelQtd}</span>
+                              <span className="text-sm font-bold text-foreground">Veículo: {turno.veiculos.modelo} ({turno.veiculos.placa})</span>
+                            </div>
+                          );
+                        })()
                       )}
                     </div>
-                  </div>
 
-                  {/* Métricas do Turno */}
-                  <div className="pt-4 border-t border-border">
-                    <h4 className="text-sm font-bold text-foreground mb-4">Métricas do Turno</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
                         <p className="text-xs font-medium text-muted-foreground">KM Rodados</p>
