@@ -301,36 +301,53 @@ const KM = () => {
                   <div>
                     <h4 className="text-sm font-bold text-foreground mb-3">Métricas do Turno</h4>
                     
-                    {/* Fontes de Ganho + Veículo */}
-                    <div className="space-y-1 mb-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {/* Fonte, Quantidade, Veículo - primeira linha */}
                       {turno.turno_fontes_ganho && turno.turno_fontes_ganho.length > 0 ? (
                         turno.turno_fontes_ganho.map((fonte) => {
                           const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
-                          const labelQtd = fontesEntrega.includes(fonte.fonte_ganho) ? "entregas" : "corridas";
+                          const labelQtd = fontesEntrega.includes(fonte.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas";
                           return (
-                            <div key={fonte.id} className="flex flex-wrap items-center gap-x-6 gap-y-1">
-                              <span className="text-base font-bold text-[#15a249] capitalize">Fonte: {fonte.fonte_ganho}</span>
-                              <span className="text-base font-bold text-[#15a249]">{fonte.quantidade_corridas} {labelQtd}</span>
-                              <span className="text-base font-bold text-foreground">Veículo: {turno.veiculos.modelo} ({turno.veiculos.placa})</span>
-                            </div>
+                            <React.Fragment key={fonte.id}>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">Fonte</p>
+                                <p className="text-lg font-bold text-[#15a249] capitalize">{fonte.fonte_ganho}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">{labelQtd}</p>
+                                <p className="text-lg font-bold text-[#15a249]">{fonte.quantidade_corridas} {fontesEntrega.includes(fonte.fonte_ganho) ? "entregas" : "corridas"}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">Veículo</p>
+                                <p className="text-lg font-bold text-[#15a249]">{turno.veiculos.modelo} ({turno.veiculos.placa})</p>
+                              </div>
+                            </React.Fragment>
                           );
                         })
                       ) : (
                         (() => {
                           const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
-                          const labelQtd = fontesEntrega.includes(turno.fonte_ganho) ? "entregas" : "corridas";
+                          const labelQtd = fontesEntrega.includes(turno.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas";
                           return (
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-                              <span className="text-base font-bold text-[#15a249] capitalize">Fonte: {turno.fonte_ganho}</span>
-                              <span className="text-base font-bold text-[#15a249]">{turno.quantidade_corridas} {labelQtd}</span>
-                              <span className="text-base font-bold text-foreground">Veículo: {turno.veiculos.modelo} ({turno.veiculos.placa})</span>
-                            </div>
+                            <>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">Fonte</p>
+                                <p className="text-lg font-bold text-[#15a249] capitalize">{turno.fonte_ganho}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">{labelQtd}</p>
+                                <p className="text-lg font-bold text-[#15a249]">{turno.quantidade_corridas} {fontesEntrega.includes(turno.fonte_ganho) ? "entregas" : "corridas"}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">Veículo</p>
+                                <p className="text-lg font-bold text-[#15a249]">{turno.veiculos.modelo} ({turno.veiculos.placa})</p>
+                              </div>
+                            </>
                           );
                         })()
                       )}
-                    </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {/* Métricas restantes */}
                       <div>
                         <p className="text-xs font-medium text-muted-foreground">KM Rodados</p>
                         <p className="text-lg font-bold text-[#15a249]">{metricas.kmRodados.toFixed(2)} km</p>
