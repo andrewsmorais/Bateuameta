@@ -372,7 +372,7 @@ const LandingPage = () => {
               >
                 {/* Thumbnail do YouTube */}
                 <img
-                  src="https://img.youtube.com/vi/8n4ex3L5G8E/maxresdefault.jpg"
+                  src="https://img.youtube.com/vi/OZ4nlZDXYUE/maxresdefault.jpg"
                   alt="Assistir vídeo - Bateu a Meta"
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
