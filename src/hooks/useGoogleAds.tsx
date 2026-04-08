@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-const GOOGLE_ADS_ID = 'AW-17945487409';
-const CONVERSION_LABEL = 'yx-VCLrj_P4bELHQie1C';
+const GOOGLE_ADS_ID = 'AW-18059469688';
+const CONVERSION_LABEL = 'WFR5CNOgl5gcEPjGtqND';
 
 declare global {
   interface Window {
@@ -41,6 +41,8 @@ export const useGoogleAds = () => {
       if (window.gtag) {
         window.gtag('event', 'conversion', {
           send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}`,
+          value: 0.0,
+          currency: 'BRL',
           transaction_id: transactionId || '',
         });
         console.log('[Google Ads] Evento: Conversion -', transactionId);
