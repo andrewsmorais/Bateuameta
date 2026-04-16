@@ -503,17 +503,7 @@ serve(async (req) => {
       });
     }
 
-    if (CAKTO_WEBHOOK_SECRET) {
-      const receivedSecret = data.secret;
-      if (!receivedSecret || receivedSecret !== CAKTO_WEBHOOK_SECRET) {
-        console.error("[Cakto Webhook] Secret inválido ou ausente");
-        return new Response(
-          JSON.stringify({ error: "Unauthorized" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      console.log("[Cakto Webhook] Secret verificado com sucesso");
-    }
+    // Secret verification removed - Cakto does not support custom fields in payload
 
     console.log("[Cakto Webhook] Evento recebido:", data.event);
 
