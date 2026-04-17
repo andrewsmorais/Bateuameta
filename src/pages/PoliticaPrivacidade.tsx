@@ -11,7 +11,7 @@ const PoliticaPrivacidade = () => {
         </Link>
 
         <h1 className="text-3xl font-bold mb-8">Política de Privacidade</h1>
-        <p className="text-muted-foreground mb-6">Última atualização: Março de 2026</p>
+        <p className="text-muted-foreground mb-6">Última atualização: Abril de 2026</p>
 
         <div className="space-y-8 text-muted-foreground leading-relaxed">
           <section>
@@ -87,7 +87,14 @@ const PoliticaPrivacidade = () => {
               Não vendemos, alugamos ou compartilhamos seus dados pessoais com terceiros, exceto:
             </p>
             <ul className="list-disc pl-6 space-y-1 mt-2">
-              <li>Processadores de pagamento (Mercado Pago) para fins de cobrança;</li>
+              <li>
+                <strong>Processadores de pagamento:</strong> para processar as assinaturas realizadas
+                através do aplicativo Android, compartilhamos as informações necessárias com o
+                <strong> Google Play</strong>, que gerencia as transações de acordo com seus próprios
+                termos de serviço e políticas de privacidade. Para pagamentos realizados através do
+                nosso site, utilizamos o processador de pagamentos <strong>Mercado Pago</strong>.
+                Não armazenamos dados do seu cartão de crédito;
+              </li>
               <li>Serviços de hospedagem e infraestrutura (Supabase);</li>
               <li>Quando exigido por lei ou ordem judicial.</li>
             </ul>
