@@ -1,0 +1,1 @@
+UPDATE public.plans SET price = 19.90, updated_at = now() WHERE id = '49a734d8-af86-4a0b-accf-755d947cc1d8';
