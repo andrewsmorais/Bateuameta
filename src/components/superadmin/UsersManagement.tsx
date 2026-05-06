@@ -127,29 +127,96 @@ export const UsersManagement = () => {
         if (error) throw error;
       }
 
-      // Update role
-      if (updates.role) {
-        await supabase
-          .from("user_roles")
-          .delete()
-          .eq("user_id", userId);
+      // Plan change: synchronize subscription + roles atomically (best-effort client-side)
+      if (updates.plan_id !== undefined) {
+        const FREE_PLAN_ID = "7ce2d64b-e97a-429e-9448-3af009895d70";
+        const MENSAL_PLAN_ID = "49a734d8-af86-4a0b-accf-755d947cc1d8";
+        const ANUAL_PLAN_ID = "08033a83-5a65-4248-ae25-89e8bc35fe04";
+        const newPlanId: string = updates.plan_id;
 
-        const { error } = await supabase
-          .from("user_roles")
-          .insert({ user_id: userId, role: updates.role });
-        if (error) throw error;
-      }
+        if (newPlanId === FREE_PLAN_ID || !newPlanId) {
+          // Cancel any existing paid subscription
+          await supabase
+            .from("subscriptions")
+            .update({ status: "cancelled" })
+            .eq("user_id", userId);
 
-      // Update subscription
-      if (updates.plan_id) {
-        const { error } = await supabase
-          .from("subscriptions")
-          .upsert({
-            user_id: userId,
-            plan_id: updates.plan_id,
-            status: "active",
-          });
-        if (error) throw error;
+          // Remove premium role, ensure free role
+          await supabase
+            .from("user_roles")
+            .delete()
+            .eq("user_id", userId)
+            .eq("role", "premium");
+
+          await supabase
+            .from("user_roles")
+            .upsert({ user_id: userId, role: "free" }, { onConflict: "user_id,role" });
+        } else if (newPlanId === MENSAL_PLAN_ID || newPlanId === ANUAL_PLAN_ID) {
+          const isAnnual = newPlanId === ANUAL_PLAN_ID;
+          const startedAt = new Date();
+          const expiresAt = new Date(startedAt);
+          if (isAnnual) {
+            expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+          } else {
+            expiresAt.setMonth(expiresAt.getMonth() + 1);
+          }
+
+          // Try to find an existing subscription for this user
+          const { data: existingSub } = await supabase
+            .from("subscriptions")
+            .select("id")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+          let subscriptionId: string | null = null;
+
+          if (existingSub?.id) {
+            const { error } = await supabase
+              .from("subscriptions")
+              .update({
+                plan_id: newPlanId,
+                status: "active",
+                started_at: startedAt.toISOString(),
+                expires_at: expiresAt.toISOString(),
+              })
+              .eq("id", existingSub.id);
+            if (error) throw error;
+            subscriptionId = existingSub.id;
+          } else {
+            const { data: newSub, error } = await supabase
+              .from("subscriptions")
+              .insert({
+                user_id: userId,
+                plan_id: newPlanId,
+                status: "active",
+                started_at: startedAt.toISOString(),
+                expires_at: expiresAt.toISOString(),
+              })
+              .select("id")
+              .single();
+            if (error) throw error;
+            subscriptionId = newSub.id;
+          }
+
+          // Link profile to subscription
+          if (subscriptionId) {
+            await supabase
+              .from("profiles")
+              .update({ subscription_id: subscriptionId })
+              .eq("id", userId);
+          }
+
+          // Ensure premium role, remove free role
+          await supabase
+            .from("user_roles")
+            .delete()
+            .eq("user_id", userId)
+            .eq("role", "free");
+
+          await supabase
+            .from("user_roles")
+            .upsert({ user_id: userId, role: "premium" }, { onConflict: "user_id,role" });
+        }
       }
     },
     onSuccess: () => {
