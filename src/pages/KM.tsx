@@ -180,8 +180,14 @@ const KM = () => {
   return (
     <div className="space-y-6">
       {/* Header com botão de adicionar */}
-      <div className="flex justify-center mb-6">
+      <div className="flex flex-wrap justify-center gap-3 mb-6">
         <AddTurnoDialog onSuccess={loadTurnos} />
+        <Link to="/veiculos">
+          <Button className="gap-2">
+            <Car className="w-4 h-4" />
+            Adicionar Veículo
+          </Button>
+        </Link>
       </div>
 
       {/* Filtro por Data */}
