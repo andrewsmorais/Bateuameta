@@ -13,7 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Pencil, Trash2, CalendarIcon } from "lucide-react";
+import { Pencil, Trash2, CalendarIcon, Car } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   AlertDialog,
@@ -180,8 +181,14 @@ const KM = () => {
   return (
     <div className="space-y-6">
       {/* Header com botão de adicionar */}
-      <div className="flex justify-center mb-6">
+      <div className="flex flex-wrap justify-center gap-3 mb-6">
         <AddTurnoDialog onSuccess={loadTurnos} />
+        <Link to="/veiculos">
+          <Button className="gap-2">
+            <Car className="w-4 h-4" />
+            Adicionar Veículo
+          </Button>
+        </Link>
       </div>
 
       {/* Filtro por Data */}
