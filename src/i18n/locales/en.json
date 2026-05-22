@@ -77,10 +77,32 @@
     "errDelete": "Failed to delete maintenance"
   },
   "metas": {
-    "title": "Goals"
+    "title": "Goals",
+    "errLoad": "Failed to load goals",
+    "errLoadDesc": "Could not load the goals",
+    "deletedTitle": "Goal deleted",
+    "deletedDesc": "Goal deleted successfully",
+    "errDelete": "Failed to delete goal",
+    "errDeleteDesc": "Could not delete the goal",
+    "allDeletedTitle": "All goals deleted",
+    "allDeletedDesc": "Screen cleared and ready to configure",
+    "errAllDelete": "Failed to delete goals",
+    "errAllDeleteDesc": "Could not delete all goals"
   },
   "relatorios": {
-    "title": "Reports"
+    "title": "Reports",
+    "errLoadVeic": "Failed to load vehicles",
+    "atencao": "Attention",
+    "errFiltros": "Please fill in all filters (Type, Vehicle and Period) to generate the report.",
+    "errDatas": "Date Error",
+    "errDatasDesc": "The start date cannot be later than the end date. Please adjust the period.",
+    "relGerado": "Report generated",
+    "registrosEncontrados": "{{count}} records found",
+    "errGerar": "Failed to generate report",
+    "semDados": "No data to export",
+    "semDadosDesc": "Apply filters first",
+    "exportado": "Report exported",
+    "exportadoDesc": "The PDF file was downloaded successfully"
   },
   "veiculos": {
     "title": "Vehicles",
