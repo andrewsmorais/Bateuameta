@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { getLocalDateString } from "@/lib/utils";
 
 interface AddTurnoDialogProps {
@@ -49,6 +50,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     veiculo_id: "",
@@ -115,7 +117,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erro ao carregar veículos",
+        title: t("turnoDialog.errLoadVeiculos"),
         description: error.message,
       });
     }
@@ -146,8 +148,8 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
         !formData.preco_combustivel || !formData.consumo_combustivel) {
       toast({
         variant: "destructive",
-        title: "Campos obrigatórios",
-        description: "Preencha todos os campos do formulário",
+        title: t("turnoDialog.errRequired"),
+        description: t("turnoDialog.errRequiredDesc"),
       });
       return;
     }
@@ -157,16 +159,16 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
       if (!fonte.fonte_ganho || !fonte.quantidade_corridas || !fonte.valor_ganho) {
         toast({
           variant: "destructive",
-          title: "Campos obrigatórios",
-          description: "Preencha todos os campos das fontes de ganho",
+          title: t("turnoDialog.errRequired"),
+          description: t("turnoDialog.errFontes"),
         });
         return;
       }
       if (fonte.fonte_ganho === "outros" && !fonte.fonte_ganho_outros) {
         toast({
           variant: "destructive",
-          title: "Campos obrigatórios",
-          description: "Informe o nome da fonte de ganho personalizada",
+          title: t("turnoDialog.errRequired"),
+          description: t("turnoDialog.errFonteCustom"),
         });
         return;
       }
@@ -227,8 +229,8 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
       if (fontesError) throw fontesError;
 
       toast({
-        title: "Turno registrado!",
-        description: "O turno foi cadastrado com sucesso",
+        title: t("turnoDialog.okTitle"),
+        description: t("turnoDialog.okDesc"),
       });
 
       setOpen(false);
@@ -249,7 +251,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erro ao registrar turno",
+        title: t("turnoDialog.errSave"),
         description: error.message,
       });
     } finally {
@@ -267,19 +269,19 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Registrar Turno</DialogTitle>
+          <DialogTitle>{t("turnoDialog.title")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="veiculo">Veículo</Label>
+              <Label htmlFor="veiculo">{t("turnoDialog.veiculo")}</Label>
               <Select
                 value={formData.veiculo_id}
                 onValueChange={(value) => setFormData({ ...formData, veiculo_id: value })}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione o veículo" />
+                  <SelectValue placeholder={t("turnoDialog.selectVeiculo")} />
                 </SelectTrigger>
                 <SelectContent>
                   {veiculos.map((veiculo) => (
@@ -292,7 +294,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="data">Data</Label>
+              <Label htmlFor="data">{t("turnoDialog.data")}</Label>
               <Input
                 id="data"
                 type="date"
@@ -303,7 +305,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="outras_despesas">Outras Despesas</Label>
+              <Label htmlFor="outras_despesas">{t("turnoDialog.outrasDespesas")}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
                 <Input
@@ -317,7 +319,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="km_inicial">KM Inicial</Label>
+              <Label htmlFor="km_inicial">{t("turnoDialog.kmInicial")}</Label>
               <Input
                 id="km_inicial"
                 type="number"
@@ -329,7 +331,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="km_final">KM Final</Label>
+              <Label htmlFor="km_final">{t("turnoDialog.kmFinal")}</Label>
               <Input
                 id="km_final"
                 type="number"
@@ -341,7 +343,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hora_inicio">Hora Início</Label>
+              <Label htmlFor="hora_inicio">{t("turnoDialog.horaInicio")}</Label>
               <Input
                 id="hora_inicio"
                 type="time"
@@ -352,7 +354,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hora_fim">Hora Fim</Label>
+              <Label htmlFor="hora_fim">{t("turnoDialog.horaFim")}</Label>
               <Input
                 id="hora_fim"
                 type="time"
@@ -363,14 +365,14 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tipo_combustivel">Tipo de Combustível</Label>
+              <Label htmlFor="tipo_combustivel">{t("turnoDialog.tipoCombustivel")}</Label>
               <Select
                 value={formData.tipo_combustivel}
                 onValueChange={(value) => setFormData({ ...formData, tipo_combustivel: value })}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder={t("turnoDialog.selecione")} />
                 </SelectTrigger>
                 <SelectContent>
                   {tiposCombustivel.map((tipo) => (
@@ -383,7 +385,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="preco_combustivel">Preço Combustível</Label>
+              <Label htmlFor="preco_combustivel">{t("turnoDialog.precoCombustivel")}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
                 <Input
@@ -398,7 +400,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="consumo_combustivel">Consumo</Label>
+              <Label htmlFor="consumo_combustivel">{t("turnoDialog.consumo")}</Label>
               <Input
                 id="consumo_combustivel"
                 type="text"
@@ -410,10 +412,10 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
 
             <div className="space-y-4 md:col-span-2">
               <div className="flex items-center justify-between">
-                <Label className="text-lg font-semibold">Fontes de Ganho</Label>
+                <Label className="text-lg font-semibold">{t("turnoDialog.fontesGanho")}</Label>
                 <Button type="button" variant="outline" size="sm" onClick={addFonteGanho}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Fonte
+                  {t("turnoDialog.addFonte")}
                 </Button>
               </div>
 
@@ -432,14 +434,14 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor={`fonte_ganho_${index}`}>Fonte de Ganho</Label>
+                    <Label htmlFor={`fonte_ganho_${index}`}>{t("turnoDialog.fonteGanho")}</Label>
                     <Select
                       value={fonte.fonte_ganho}
                       onValueChange={(value) => updateFonteGanho(index, "fonte_ganho", value)}
                       required
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue placeholder={t("turnoDialog.selecione")} />
                       </SelectTrigger>
                       <SelectContent>
                         {fontesGanho.map((f) => (
@@ -453,7 +455,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
 
                   {fonte.fonte_ganho === "outros" && (
                     <div className="space-y-2">
-                      <Label htmlFor={`fonte_ganho_outros_${index}`}>Nome da Fonte</Label>
+                      <Label htmlFor={`fonte_ganho_outros_${index}`}>{t("turnoDialog.nomeFonte")}</Label>
                       <Input
                         id={`fonte_ganho_outros_${index}`}
                         value={fonte.fonte_ganho_outros}
@@ -464,7 +466,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor={`quantidade_corridas_${index}`}>{fontesEntrega.includes(fonte.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas"}</Label>
+                    <Label htmlFor={`quantidade_corridas_${index}`}>{fontesEntrega.includes(fonte.fonte_ganho) ? t("turnoDialog.qtdEntregas") : t("turnoDialog.qtdCorridas")}</Label>
                     <Input
                       id={`quantidade_corridas_${index}`}
                       type="number"
@@ -476,7 +478,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor={`valor_ganho_${index}`}>Valor Ganho</Label>
+                    <Label htmlFor={`valor_ganho_${index}`}>{t("turnoDialog.valorGanho")}</Label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
                       <Input
@@ -502,7 +504,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
               Cancelar
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Salvando..." : "Salvar"}
+              {loading ? t("common.saving") : t("common.save")}
             </Button>
           </div>
         </form>
