@@ -264,7 +264,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="w-4 h-4" />
-          Novo Turno
+          {t("turnoDialog.novoTurno")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -501,7 +501,7 @@ export const AddTurnoDialog = ({ onSuccess }: AddTurnoDialogProps) => {
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading ? t("common.saving") : t("common.save")}
