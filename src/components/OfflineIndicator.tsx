@@ -32,7 +32,7 @@ export const OfflineIndicator: React.FC = () => {
       )}>
         {!isOnline && t('offline.offlineMode')}
         {isOnline && isSyncing && t('common.carregando')}
-        {isOnline && !isSyncing && pendingCount > 0 && t('offline.syncedFail', { count: pendingCount })}
+        {isOnline && !isSyncing && pendingCount > 0 && `${pendingCount}`}
       </span>
 
       {isOnline && pendingCount > 0 && !isSyncing && (
