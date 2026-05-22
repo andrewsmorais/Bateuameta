@@ -10,7 +10,7 @@ import { AddMetaDialog } from "@/components/dialogs/AddMetaDialog";
 import { EditMetaDialog } from "@/components/dialogs/EditMetaDialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { getDateLocale } from "@/lib/dateLocale";
 
 interface Meta {
   id: string;
@@ -145,7 +145,7 @@ const Metas = () => {
   };
 
   const getMetaLabel = (meta: Meta) => {
-    return meta.nome_personalizado || "Meta";
+    return meta.nome_personalizado || t("metas.metaLabel");
   };
 
   const formatCurrency = (value: number) => {
@@ -157,10 +157,10 @@ const Metas = () => {
 
   const getStatusConclusao = (progresso: number, valorMeta: number) => {
     if (progresso >= valorMeta) {
-      return { tipo: "batida", texto: "Meta Batida! 🎉" };
+      return { tipo: "batida", texto: t("metas.metaBatida") };
     }
     const faltante = valorMeta - progresso;
-    return { tipo: "faltante", texto: `Faltam ${formatCurrency(faltante)}` };
+    return { tipo: "faltante", texto: t("metas.faltam", { value: formatCurrency(faltante) }) };
   };
 
 
@@ -168,7 +168,7 @@ const Metas = () => {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Carregando...</div>
+          <div className="text-lg">{t("common.carregando")}</div>
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ const Metas = () => {
       <div className="space-y-6">
         <h1 className="text-3xl font-bold text-center">{t("metas.title")}</h1>
         <p className="text-sm text-muted-foreground text-center">
-          Exibindo os 4 Relatórios de Metas mais recentes. Acesse o Menu Relatórios para ver o histórico completo.
+          {t("metas.exibindoTop")}
         </p>
         
         <div className="flex flex-col items-center gap-4">
@@ -189,7 +189,7 @@ const Metas = () => {
             className="text-lg px-8 py-6"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Criar Meta
+            {t("metas.criarMeta")}
           </Button>
           
           {metas.length > 0 && (
@@ -199,7 +199,7 @@ const Metas = () => {
               size="sm"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Limpar Todas
+              {t("metas.limparTodas")}
             </Button>
           )}
         </div>
@@ -215,13 +215,13 @@ const Metas = () => {
                   <div className="space-y-2">
                     <h3 className="font-semibold text-lg">{getMetaLabel(meta)}</h3>
                     <p className="text-base font-medium text-foreground">
-                      {format(new Date(meta.data_inicio), "dd/MM/yyyy", { locale: ptBR })} -{" "}
-                      {format(new Date(meta.data_fim), "dd/MM/yyyy", { locale: ptBR })}
+                      {format(new Date(meta.data_inicio), "dd/MM/yyyy", { locale: getDateLocale() })} -{" "}
+                      {format(new Date(meta.data_fim), "dd/MM/yyyy", { locale: getDateLocale() })}
                     </p>
                     <p className="text-sm">
-                      <span className="font-semibold text-muted-foreground">Métrica de Rastreamento:</span>{" "}
+                      <span className="font-semibold text-muted-foreground">{t("metas.metricaRastreamento")}</span>{" "}
                       <span className="font-medium text-foreground">
-                        {meta.metrica_rastreamento === "lucro_liquido" ? "Lucro Líquido" : "Ganhos Brutos"}
+                        {meta.metrica_rastreamento === "lucro_liquido" ? t("metas.lucroLiquido") : t("metas.ganhosBrutos")}
                       </span>
                     </p>
                   </div>
@@ -244,7 +244,7 @@ const Metas = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Progresso</span>
+                    <span>{t("metas.progresso")}</span>
                     <span className="font-semibold">
                       {formatCurrency(meta.progresso)} / {formatCurrency(meta.valor_meta)}
                     </span>
@@ -270,7 +270,7 @@ const Metas = () => {
       {metas.length === 0 && (
         <Card className="p-12 text-center">
           <p className="text-muted-foreground">
-            Nenhuma meta cadastrada. Clique em "Criar Meta" para começar.
+            {t("metas.nenhumaMeta")}
           </p>
         </Card>
       )}
@@ -293,14 +293,14 @@ const Metas = () => {
       <AlertDialog open={!!deletingMetaId} onOpenChange={() => setDeletingMetaId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogTitle>{t("metas.confirmExclusao")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta meta? Esta ação não pode ser desfeita.
+              {t("metas.confirmExclusaoDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Excluir</AlertDialogAction>
+            <AlertDialogCancel>{t("common.cancelar")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>{t("common.excluir")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
