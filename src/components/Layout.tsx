@@ -128,7 +128,7 @@ export const Layout = ({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sair
+                  {t("common.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -243,7 +243,7 @@ export const Layout = ({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sair
+                  {t("common.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
