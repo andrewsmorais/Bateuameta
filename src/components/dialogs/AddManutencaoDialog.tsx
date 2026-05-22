@@ -23,17 +23,6 @@ interface Veiculo {
   placa: string;
 }
 
-const tiposManutencao = [
-  { value: "troca_oleo", label: t("manutencaoDialog.trocaOleo") },
-  { value: "balanceamento_alinhamento", label: t("manutencaoDialog.balanceamento") },
-  { value: "revisao", label: t("manutencaoDialog.revisao") },
-  { value: "pneus", label: "Pneus" },
-  { value: "freios", label: "Freios" },
-  { value: "suspensao", label: "Suspensão" },
-  { value: "bateria", label: "Bateria" },
-  { value: "outros", label: "Outros" },
-];
-
 export const AddManutencaoDialog = ({ onSuccess, preSelectedType, triggerButton }: AddManutencaoDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
