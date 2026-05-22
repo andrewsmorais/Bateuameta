@@ -27,6 +27,7 @@ interface Meta {
 }
 
 const Metas = () => {
+  const { t } = useTranslation();
   const [metas, setMetas] = useState<Meta[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);

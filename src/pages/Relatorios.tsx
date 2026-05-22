@@ -76,6 +76,7 @@ const formatDateSafe = (dateValue: string | null | undefined, formatStr: string 
 };
 
 const Relatorios = () => {
+  const { t } = useTranslation();
   const [filtros, setFiltros] = useState<Filtros>({
     dataInicio: "",
     dataFim: "",

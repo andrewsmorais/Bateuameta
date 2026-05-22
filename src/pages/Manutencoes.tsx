@@ -44,6 +44,7 @@ interface EstadoManutencoes {
 }
 
 const Manutencoes = () => {
+  const { t } = useTranslation();
   const [estadoManutencoes, setEstadoManutencoes] = useState<EstadoManutencoes>({
     trocaOleo: null,
     balanceamento: null,

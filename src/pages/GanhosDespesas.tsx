@@ -40,6 +40,7 @@ interface Transacao {
 }
 
 const GanhosDespesas = () => {
+  const { t } = useTranslation();
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtroData, setFiltroData] = useState<Date | undefined>(new Date());
