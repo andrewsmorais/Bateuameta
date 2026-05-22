@@ -6,7 +6,7 @@ import { EditGanhoDespesaDialog } from "@/components/dialogs/EditGanhoDespesaDia
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { getDateLocale } from "@/lib/dateLocale";
 import { TrendingUp, TrendingDown, Trash2, Repeat, Calendar as CalendarLucide, LayoutDashboard, CalendarIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,22 +98,13 @@ const GanhosDespesas = () => {
   }, []);
 
   const getCategoriaLabel = (categoria: string) => {
-    const labels: Record<string, string> = {
-      uber: "Uber",
-      "99": "99",
-      cabify: "Cabify",
-      ganhos_extras: "Ganhos Extras",
-      combustivel: "Combustível",
-      manutencao: "Manutenção",
-      pedagio: "Pedágio",
-      estacionamento: "Estacionamento",
-      despesas_extras: "Despesas Extras",
-    };
-    return labels[categoria] || categoria;
+    const key = `ganhosDespesas.cat.${categoria}`;
+    const translated = t(key);
+    return translated === key ? categoria : translated;
   };
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return <div className="text-center py-8">{t("common.carregando")}</div>;
   }
 
   // Aplica filtro por data selecionada
@@ -149,7 +140,7 @@ const GanhosDespesas = () => {
       {/* Filtro por Data */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filtrar por Data</CardTitle>
+          <CardTitle className="text-lg">{t("ganhosDespesas.filtrarPorData")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-4">
@@ -163,7 +154,7 @@ const GanhosDespesas = () => {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filtroData ? format(filtroData, "PPP", { locale: ptBR }) : "Selecione uma data"}
+                  {filtroData ? format(filtroData, "PPP", { locale: getDateLocale() }) : t("ganhosDespesas.selecioneData")}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -172,7 +163,7 @@ const GanhosDespesas = () => {
                   selected={filtroData}
                   onSelect={setFiltroData}
                   initialFocus
-                  locale={ptBR}
+                  locale={getDateLocale()}
                   className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
@@ -180,7 +171,7 @@ const GanhosDespesas = () => {
           </div>
           {filtroData && (
             <p className="text-sm text-muted-foreground mt-2">
-              Exibindo transações de {format(filtroData, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              {t("ganhosDespesas.exibindoTransacoes", { date: format(filtroData, "PPP", { locale: getDateLocale() }) })}
             </p>
           )}
         </CardContent>
@@ -189,13 +180,13 @@ const GanhosDespesas = () => {
       {transacoesFiltradas.length === 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>Histórico de Ganhos e Despesas</CardTitle>
+            <CardTitle>{t("ganhosDespesas.historicoTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
               {filtroData
-                ? `Nenhuma transação encontrada para ${format(filtroData, "dd/MM/yyyy", { locale: ptBR })}.`
-                : 'Nenhuma transação registrada ainda. Clique em "Nova Transação" para começar.'}
+                ? t("ganhosDespesas.nenhumaTransacaoData", { date: format(filtroData, "dd/MM/yyyy", { locale: getDateLocale() }) })
+                : t("ganhosDespesas.nenhumaTransacaoNova")}
             </p>
           </CardContent>
         </Card>
@@ -203,7 +194,7 @@ const GanhosDespesas = () => {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <h2 className="text-xl font-bold text-foreground">
-              Histórico de Ganhos e Despesas {filtroData ? `(${format(filtroData, "dd/MM/yyyy", { locale: ptBR })})` : ""}
+              {t("ganhosDespesas.historicoTitle")} {filtroData ? `(${format(filtroData, "dd/MM/yyyy", { locale: getDateLocale() })})` : ""}
             </h2>
           </div>
           <div className="grid gap-4">
@@ -225,19 +216,19 @@ const GanhosDespesas = () => {
                       {transacao.recorrente && (
                         <Badge variant="secondary" className="gap-1">
                           <Repeat className="w-3 h-3" />
-                          Recorrente
+                          {t("ganhosDespesas.recorrente")}
                         </Badge>
                       )}
                       {transacao.data_fim && !transacao.recorrente && (
                         <Badge variant="outline" className="gap-1">
                           <CalendarLucide className="w-3 h-3" />
-                          Até {format(parseISO(transacao.data_fim), "dd/MM/yyyy")}
+                          {t("ganhosDespesas.ate")} {format(parseISO(transacao.data_fim), "dd/MM/yyyy")}
                         </Badge>
                       )}
                       {transacao.incluir_dashboard && (
                         <Badge variant="default" className="gap-1 bg-[#15a249]">
                           <LayoutDashboard className="w-3 h-3" />
-                          Dashboard
+                          {t("ganhosDespesas.dashboard")}
                         </Badge>
                       )}
                     </div>
@@ -246,22 +237,22 @@ const GanhosDespesas = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-4">
                       {transacao.nome && (
                         <div>
-                          <p className="text-sm font-bold text-foreground mb-1">Nome</p>
+                          <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.nome")}</p>
                           <p className="text-xl font-bold text-[#15a249]">{transacao.nome}</p>
                         </div>
                       )}
                       <div>
-                        <p className="text-sm font-bold text-foreground mb-1">Categoria</p>
+                        <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.categoria")}</p>
                         <p className="text-xl font-bold text-[#15a249]">{getCategoriaLabel(transacao.categoria)}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground mb-1">Data</p>
+                        <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.data")}</p>
                         <p className="text-xl font-bold text-[#15a249]">
                           {format(parseISO(transacao.data), "dd/MM/yyyy")}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground mb-1">Valor</p>
+                        <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.valor")}</p>
                         <p className={`text-xl font-bold ${
                           transacao.tipo === "ganho" ? "text-[#15a249]" : "text-destructive"
                         }`}>
@@ -270,7 +261,7 @@ const GanhosDespesas = () => {
                       </div>
                       {transacao.data_inicio && !transacao.recorrente && (
                         <div>
-                          <p className="text-sm font-bold text-foreground mb-1">Data Início</p>
+                          <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.dataInicio")}</p>
                           <p className="text-xl font-bold text-[#15a249]">
                             {format(parseISO(transacao.data_inicio), "dd/MM/yyyy")}
                           </p>
@@ -278,7 +269,7 @@ const GanhosDespesas = () => {
                       )}
                       {transacao.data_fim && !transacao.recorrente && (
                         <div>
-                          <p className="text-sm font-bold text-foreground mb-1">Data Final</p>
+                          <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.dataFinal")}</p>
                           <p className="text-xl font-bold text-[#15a249]">
                             {format(parseISO(transacao.data_fim), "dd/MM/yyyy")}
                           </p>
@@ -288,7 +279,7 @@ const GanhosDespesas = () => {
 
                     {transacao.observacoes && (
                       <div className="mt-4 p-3 bg-muted rounded-lg">
-                        <p className="text-sm font-bold text-foreground mb-1">Observações</p>
+                        <p className="text-sm font-bold text-foreground mb-1">{t("ganhosDespesas.observacoes")}</p>
                         <p className="text-muted-foreground">{transacao.observacoes}</p>
                       </div>
                     )}
@@ -305,18 +296,18 @@ const GanhosDespesas = () => {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Excluir transação?</AlertDialogTitle>
+                          <AlertDialogTitle>{t("ganhosDespesas.excluirTitle")}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Esta ação não pode ser desfeita. A transação será removida permanentemente.
+                            {t("ganhosDespesas.excluirDesc")}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogCancel>{t("common.cancelar")}</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleDelete(transacao.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Excluir
+                            {t("common.excluir")}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -333,7 +324,7 @@ const GanhosDespesas = () => {
             <Card className="bg-blue-500/10 border-blue-500/30">
               <CardContent className="py-4">
                 <div className="text-center">
-                  <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">Ganhos</p>
+                  <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">{t("ganhosDespesas.ganhos")}</p>
                   <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     R$ {totalGanhos.toFixed(2)}
                   </p>
@@ -343,7 +334,7 @@ const GanhosDespesas = () => {
             <Card className="bg-red-500/10 border-red-500/30">
               <CardContent className="py-4">
                 <div className="text-center">
-                  <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">Despesas</p>
+                  <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">{t("ganhosDespesas.despesas")}</p>
                   <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                     R$ {totalDespesas.toFixed(2)}
                   </p>
@@ -353,7 +344,7 @@ const GanhosDespesas = () => {
             <Card className="bg-green-500/10 border-green-500/30">
               <CardContent className="py-4">
                 <div className="text-center">
-                  <p className="text-xs font-bold text-green-600 dark:text-green-400 mb-1">Saldo</p>
+                  <p className="text-xs font-bold text-green-600 dark:text-green-400 mb-1">{t("ganhosDespesas.saldo")}</p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                     R$ {saldo.toFixed(2)}
                   </p>
