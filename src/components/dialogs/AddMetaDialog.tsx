@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface AddMetaDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface AddMetaDialogProps {
 }
 
 export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [nome, setNome] = useState("");
   const [valor, setValor] = useState("");
@@ -45,8 +47,8 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
 
         if (metasDashboard && metasDashboard.length >= 3) {
           toast({
-            title: "Limite atingido",
-            description: "Você só pode exibir no máximo 3 metas no Dashboard. Desmarque uma meta existente antes de adicionar outra.",
+            title: t("metaDialog.limiteTitle"),
+            description: t("metaDialog.limiteDesc"),
             variant: "destructive",
           });
           setLoading(false);
@@ -70,8 +72,8 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
       if (error) throw error;
 
       toast({
-        title: "Meta criada",
-        description: "Meta personalizada criada com sucesso",
+        title: t("metaDialog.okTitle"),
+        description: t("metaDialog.okDesc"),
       });
 
       setNome("");
@@ -85,8 +87,8 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
     } catch (error) {
       console.error("Erro ao criar meta:", error);
       toast({
-        title: "Erro ao criar meta",
-        description: "Não foi possível criar a meta",
+        title: t("metaDialog.errSave"),
+        description: t("metaDialog.errSaveDesc"),
         variant: "destructive",
       });
     } finally {
@@ -98,11 +100,11 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Criar Meta</DialogTitle>
+          <DialogTitle>{t("metaDialog.title")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="nome">Nome da Meta</Label>
+            <Label htmlFor="nome">{t("metaDialog.nome")}</Label>
             <Input
               id="nome"
               value={nome}
@@ -112,7 +114,7 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="valor">Valor da Meta</Label>
+            <Label htmlFor="valor">{t("metaDialog.valor")}</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
               <Input
@@ -129,7 +131,7 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="dataInicio">Data Início</Label>
+              <Label htmlFor="dataInicio">{t("metaDialog.dataInicio")}</Label>
               <Input
                 id="dataInicio"
                 type="date"
@@ -141,7 +143,7 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dataFim">Data Fim</Label>
+              <Label htmlFor="dataFim">{t("metaDialog.dataFim")}</Label>
               <Input
                 id="dataFim"
                 type="date"
@@ -154,14 +156,14 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="metrica">Métrica de Rastreamento</Label>
+            <Label htmlFor="metrica">{t("metaDialog.metrica")}</Label>
             <Select value={metricaRastreamento} onValueChange={setMetricaRastreamento}>
               <SelectTrigger id="metrica">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="lucro_liquido">Lucro Líquido</SelectItem>
-                <SelectItem value="ganhos_brutos">Ganhos Brutos</SelectItem>
+                <SelectItem value="lucro_liquido">{t("metaDialog.lucroLiquido")}</SelectItem>
+                <SelectItem value="ganhos_brutos">{t("metaDialog.ganhosBrutos")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -175,16 +177,16 @@ export function AddMetaDialog({ open, onOpenChange, onSuccess }: AddMetaDialogPr
               className="w-4 h-4 rounded"
             />
             <Label htmlFor="dashboard" className="cursor-pointer">
-              Mostrar no Dashboard
+              {t("metaDialog.mostrarDashboard")}
             </Label>
           </div>
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Criando..." : "Criar Meta"}
+              {loading ? t("metaDialog.criando") : t("metaDialog.criar")}
             </Button>
           </div>
         </form>
