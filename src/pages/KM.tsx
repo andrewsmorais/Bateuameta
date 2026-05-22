@@ -12,7 +12,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { getDateLocale } from "@/lib/dateLocale";
 import { Pencil, Trash2, CalendarIcon, Car } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -177,7 +177,7 @@ const KM = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return <div className="text-center py-8">{t("common.carregando")}</div>;
   }
 
   return (
@@ -196,7 +196,7 @@ const KM = () => {
       {/* Filtro por Data */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filtrar por Data</CardTitle>
+          <CardTitle className="text-lg">{t("km.filtrarPorData")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-4">
@@ -210,7 +210,7 @@ const KM = () => {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filtroData ? format(filtroData, "PPP", { locale: ptBR }) : "Selecione uma data"}
+                  {filtroData ? format(filtroData, "PPP", { locale: getDateLocale() }) : t("km.selecioneData")}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -219,7 +219,7 @@ const KM = () => {
                   selected={filtroData}
                   onSelect={setFiltroData}
                   initialFocus
-                  locale={ptBR}
+                  locale={getDateLocale()}
                   className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
@@ -227,7 +227,7 @@ const KM = () => {
           </div>
           {filtroData && (
             <p className="text-sm text-muted-foreground mt-2">
-              Exibindo turnos de {format(filtroData, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              {t("km.exibindoTurnos", { date: format(filtroData, "PPP", { locale: getDateLocale() }) })}
             </p>
           )}
         </CardContent>
@@ -237,13 +237,13 @@ const KM = () => {
       {turnos.length === 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>Histórico de Turnos</CardTitle>
+            <CardTitle>{t("km.historicoTurnos")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
               {filtroData 
-                ? `Nenhum turno encontrado para ${format(filtroData, "dd/MM/yyyy", { locale: ptBR })}.`
-                : "Nenhum turno registrado ainda. Clique em \"Novo Turno\" para começar."
+                ? t("km.nenhumTurnoData", { date: format(filtroData, "dd/MM/yyyy", { locale: getDateLocale() }) })
+                : t("km.nenhumTurnoNovo")
               }
             </p>
           </CardContent>
@@ -252,10 +252,10 @@ const KM = () => {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <h2 className="text-xl font-bold text-foreground">
-              Histórico de Turnos {filtroData ? `(${format(filtroData, "dd/MM/yyyy", { locale: ptBR })})` : ""}
+              {t("km.historicoTurnos")} {filtroData ? `(${format(filtroData, "dd/MM/yyyy", { locale: getDateLocale() })})` : ""}
             </h2>
             {turnos.length === 1 && (
-              <span className="text-xl font-bold text-[#15a249]">Horário: {turnos[0].hora_inicio} - {turnos[0].hora_fim}</span>
+              <span className="text-xl font-bold text-[#15a249]">{t("km.horario")}: {turnos[0].hora_inicio} - {turnos[0].hora_fim}</span>
             )}
           </div>
           
@@ -267,7 +267,7 @@ const KM = () => {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="flex flex-wrap items-center gap-3">
-                      <CardTitle className="text-lg">Métricas do Turno</CardTitle>
+                      <CardTitle className="text-lg">{t("km.metricasTurno")}</CardTitle>
                     </div>
                     <div className="flex gap-2">
                       <Button 
@@ -286,18 +286,18 @@ const KM = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Tem certeza que deseja excluir este turno?</AlertDialogTitle>
+                            <AlertDialogTitle>{t("km.confirmDeleteTitle")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Esta ação não pode ser desfeita. O turno de {format(parseISO(turno.data), "dd/MM/yyyy", { locale: ptBR })} será permanentemente excluído.
+                              {t("km.confirmDeleteDesc", { date: format(parseISO(turno.data), "dd/MM/yyyy", { locale: getDateLocale() }) })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel>{t("common.cancelar")}</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => handleDelete(turno.id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Excluir
+                              {t("common.excluir")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -313,19 +313,19 @@ const KM = () => {
                       {turno.turno_fontes_ganho && turno.turno_fontes_ganho.length > 0 ? (
                         turno.turno_fontes_ganho.map((fonte) => {
                           const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
-                          const labelQtd = fontesEntrega.includes(fonte.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas";
+                          const labelQtd = fontesEntrega.includes(fonte.fonte_ganho) ? t("km.qtdEntregas") : t("km.qtdCorridas");
                           return (
                             <React.Fragment key={fonte.id}>
                               <div>
-                                <p className="text-xs font-medium text-muted-foreground">Fonte</p>
+                                <p className="text-xs font-medium text-muted-foreground">{t("km.fonte")}</p>
                                 <p className="text-lg font-bold text-[#15a249] capitalize">{fonte.fonte_ganho}</p>
                               </div>
                               <div>
                                 <p className="text-xs font-medium text-muted-foreground">{labelQtd}</p>
-                                <p className="text-lg font-bold text-[#15a249]">{fonte.quantidade_corridas} {fontesEntrega.includes(fonte.fonte_ganho) ? "entregas" : "corridas"}</p>
+                                <p className="text-lg font-bold text-[#15a249]">{fonte.quantidade_corridas} {fontesEntrega.includes(fonte.fonte_ganho) ? t("km.entregas") : t("km.corridas")}</p>
                               </div>
                               <div>
-                                <p className="text-xs font-medium text-muted-foreground">Veículo</p>
+                                <p className="text-xs font-medium text-muted-foreground">{t("km.veiculo")}</p>
                                 <p className="text-lg font-bold text-[#15a249]">{turno.veiculos.modelo} ({turno.veiculos.placa})</p>
                               </div>
                             </React.Fragment>
@@ -334,19 +334,19 @@ const KM = () => {
                       ) : (
                         (() => {
                           const fontesEntrega = ["ifood", "keeta", "shopee", "mercado_livre"];
-                          const labelQtd = fontesEntrega.includes(turno.fonte_ganho) ? "Quantidade de Entregas" : "Quantidade de Corridas";
+                          const labelQtd = fontesEntrega.includes(turno.fonte_ganho) ? t("km.qtdEntregas") : t("km.qtdCorridas");
                           return (
                             <>
                               <div>
-                                <p className="text-xs font-medium text-muted-foreground">Fonte</p>
+                                <p className="text-xs font-medium text-muted-foreground">{t("km.fonte")}</p>
                                 <p className="text-lg font-bold text-[#15a249] capitalize">{turno.fonte_ganho}</p>
                               </div>
                               <div>
                                 <p className="text-xs font-medium text-muted-foreground">{labelQtd}</p>
-                                <p className="text-lg font-bold text-[#15a249]">{turno.quantidade_corridas} {fontesEntrega.includes(turno.fonte_ganho) ? "entregas" : "corridas"}</p>
+                                <p className="text-lg font-bold text-[#15a249]">{turno.quantidade_corridas} {fontesEntrega.includes(turno.fonte_ganho) ? t("km.entregas") : t("km.corridas")}</p>
                               </div>
                               <div>
-                                <p className="text-xs font-medium text-muted-foreground">Veículo</p>
+                                <p className="text-xs font-medium text-muted-foreground">{t("km.veiculo")}</p>
                                 <p className="text-lg font-bold text-[#15a249]">{turno.veiculos.modelo} ({turno.veiculos.placa})</p>
                               </div>
                             </>
@@ -356,39 +356,39 @@ const KM = () => {
 
                       {/* Métricas restantes */}
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">KM Rodados</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.kmRodados")}</p>
                         <p className="text-lg font-bold text-[#15a249]">{metricas.kmRodados.toFixed(2)} km</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Horas Trabalhadas</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.horasTrabalhadas")}</p>
                         <p className="text-lg font-bold text-[#15a249]">{metricas.totalHoras.toFixed(1)} h</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Consumo</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.consumo")}</p>
                         <p className="text-lg font-bold text-[#15a249]">{turno.consumo_combustivel.toFixed(2)} km/L</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Total de Litros Gasto</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.totalLitros")}</p>
                         <p className="text-lg font-bold text-[#15a249]">{metricas.totalLitros.toFixed(1)} L</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Preço Combustível/Litro</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.precoCombLitro")}</p>
                         <p className="text-lg font-bold text-[#15a249]">R$ {turno.preco_combustivel.toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Ganho Bruto/KM</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.ganhoBrutoKm")}</p>
                         <p className="text-lg font-bold text-[#15a249]">R$ {metricas.ganhoBrutoPorKm.toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Custo Combustível/KM</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.custoCombustivelKm")}</p>
                         <p className="text-lg font-bold text-red-500">R$ {metricas.custoCombustivelPorKm.toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Lucro Líquido/KM</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.lucroLiquidoKm")}</p>
                         <p className="text-lg font-bold text-[#15a249]">R$ {metricas.lucroPorKm.toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Ganhos/Hora</p>
+                        <p className="text-xs font-medium text-muted-foreground">{t("km.ganhosHora")}</p>
                         <p className="text-lg font-bold text-[#15a249]">R$ {metricas.ganhosPorHora.toFixed(2)}</p>
                       </div>
                     </div>
@@ -399,7 +399,7 @@ const KM = () => {
                     <Card className="bg-blue-500/10 border-blue-500/30">
                       <CardContent className="py-4">
                         <div className="text-center">
-                          <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">Ganhos Brutos</p>
+                          <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">{t("km.ganhosBrutos")}</p>
                           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                             R$ {metricas.ganhoBruto.toFixed(2)}
                           </p>
@@ -409,12 +409,12 @@ const KM = () => {
                     <Card className="bg-red-500/10 border-red-500/30">
                       <CardContent className="py-4">
                         <div className="text-center">
-                          <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">Despesas</p>
+                          <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">{t("km.despesas")}</p>
                           <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                             R$ {metricas.despesaTotal.toFixed(2)}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Comb: R$ {metricas.despesaCombustivel.toFixed(2)} | Outras: R$ {metricas.outrasDespesas.toFixed(2)}
+                            {t("km.combLabel")}: R$ {metricas.despesaCombustivel.toFixed(2)} | {t("km.outrasLabel")}: R$ {metricas.outrasDespesas.toFixed(2)}
                           </p>
                         </div>
                       </CardContent>
@@ -422,7 +422,7 @@ const KM = () => {
                     <Card className="bg-green-500/10 border-green-500/30">
                       <CardContent className="py-4">
                         <div className="text-center">
-                          <p className="text-xs font-bold text-green-600 dark:text-green-400 mb-1">Lucro Líquido</p>
+                          <p className="text-xs font-bold text-green-600 dark:text-green-400 mb-1">{t("km.lucroLiquido")}</p>
                           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                             R$ {metricas.lucroLiquido.toFixed(2)}
                           </p>
